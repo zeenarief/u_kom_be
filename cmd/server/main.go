@@ -8,6 +8,7 @@ import (
 	"belajar-golang/internal/repository"
 	"belajar-golang/internal/service"
 	"log"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -68,11 +69,15 @@ func main() {
 	// Public routes
 	public := router.Group("/api/v1")
 	{
-		public.POST("/register", userHandler.CreateUser)
-		public.POST("/login", authHandler.Login)
-		public.POST("/refresh", authHandler.RefreshToken)
+		public.POST("/auth/register", userHandler.CreateUser)
+		public.POST("/auth/login", authHandler.Login)
+		public.POST("/auth/refresh", authHandler.RefreshToken)
 		public.GET("/health", func(c *gin.Context) {
-			c.JSON(200, gin.H{"status": "OK", "message": "Server is running"})
+			handler.SuccessResponse(c, "Server is healthy and running", gin.H{
+				"status":    "healthy",
+				"timestamp": time.Now(),
+				"version":   "1.0.0",
+			})
 		})
 	}
 
@@ -82,14 +87,15 @@ func main() {
 	{
 		// User routes
 		protected.GET("/users", userHandler.GetAllUsers)
+		protected.POST("/users", userHandler.CreateUser)
 		protected.GET("/users/:id", userHandler.GetUserByID)
 		protected.PUT("/users/:id", userHandler.UpdateUser)
 		protected.DELETE("/users/:id", userHandler.DeleteUser)
 		protected.POST("/users/:id/change-password", userHandler.ChangePassword)
 
 		// Auth routes
-		protected.POST("/logout", authHandler.Logout)
-		protected.GET("/profile", userHandler.GetProfile) // Error sudah teratasi
+		protected.POST("/auth/logout", authHandler.Logout)
+		protected.GET("/profile", userHandler.GetProfile)
 	}
 
 	// Start server

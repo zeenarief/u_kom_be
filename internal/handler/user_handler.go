@@ -3,7 +3,6 @@ package handler
 import (
 	"belajar-golang/internal/model/request"
 	"belajar-golang/internal/service"
-	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -20,22 +19,21 @@ func NewUserHandler(userService service.UserService) *UserHandler {
 func (h *UserHandler) CreateUser(c *gin.Context) {
 	var req request.UserCreateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		BadRequestError(c, "Invalid request payload", err.Error())
 		return
 	}
 
 	user, err := h.userService.CreateUser(req)
 	if err != nil {
-		// Return 400 untuk duplicate, 500 untuk error lainnya
 		if strings.Contains(err.Error(), "already exists") {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			BadRequestError(c, "Registration failed", err.Error())
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			InternalServerError(c, err.Error())
 		}
 		return
 	}
 
-	c.JSON(http.StatusCreated, user)
+	CreatedResponse(c, "User created successfully", user)
 }
 
 func (h *UserHandler) GetUserByID(c *gin.Context) {
@@ -43,21 +41,21 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 
 	user, err := h.userService.GetUserByID(id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		NotFoundError(c, "User not found")
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	SuccessResponse(c, "User retrieved successfully", user)
 }
 
 func (h *UserHandler) GetAllUsers(c *gin.Context) {
 	users, err := h.userService.GetAllUsers()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		InternalServerError(c, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, users)
+	SuccessResponse(c, "Users retrieved successfully", users)
 }
 
 func (h *UserHandler) UpdateUser(c *gin.Context) {
@@ -65,17 +63,20 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 
 	var req request.UserUpdateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		//c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		BadRequestError(c, "Invalid request payload", err.Error())
 		return
 	}
 
 	user, err := h.userService.UpdateUser(id, req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		//c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		InternalServerError(c, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	//c.JSON(http.StatusOK, user)
+	SuccessResponse(c, "User updated successfully", user)
 }
 
 func (h *UserHandler) DeleteUser(c *gin.Context) {
@@ -83,11 +84,13 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 
 	err := h.userService.DeleteUser(id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		//c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		InternalServerError(c, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
+	//c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
+	SuccessResponse(c, "User deleted successfully", nil)
 }
 
 func (h *UserHandler) ChangePassword(c *gin.Context) {
@@ -99,39 +102,40 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		//c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		BadRequestError(c, "Invalid request payload", err.Error())
 		return
 	}
 
 	err := h.userService.ChangePassword(id, req.CurrentPassword, req.NewPassword)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		//c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		InternalServerError(c, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Password changed successfully"})
+	//c.JSON(http.StatusOK, gin.H{"message": "Password changed successfully"})
+	SuccessResponse(c, "Password changed successfully", nil)
 }
 
 func (h *UserHandler) GetProfile(c *gin.Context) {
-	// Ambil userID dari context
 	userID, exists := c.Get("userID")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})
+		UnauthorizedError(c, "User ID not found in context")
 		return
 	}
 
 	userIDStr, ok := userID.(string)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID format"})
+		InternalServerError(c, "Invalid user ID format")
 		return
 	}
 
-	// Gunakan service method khusus profile
-	profile, err := h.userService.GetProfile(userIDStr)
+	user, err := h.userService.GetUserByID(userIDStr)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		NotFoundError(c, "User not found")
 		return
 	}
 
-	c.JSON(http.StatusOK, profile)
+	SuccessResponse(c, "Profile retrieved successfully", user)
 }
