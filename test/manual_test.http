@@ -1,0 +1,47 @@
+### Base URL
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### STEP 1: Health Check
+GET {{baseUrl}}/api/v1/health
+
+### STEP 2: Register User
+POST {{baseUrl}}/api/v1/register
+Content-Type: {{contentType}}
+
+{
+  "username": "testuser",
+  "name": "Test User",
+  "email": "testuser@example.com",
+  "password": "password123"
+}
+
+### STEP 3: Login dan copy token secara manual
+POST {{baseUrl}}/api/v1/login
+Content-Type: {{contentType}}
+
+{
+  "email": "testuser@example.com",
+  "password": "password123"
+}
+
+### STEP 4: Set token manually (copy dari response login di atas)
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTcxNDM4MzEsInR5cGUiOiJhY2Nlc3MiLCJ1c2VyX2lkIjoiMTI3NTdkMTEtMzg1ZC00OTY3LTkzY2MtYTgzOWRhZGU0YmQ1In0.pMQtq8m8Xe9Wt1IQHYHsB31yxYYwhDQIYLOAfyDvN-g
+
+### STEP 5: Get Profile dengan token
+GET {{baseUrl}}/api/v1/profile
+Authorization: Bearer {{authToken}}
+
+### STEP 6: Get All Users
+GET {{baseUrl}}/api/v1/users
+Authorization: Bearer {{authToken}}
+
+### STEP 7: Get Health (public)
+GET {{baseUrl}}/api/v1/health
+
+### STEP 8: Test invalid token
+GET {{baseUrl}}/api/v1/users
+Authorization: Bearer invalid_token_here
+
+### STEP 9: Test without token
+GET {{baseUrl}}/api/v1/users

@@ -1,0 +1,135 @@
+### Base URL
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### Variables untuk auth token - akan di-set manual setelah login
+@accessToken = <paste_token_here_after_login>
+
+### 1. GET request to get status of server
+GET {{baseUrl}}/api/v1/health
+
+### 2. POST Register - User pertama
+# @name register1
+POST {{baseUrl}}/api/v1/register
+Content-Type: {{contentType}}
+
+{
+  "username": "admin",
+  "name": "Admin",
+  "email": "admin@example.com",
+  "password": "secret"
+}
+
+### 3. POST Login - User pertama
+# @name login1
+POST {{baseUrl}}/api/v1/login
+Content-Type: {{contentType}}
+
+{
+  "email": "admin@example.com",
+  "password": "secret"
+}
+
+> {%
+    // Script untuk menyimpan token dari response login
+    client.global.set("accessToken", response.body.access_token);
+    client.global.set("userId", response.body.user.id);
+    client.log("Token saved: " + client.global.get("accessToken"));
+%}
+
+### 4. GET All Users (Protected - butuh token)
+GET {{baseUrl}}/api/v1/users
+Authorization: Bearer {{accessToken}}
+
+### 5. GET User Profile (Protected - butuh token)
+GET {{baseUrl}}/api/v1/profile
+Authorization: Bearer {{accessToken}}
+
+### 6. GET User by ID (Protected - butuh token)
+GET {{baseUrl}}/api/v1/users/{{userId}}
+Authorization: Bearer {{accessToken}}
+
+### 7. UPDATE User (Protected - butuh token)
+PUT {{baseUrl}}/api/v1/users/{{userId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Administrator Updated",
+  "email": "admin.updated@example.com"
+}
+
+### 8. CHANGE Password (Protected - butuh token)
+POST {{baseUrl}}/api/v1/users/{{userId}}/change-password
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "current_password": "secret",
+  "new_password": "newsecret123"
+}
+
+### 9. LOGOUT (Protected - butuh token)
+POST {{baseUrl}}/api/v1/logout
+Authorization: Bearer {{accessToken}}
+
+### 10. POST Refresh Token
+POST {{baseUrl}}/api/v1/refresh
+Content-Type: {{contentType}}
+
+{
+  "refresh_token": "{{login1.response.body.refresh_token}}"
+}
+
+### 11. Test dengan token yang invalid (Error case)
+GET {{baseUrl}}/api/v1/users
+Authorization: Bearer invalid_token_here
+
+### 12. Test tanpa token (Error case)
+GET {{baseUrl}}/api/v1/users
+
+### 13. Test validation error pada register
+POST {{baseUrl}}/api/v1/register
+Content-Type: {{contentType}}
+
+{
+  "username": "a",
+  "name": "Test",
+  "email": "invalid-email",
+  "password": "short"
+}
+
+### 14. Test login dengan credential salah
+POST {{baseUrl}}/api/v1/login
+Content-Type: {{contentType}}
+
+{
+  "email": "wrong@example.com",
+  "password": "wrongpassword"
+}
+
+### 15. Register User kedua
+POST {{baseUrl}}/api/v1/register
+Content-Type: {{contentType}}
+
+{
+  "username": "user2",
+  "name": "User Two",
+  "email": "user2@example.com",
+  "password": "password123"
+}
+
+### 16. Login User kedua
+# @name login2
+POST {{baseUrl}}/api/v1/login
+Content-Type: {{contentType}}
+
+{
+  "email": "user2@example.com",
+  "password": "password123"
+}
+
+> {%
+    client.global.set("accessToken2", response.body.access_token);
+    client.global.set("userId2", response.body.user.id);
+%}
