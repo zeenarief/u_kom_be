@@ -75,7 +75,25 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
-	// In a stateless JWT setup, logout is handled client-side by removing the token
-	// For server-side logout, you might want to implement a token blacklist
+	// Ambil userID dari context (diset oleh AuthMiddleware)
+	userID, exists := c.Get("userID")
+	if !exists {
+		UnauthorizedError(c, "User ID not found in context")
+		return
+	}
+
+	userIDStr, ok := userID.(string)
+	if !ok {
+		InternalServerError(c, "Invalid user ID format")
+		return
+	}
+
+	// Panggil service untuk logout
+	err := h.authService.Logout(userIDStr)
+	if err != nil {
+		InternalServerError(c, "Failed to logout: "+err.Error())
+		return
+	}
+
 	SuccessResponse(c, "Logged out successfully", nil)
 }

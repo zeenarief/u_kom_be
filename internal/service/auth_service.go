@@ -19,6 +19,7 @@ type AuthService interface {
 	Login(req request.LoginRequest) (*response.AuthResponse, error)
 	RefreshToken(refreshToken string) (*response.AuthResponse, error)
 	ValidateToken(tokenString string) (string, error)
+	Logout(userID string) error
 }
 
 type authService struct {
@@ -39,6 +40,10 @@ func NewAuthService(userRepo repository.UserRepository, jwtSecret, refreshSecret
 	}
 }
 
+func (s *authService) Logout(userID string) error {
+	// Set token hash menjadi empty string, sehingga token sekarang tidak valid
+	return s.userRepo.UpdateTokenHash(userID, "")
+}
 func (s *authService) Register(req request.UserCreateRequest) (*response.UserResponse, error) {
 	//func (s *userService) Register(req request.UserCreateRequest) (*response.UserResponse, error) {
 	// Check if email already exists
@@ -206,10 +211,15 @@ func (s *authService) ValidateToken(tokenString string) (string, error) {
 		return "", errors.New("invalid user ID in token")
 	}
 
-	// ✅ Check if this token is the latest one for the user
+	// ✅ Check if user has logged out (token hash is empty)
 	currentTokenHash, err := s.userRepo.GetTokenHash(userID)
 	if err != nil {
 		return "", errors.New("user not found")
+	}
+
+	// Jika token hash kosong, berarti user sudah logout
+	if currentTokenHash == "" {
+		return "", errors.New("token revoked - user logged out")
 	}
 
 	// Hash the incoming token and compare with stored hash

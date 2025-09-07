@@ -145,7 +145,7 @@ Authorization: Bearer {{authToken}}
 Content-Type: {{contentType}}
 
 {
-  "name": "1Updated Test User {{$timestamp}}",
+  "name": "Updated Test User {{$timestamp}}",
   "email": "updated{{$timestamp}}@example.com"
 }
 
@@ -197,6 +197,50 @@ Content-Type: {{contentType}}
         // Update token global untuk test selanjutnya
         client.global.set("authToken", response.body.data.access_token);
         client.global.set("refreshToken", response.body.data.refresh_token);
+    });
+%}
+
+### [AUTH] Test with Invalid Token (should fail)
+# @name invalidToken
+GET {{baseUrl}}/users
+Authorization: Bearer invalid_token_here
+Content-Type: {{contentType}}
+
+> {%
+    client.test("Invalid Token - Should Fail", function() {
+        client.assert(response.status === 401, "Expected 401 for invalid token");
+        client.assert(response.body.status === "error", "Expected error status");
+    });
+%}
+
+### [AUTH] Test Get Non-Existent User
+# @name nonExistentUser
+GET {{baseUrl}}/users/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+> {%
+    client.test("Non-Existent User - Should Fail", function() {
+        client.assert(response.status === 404, "Expected 404 for non-existent user");
+        client.assert(response.body.status === "error", "Expected error status");
+    });
+%}
+
+### [AUTH] Test Update Other User (should fail if not admin)
+# @name updateOtherUser
+PUT {{baseUrl}}/users/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Other User",
+  "email": "other@example.com"
+}
+
+> {%
+    client.test("Update Other User - Should Fail", function() {
+        client.assert(response.status === 403 || response.status === 404, "Expected 403/404 for other user update");
+        client.assert(response.body.status === "error", "Expected error status");
     });
 %}
 
@@ -257,50 +301,6 @@ Content-Type: {{contentType}}
 > {%
     client.test("No Token - Should Fail", function() {
         client.assert(response.status === 401, "Expected 401 for missing token");
-        client.assert(response.body.status === "error", "Expected error status");
-    });
-%}
-
-### [AUTH] Test with Invalid Token (should fail)
-# @name invalidToken
-GET {{baseUrl}}/users
-Authorization: Bearer invalid_token_here
-Content-Type: {{contentType}}
-
-> {%
-    client.test("Invalid Token - Should Fail", function() {
-        client.assert(response.status === 401, "Expected 401 for invalid token");
-        client.assert(response.body.status === "error", "Expected error status");
-    });
-%}
-
-### [AUTH] Test Get Non-Existent User
-# @name nonExistentUser
-GET {{baseUrl}}/users/00000000-0000-0000-0000-000000000000
-Authorization: Bearer {{authToken}}
-Content-Type: {{contentType}}
-
-> {%
-    client.test("Non-Existent User - Should Fail", function() {
-        client.assert(response.status === 404, "Expected 404 for non-existent user");
-        client.assert(response.body.status === "error", "Expected error status");
-    });
-%}
-
-### [AUTH] Test Update Other User (should fail if not admin)
-# @name updateOtherUser
-PUT {{baseUrl}}/users/00000000-0000-0000-0000-000000000000
-Authorization: Bearer {{authToken}}
-Content-Type: {{contentType}}
-
-{
-  "name": "Other User",
-  "email": "other@example.com"
-}
-
-> {%
-    client.test("Update Other User - Should Fail", function() {
-        client.assert(response.status === 403 || response.status === 404, "Expected 403/404 for other user update");
         client.assert(response.body.status === "error", "Expected error status");
     });
 %}
