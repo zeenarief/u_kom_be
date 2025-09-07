@@ -88,10 +88,8 @@ func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, e
 	// Find user by email
 	user, err := s.userRepo.FindByEmail(req.Email)
 	if err != nil {
-		return nil, fmt.Errorf("error checking email: %v", err)
+		return nil, errors.New("invalid email or password")
 	}
-
-	// Check if user exists
 	if user == nil {
 		return nil, errors.New("invalid email or password")
 	}
@@ -112,6 +110,12 @@ func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, e
 		return nil, err
 	}
 
+	// Hash the access token and save to database
+	tokenHash := utils.HashToken(accessToken)
+	if err := s.userRepo.UpdateTokenHash(user.ID, tokenHash); err != nil {
+		return nil, err
+	}
+
 	// Convert user to response
 	userResponse := response.UserResponse{
 		ID:        user.ID,
@@ -126,7 +130,7 @@ func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, e
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		TokenType:    "Bearer",
-		ExpiresIn:    time.Now().Add(s.accessTokenExpire).Unix(), // Gunakan config
+		ExpiresIn:    time.Now().Add(s.accessTokenExpire).Unix(),
 		User:         userResponse,
 	}, nil
 }
@@ -155,6 +159,12 @@ func (s *authService) RefreshToken(refreshToken string) (*response.AuthResponse,
 		return nil, err
 	}
 
+	// ✅ Update token hash for the new token
+	tokenHash := utils.HashToken(newAccessToken)
+	if err := s.userRepo.UpdateTokenHash(user.ID, tokenHash); err != nil {
+		return nil, err
+	}
+
 	userResponse := response.UserResponse{
 		ID:        user.ID,
 		Username:  user.Username,
@@ -168,9 +178,47 @@ func (s *authService) RefreshToken(refreshToken string) (*response.AuthResponse,
 		AccessToken:  newAccessToken,
 		RefreshToken: newRefreshToken,
 		TokenType:    "Bearer",
-		ExpiresIn:    time.Now().Add(24 * time.Hour).Unix(),
+		ExpiresIn:    time.Now().Add(s.accessTokenExpire).Unix(),
 		User:         userResponse,
 	}, nil
+}
+
+func (s *authService) ValidateToken(tokenString string) (string, error) {
+	// Validate token signature first
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, jwt.ErrSignatureInvalid
+		}
+		return []byte(s.jwtSecret), nil
+	})
+
+	if err != nil || !token.Valid {
+		return "", errors.New("invalid token")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || claims["type"] != "access" {
+		return "", errors.New("invalid token type")
+	}
+
+	userID, ok := claims["user_id"].(string)
+	if !ok {
+		return "", errors.New("invalid user ID in token")
+	}
+
+	// ✅ Check if this token is the latest one for the user
+	currentTokenHash, err := s.userRepo.GetTokenHash(userID)
+	if err != nil {
+		return "", errors.New("user not found")
+	}
+
+	// Hash the incoming token and compare with stored hash
+	incomingTokenHash := utils.HashToken(tokenString)
+	if incomingTokenHash != currentTokenHash {
+		return "", errors.New("token revoked - new login detected")
+	}
+
+	return userID, nil
 }
 
 func (s *authService) generateAccessToken(userID string) (string, error) {
@@ -209,31 +257,6 @@ func (s *authService) validateRefreshToken(tokenString string) (string, error) {
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || claims["type"] != "refresh" {
-		return "", errors.New("invalid token type")
-	}
-
-	userID, ok := claims["user_id"].(string)
-	if !ok {
-		return "", errors.New("invalid user ID in token")
-	}
-
-	return userID, nil
-}
-
-func (s *authService) ValidateToken(tokenString string) (string, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, jwt.ErrSignatureInvalid
-		}
-		return []byte(s.jwtSecret), nil
-	})
-
-	if err != nil || !token.Valid {
-		return "", errors.New("invalid token")
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || claims["type"] != "access" {
 		return "", errors.New("invalid token type")
 	}
 

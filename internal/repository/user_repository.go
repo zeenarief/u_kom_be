@@ -15,10 +15,25 @@ type UserRepository interface {
 	FindAll() ([]domain.User, error)
 	Update(user *domain.User) error
 	Delete(id string) error
+	UpdateTokenHash(id string, tokenHash string) error
+	GetTokenHash(id string) (string, error)
 }
 
 type userRepository struct {
 	db *gorm.DB
+}
+
+func (r *userRepository) GetTokenHash(id string) (string, error) {
+	var user domain.User
+	err := r.db.Select("current_token_hash").First(&user, "id = ?", id).Error
+	if err != nil {
+		return "", err
+	}
+	return user.CurrentTokenHash, nil
+}
+
+func (r *userRepository) UpdateTokenHash(id string, tokenHash string) error {
+	return r.db.Model(&domain.User{}).Where("id = ?", id).Update("current_token_hash", tokenHash).Error
 }
 
 func NewUserRepository(db *gorm.DB) UserRepository {

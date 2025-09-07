@@ -77,6 +77,5 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 func (h *AuthHandler) Logout(c *gin.Context) {
 	// In a stateless JWT setup, logout is handled client-side by removing the token
 	// For server-side logout, you might want to implement a token blacklist
-	//c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 	SuccessResponse(c, "Logged out successfully", nil)
 }

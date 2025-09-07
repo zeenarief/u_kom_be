@@ -145,7 +145,7 @@ Authorization: Bearer {{authToken}}
 Content-Type: {{contentType}}
 
 {
-  "name": "Updated Test User {{$timestamp}}",
+  "name": "1Updated Test User {{$timestamp}}",
   "email": "updated{{$timestamp}}@example.com"
 }
 
