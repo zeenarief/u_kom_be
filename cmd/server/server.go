@@ -33,6 +33,9 @@ func NewServer() *Server {
 	// Load configuration
 	cfg := config.LoadConfig()
 
+	// Set Gin mode dari config
+	gin.SetMode(cfg.ServerMode)
+
 	// Initialize database
 	db, err := database.NewDB(cfg)
 	if err != nil {
