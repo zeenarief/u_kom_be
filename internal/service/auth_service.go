@@ -40,10 +40,6 @@ func NewAuthService(userRepo repository.UserRepository, jwtSecret, refreshSecret
 	}
 }
 
-func (s *authService) Logout(userID string) error {
-	// Set token hash menjadi empty string, sehingga token sekarang tidak valid
-	return s.userRepo.UpdateTokenHash(userID, "")
-}
 func (s *authService) Register(req request.UserCreateRequest) (*response.UserResponse, error) {
 	//func (s *userService) Register(req request.UserCreateRequest) (*response.UserResponse, error) {
 	// Check if email already exists
@@ -90,18 +86,29 @@ func (s *authService) Register(req request.UserCreateRequest) (*response.UserRes
 }
 
 func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, error) {
-	// Find user by email
-	user, err := s.userRepo.FindByEmail(req.Email)
+	var user *domain.User
+	var err error
+
+	// Coba sebagai email dulu
+	user, err = s.userRepo.FindByEmail(req.Login)
 	if err != nil {
-		return nil, errors.New("invalid email or password")
+		return nil, errors.New("invalid login or password")
 	}
+
+	// Jika tidak ditemukan sebagai email, coba sebagai username
 	if user == nil {
-		return nil, errors.New("invalid email or password")
+		user, err = s.userRepo.FindByUsername(req.Login)
+		if err != nil {
+			return nil, errors.New("invalid login or password")
+		}
+		if user == nil {
+			return nil, errors.New("invalid login or password")
+		}
 	}
 
 	// Check password
 	if !utils.CheckPasswordHash(req.Password, user.Password) {
-		return nil, errors.New("invalid email or password")
+		return nil, errors.New("invalid login or password")
 	}
 
 	// Generate tokens
@@ -138,6 +145,11 @@ func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, e
 		ExpiresIn:    time.Now().Add(s.accessTokenExpire).Unix(),
 		User:         userResponse,
 	}, nil
+}
+
+func (s *authService) Logout(userID string) error {
+	// Set token hash menjadi empty string, sehingga token sekarang tidak valid
+	return s.userRepo.UpdateTokenHash(userID, "")
 }
 
 func (s *authService) RefreshToken(refreshToken string) (*response.AuthResponse, error) {

@@ -49,7 +49,7 @@
                 "userLogin": {
                   "summary": "Example login",
                   "value": {
-                    "username": "johndoe",
+                    "login": "johndoe",
                     "password": "password123"
                   }
                 }
@@ -853,13 +853,13 @@
       "UserLogin": {
         "type": "object",
         "required": [
-          "username",
+          "login",
           "password"
         ],
         "properties": {
-          "username": {
+          "login": {
             "type": "string",
-            "description": "Username for login",
+            "description": "Username or Email for login",
             "example": "johndoe"
           },
           "password": {
