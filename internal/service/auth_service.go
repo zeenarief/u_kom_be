@@ -1,6 +1,7 @@
 package service
 
 import (
+	"belajar-golang/internal/model/domain"
 	"belajar-golang/internal/model/request"
 	"belajar-golang/internal/model/response"
 	"belajar-golang/internal/repository"
@@ -10,9 +11,11 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 )
 
 type AuthService interface {
+	Register(req request.UserCreateRequest) (*response.UserResponse, error)
 	Login(req request.LoginRequest) (*response.AuthResponse, error)
 	RefreshToken(refreshToken string) (*response.AuthResponse, error)
 	ValidateToken(tokenString string) (string, error)
@@ -34,6 +37,51 @@ func NewAuthService(userRepo repository.UserRepository, jwtSecret, refreshSecret
 		accessTokenExpire:  accessExpire,
 		refreshTokenExpire: refreshExpire,
 	}
+}
+
+func (s *authService) Register(req request.UserCreateRequest) (*response.UserResponse, error) {
+	//func (s *userService) Register(req request.UserCreateRequest) (*response.UserResponse, error) {
+	// Check if email already exists
+	existingUser, err := s.userRepo.FindByEmail(req.Email)
+	if err != nil {
+		return nil, fmt.Errorf("error checking email: %v", err)
+	}
+	if existingUser != nil {
+		return nil, errors.New("email already exists")
+	}
+
+	// Check if username already exists
+	existingUser, err = s.userRepo.FindByUsername(req.Username)
+	if err != nil {
+		return nil, fmt.Errorf("error checking username: %v", err)
+	}
+	if existingUser != nil {
+		return nil, errors.New("username already exists")
+	}
+
+	// Hash password
+	hashedPassword, err := utils.HashPassword(req.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert request to domain model
+	user := &domain.User{
+		ID:       uuid.New().String(),
+		Username: req.Username,
+		Name:     req.Name,
+		Email:    req.Email,
+		Password: hashedPassword,
+	}
+
+	// Save to database
+	err = s.userRepo.Create(user)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert domain model to response
+	return s.convertToResponse(user), nil
 }
 
 func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, error) {
@@ -195,4 +243,15 @@ func (s *authService) ValidateToken(tokenString string) (string, error) {
 	}
 
 	return userID, nil
+}
+
+func (s *authService) convertToResponse(user *domain.User) *response.UserResponse {
+	return &response.UserResponse{
+		ID:        user.ID,
+		Username:  user.Username,
+		Name:      user.Name,
+		Email:     user.Email,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}
 }

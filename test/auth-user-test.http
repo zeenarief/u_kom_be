@@ -81,6 +81,35 @@ Content-Type: {{contentType}}
     });
 %}
 
+### [PUBLIC] Register New User
+# @name postUser
+POST {{baseUrl}}/users
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "testuser{{$timestamp}}",
+  "password": "Password123!",
+  "name": "Test User from User {{$timestamp}}",
+  "email": "testuser{{$timestamp}}@example.com"
+}
+
+> {%
+    client.test("Register User - Success", function() {
+        client.assert(response.status === 201, "Response status is not 201");
+        client.assert(response.body.status === "success", "Status is not success");
+        client.assert(response.body.data.id, "User ID not found in response");
+        client.assert(response.body.data.username, "Username not found in response");
+        client.assert(response.body.data.email, "Email not found in response");
+
+        // Simpan user ID untuk test selanjutnya
+        client.global.set("userId", response.body.data.id);
+        client.global.set("testUsername", response.body.data.username);
+        client.global.set("testEmail", response.body.data.email);
+        client.global.set("testPassword", "Password123!");
+    });
+%}
+
 ### [AUTH] Get All Users
 # @name getAllUsers
 GET {{baseUrl}}/users?page=1&limit=10

@@ -3,6 +3,7 @@ package handler
 import (
 	"belajar-golang/internal/model/request"
 	"belajar-golang/internal/service"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,6 +14,26 @@ type AuthHandler struct {
 
 func NewAuthHandler(authService service.AuthService) *AuthHandler {
 	return &AuthHandler{authService: authService}
+}
+
+func (h *AuthHandler) Register(c *gin.Context) {
+	var req request.UserCreateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		BadRequestError(c, "Invalid request payload", err.Error())
+		return
+	}
+
+	user, err := h.authService.Register(req)
+	if err != nil {
+		if strings.Contains(err.Error(), "already exists") {
+			BadRequestError(c, "Registration failed", err.Error())
+		} else {
+			InternalServerError(c, err.Error())
+		}
+		return
+	}
+
+	CreatedResponse(c, "User created successfully from public", user)
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
