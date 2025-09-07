@@ -6,6 +6,7 @@ import (
 	"belajar-golang/internal/repository"
 	"belajar-golang/internal/utils"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -39,6 +40,11 @@ func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, e
 	// Find user by email
 	user, err := s.userRepo.FindByEmail(req.Email)
 	if err != nil {
+		return nil, fmt.Errorf("error checking email: %v", err)
+	}
+
+	// Check if user exists
+	if user == nil {
 		return nil, errors.New("invalid email or password")
 	}
 
@@ -72,7 +78,7 @@ func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, e
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		TokenType:    "Bearer",
-		ExpiresIn:    time.Now().Add(24 * time.Hour).Unix(),
+		ExpiresIn:    time.Now().Add(s.accessTokenExpire).Unix(), // Gunakan config
 		User:         userResponse,
 	}, nil
 }

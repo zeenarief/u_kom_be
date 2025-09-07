@@ -71,7 +71,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 	user, err := h.userService.UpdateUser(id, req)
 	if err != nil {
 		//c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		InternalServerError(c, err.Error())
+		NotFoundError(c, err.Error())
 		return
 	}
 
