@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS roles, permissions, role_permission, user_role, user_permission;

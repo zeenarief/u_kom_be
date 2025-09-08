@@ -16,11 +16,13 @@ import (
 
 // Server holds the application dependencies
 type Server struct {
-	Config      *config.Config
-	Router      *gin.Engine
-	UserHandler *handler.UserHandler
-	AuthHandler *handler.AuthHandler
-	AuthService service.AuthService
+	Config            *config.Config
+	Router            *gin.Engine
+	UserHandler       *handler.UserHandler
+	AuthHandler       *handler.AuthHandler
+	RoleHandler       *handler.RoleHandler
+	PermissionHandler *handler.PermissionHandler
+	AuthService       service.AuthService
 }
 
 // NewServer creates a new server instance with all dependencies
@@ -44,9 +46,13 @@ func NewServer() *Server {
 
 	// Initialize repository
 	userRepo := repository.NewUserRepository(db)
+	roleRepo := repository.NewRoleRepository(db)
+	permissionRepo := repository.NewPermissionRepository(db)
 
 	// Initialize services
-	userService := service.NewUserService(userRepo)
+	userService := service.NewUserService(userRepo, roleRepo, permissionRepo)
+	roleService := service.NewRoleService(roleRepo, permissionRepo)
+	permissionService := service.NewPermissionService(permissionRepo)
 	authService := service.NewAuthService(
 		userRepo,
 		cfg.JWTSecret,
@@ -58,16 +64,20 @@ func NewServer() *Server {
 	// Initialize handlers
 	userHandler := handler.NewUserHandler(userService)
 	authHandler := handler.NewAuthHandler(authService)
+	roleHandler := handler.NewRoleHandler(roleService)
+	permissionHandler := handler.NewPermissionHandler(permissionService)
 
 	// Setup router with middleware
 	router := setupRouter(cfg, authService)
 
 	return &Server{
-		Config:      cfg,
-		Router:      router,
-		UserHandler: userHandler,
-		AuthHandler: authHandler,
-		AuthService: authService,
+		Config:            cfg,
+		Router:            router,
+		UserHandler:       userHandler,
+		AuthHandler:       authHandler,
+		RoleHandler:       roleHandler,
+		PermissionHandler: permissionHandler,
+		AuthService:       authService,
 	}
 }
 
@@ -90,7 +100,14 @@ func setupRouter(cfg *config.Config, authService service.AuthService) *gin.Engin
 // Start runs the HTTP server
 func (s *Server) Start() error {
 	// Setup routes
-	routes.SetupRoutes(s.Router, s.AuthHandler, s.UserHandler, s.AuthService)
+	routes.SetupRoutes(
+		s.Router,
+		s.AuthHandler,
+		s.UserHandler,
+		s.AuthService,
+		s.RoleHandler,
+		s.PermissionHandler,
+	)
 
 	// Start server
 	serverAddress := s.Config.ServerHost + ":" + s.Config.ServerPort

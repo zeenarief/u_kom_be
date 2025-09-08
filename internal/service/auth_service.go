@@ -20,6 +20,7 @@ type AuthService interface {
 	RefreshToken(refreshToken string) (*response.AuthResponse, error)
 	ValidateToken(tokenString string) (string, error)
 	Logout(userID string) error
+	GetUserWithPermissions(userID string) (*domain.User, error)
 }
 
 type authService struct {
@@ -241,6 +242,10 @@ func (s *authService) ValidateToken(tokenString string) (string, error) {
 	}
 
 	return userID, nil
+}
+
+func (s *authService) GetUserWithPermissions(userID string) (*domain.User, error) {
+	return s.userRepo.GetUserWithRolesAndPermissions(userID)
 }
 
 func (s *authService) generateAccessToken(userID string) (string, error) {

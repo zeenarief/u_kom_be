@@ -9,15 +9,22 @@ import (
 )
 
 // SetupRoutes registers all application routes
-func SetupRoutes(router *gin.Engine, authHandler *handler.AuthHandler, userHandler *handler.UserHandler, authService service.AuthService) {
+func SetupRoutes(
+	router *gin.Engine,
+	authHandler *handler.AuthHandler,
+	userHandler *handler.UserHandler,
+	authService service.AuthService,
+	roleHandler *handler.RoleHandler,
+	permissionHandler *handler.PermissionHandler,
+) {
 	// API v1 group
 	apiV1 := router.Group("/api/v1")
 
-	// Register auth routes
+	// Register all routes
 	RegisterAuthRoutes(apiV1, authHandler, authService)
-
-	// Register user routes
 	RegisterUserRoutes(apiV1, userHandler, authService)
+	RegisterRoleRoutes(apiV1, roleHandler, authService)
+	RegisterPermissionRoutes(apiV1, permissionHandler, authService)
 
 	// Health check route
 	apiV1.GET("/health", healthCheck)

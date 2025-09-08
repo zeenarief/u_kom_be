@@ -139,3 +139,57 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 
 	SuccessResponse(c, "Profile retrieved successfully", user)
 }
+
+func (h *UserHandler) SyncUserRoles(c *gin.Context) {
+	userID := c.Param("id")
+
+	var req struct {
+		Roles []string `json:"roles" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		BadRequestError(c, "Invalid request payload", err.Error())
+		return
+	}
+
+	err := h.userService.SyncUserRoles(userID, req.Roles)
+	if err != nil {
+		InternalServerError(c, err.Error())
+		return
+	}
+
+	SuccessResponse(c, "User roles synced successfully", nil)
+}
+
+func (h *UserHandler) SyncUserPermissions(c *gin.Context) {
+	userID := c.Param("id")
+
+	var req struct {
+		Permissions []string `json:"permissions" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		BadRequestError(c, "Invalid request payload", err.Error())
+		return
+	}
+
+	err := h.userService.SyncUserPermissions(userID, req.Permissions)
+	if err != nil {
+		InternalServerError(c, err.Error())
+		return
+	}
+
+	SuccessResponse(c, "User permissions synced successfully", nil)
+}
+
+func (h *UserHandler) GetUserPermissions(c *gin.Context) {
+	userID := c.Param("id")
+
+	userWithPermissions, err := h.userService.GetUserWithRolesAndPermissions(userID)
+	if err != nil {
+		NotFoundError(c, "User not found")
+		return
+	}
+
+	SuccessResponse(c, "User permissions retrieved successfully", userWithPermissions)
+}

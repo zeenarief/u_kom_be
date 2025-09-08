@@ -8,8 +8,6 @@ import (
 	"belajar-golang/internal/utils"
 	"errors"
 	"fmt"
-
-	"github.com/google/uuid"
 )
 
 type UserService interface {
@@ -20,14 +18,27 @@ type UserService interface {
 	DeleteUser(id string) error
 	ChangePassword(id string, currentPassword, newPassword string) error
 	GetProfile(userID string) (*response.ProfileResponse, error)
+	SyncUserRoles(userID string, roleNames []string) error
+	SyncUserPermissions(userID string, permissionNames []string) error
+	GetUserWithRolesAndPermissions(userID string) (*response.UserWithRolesResponse, error)
 }
 
 type userService struct {
-	userRepo repository.UserRepository
+	userRepo       repository.UserRepository
+	roleRepo       repository.RoleRepository
+	permissionRepo repository.PermissionRepository
 }
 
-func NewUserService(userRepo repository.UserRepository) UserService {
-	return &userService{userRepo: userRepo}
+func NewUserService(
+	userRepo repository.UserRepository,
+	roleRepo repository.RoleRepository,
+	permissionRepo repository.PermissionRepository,
+) UserService {
+	return &userService{
+		userRepo:       userRepo,
+		roleRepo:       roleRepo,
+		permissionRepo: permissionRepo,
+	}
 }
 
 func (s *userService) CreateUser(req request.UserCreateRequest) (*response.UserResponse, error) {
@@ -55,9 +66,9 @@ func (s *userService) CreateUser(req request.UserCreateRequest) (*response.UserR
 		return nil, err
 	}
 
-	// Convert request to domain model
+	// Create user
 	user := &domain.User{
-		ID:       uuid.New().String(),
+		ID:       utils.GenerateUUID(),
 		Username: req.Username,
 		Name:     req.Name,
 		Email:    req.Email,
@@ -70,7 +81,19 @@ func (s *userService) CreateUser(req request.UserCreateRequest) (*response.UserR
 		return nil, err
 	}
 
-	// Convert domain model to response
+	// Assign default role
+	defaultRole, err := s.userRepo.GetDefaultRole()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get default role: %v", err)
+	}
+	if defaultRole == nil {
+		return nil, errors.New("default role not found")
+	}
+
+	if err := s.userRepo.AssignRole(user.ID, defaultRole.ID); err != nil {
+		return nil, fmt.Errorf("failed to assign default role: %v", err)
+	}
+
 	return s.convertToResponse(user), nil
 }
 
@@ -175,6 +198,49 @@ func (s *userService) GetProfile(userID string) (*response.ProfileResponse, erro
 	}, nil
 }
 
+func (s *userService) SyncUserRoles(userID string, roleNames []string) error {
+	// Convert role names to IDs
+	var roleIDs []string
+	for _, roleName := range roleNames {
+		role, err := s.roleRepo.FindByName(roleName)
+		if err != nil {
+			return fmt.Errorf("error finding role: %s - %v", roleName, err)
+		}
+		if role == nil {
+			return fmt.Errorf("role not found: %s", roleName)
+		}
+		roleIDs = append(roleIDs, role.ID)
+	}
+
+	return s.userRepo.SyncRoles(userID, roleIDs)
+}
+
+func (s *userService) SyncUserPermissions(userID string, permissionNames []string) error {
+	// Convert permission names to IDs
+	var permissionIDs []string
+	for _, permName := range permissionNames {
+		permission, err := s.permissionRepo.FindByName(permName)
+		if err != nil {
+			return fmt.Errorf("error finding permission: %s - %v", permName, err)
+		}
+		if permission == nil {
+			return fmt.Errorf("permission not found: %s", permName)
+		}
+		permissionIDs = append(permissionIDs, permission.ID)
+	}
+
+	return s.userRepo.SyncPermissions(userID, permissionIDs)
+}
+
+func (s *userService) GetUserWithRolesAndPermissions(userID string) (*response.UserWithRolesResponse, error) {
+	user, err := s.userRepo.GetUserWithRolesAndPermissions(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.convertToUserWithRolesResponse(user), nil
+}
+
 func (s *userService) convertToResponse(user *domain.User) *response.UserResponse {
 	return &response.UserResponse{
 		ID:        user.ID,
@@ -183,5 +249,31 @@ func (s *userService) convertToResponse(user *domain.User) *response.UserRespons
 		Email:     user.Email,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
+	}
+}
+
+func (s *userService) convertToUserWithRolesResponse(user *domain.User) *response.UserWithRolesResponse {
+	// Convert roles to response
+	var roleResponses []response.RoleResponse
+	for _, role := range user.Roles {
+		roleResponses = append(roleResponses, response.RoleResponse{
+			ID:          role.ID,
+			Name:        role.Name,
+			Description: role.Description,
+			IsDefault:   role.IsDefault,
+			CreatedAt:   role.CreatedAt,
+			UpdatedAt:   role.UpdatedAt,
+		})
+	}
+
+	return &response.UserWithRolesResponse{
+		ID:          user.ID,
+		Username:    user.Username,
+		Name:        user.Name,
+		Email:       user.Email,
+		Roles:       roleResponses,
+		Permissions: user.GetPermissions(), // Use the method from domain
+		CreatedAt:   user.CreatedAt,
+		UpdatedAt:   user.UpdatedAt,
 	}
 }

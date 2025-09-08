@@ -17,10 +17,19 @@ type UserRepository interface {
 	Delete(id string) error
 	UpdateTokenHash(id string, tokenHash string) error
 	GetTokenHash(id string) (string, error)
+	GetUserWithRolesAndPermissions(id string) (*domain.User, error)
+	SyncRoles(id string, roleIDs []string) error
+	SyncPermissions(id string, permissionIDs []string) error
+	GetDefaultRole() (*domain.Role, error)
+	AssignRole(userID string, roleID string) error
 }
 
 type userRepository struct {
 	db *gorm.DB
+}
+
+func NewUserRepository(db *gorm.DB) UserRepository {
+	return &userRepository{db: db}
 }
 
 func (r *userRepository) GetTokenHash(id string) (string, error) {
@@ -34,10 +43,6 @@ func (r *userRepository) GetTokenHash(id string) (string, error) {
 
 func (r *userRepository) UpdateTokenHash(id string, tokenHash string) error {
 	return r.db.Model(&domain.User{}).Where("id = ?", id).Update("current_token_hash", tokenHash).Error
-}
-
-func NewUserRepository(db *gorm.DB) UserRepository {
-	return &userRepository{db: db}
 }
 
 func (r *userRepository) Create(user *domain.User) error {
@@ -86,4 +91,68 @@ func (r *userRepository) Update(user *domain.User) error {
 
 func (r *userRepository) Delete(id string) error {
 	return r.db.Delete(&domain.User{}, "id = ?", id).Error
+}
+
+func (r *userRepository) SyncRoles(userID string, roleIDs []string) error {
+	// Hapus semua roles user
+	if err := r.db.Exec("DELETE FROM user_role WHERE user_id = ?", userID).Error; err != nil {
+		return err
+	}
+
+	// Tambahkan roles baru
+	for _, roleID := range roleIDs {
+		if err := r.db.Exec("INSERT INTO user_role (user_id, role_id) VALUES (?, ?)", userID, roleID).Error; err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (r *userRepository) SyncPermissions(userID string, permissionIDs []string) error {
+	// Hapus semua permissions langsung user
+	if err := r.db.Exec("DELETE FROM user_permission WHERE user_id = ?", userID).Error; err != nil {
+		return err
+	}
+
+	// Tambahkan permissions baru
+	for _, permissionID := range permissionIDs {
+		if err := r.db.Exec("INSERT INTO user_permission (user_id, permission_id) VALUES (?, ?)", userID, permissionID).Error; err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (r *userRepository) GetUserWithRolesAndPermissions(userID string) (*domain.User, error) {
+	var user domain.User
+	err := r.db.
+		Preload("Roles").
+		Preload("Roles.Permissions").
+		Preload("Permissions").
+		First(&user, "id = ?", userID).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *userRepository) GetDefaultRole() (*domain.Role, error) {
+	var role domain.Role
+	err := r.db.First(&role, "is_default = ?", true).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &role, nil
+}
+
+func (r *userRepository) AssignRole(userID string, roleID string) error {
+	return r.db.Exec("INSERT INTO user_role (user_id, role_id) VALUES (?, ?)", userID, roleID).Error
 }
