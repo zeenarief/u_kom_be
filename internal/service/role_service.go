@@ -10,11 +10,11 @@ import (
 )
 
 type RoleService interface {
-	CreateRole(req request.RoleCreateRequest) (*response.RoleResponse, error)
-	GetRoleByID(id string) (*response.RoleResponse, error)
-	GetRoleByName(name string) (*response.RoleResponse, error)
-	GetAllRoles() ([]response.RoleResponse, error)
-	UpdateRole(id string, req request.RoleUpdateRequest) (*response.RoleResponse, error)
+	CreateRole(req request.RoleCreateRequest) (*response.RoleDetailResponse, error)
+	GetRoleByID(id string) (*response.RoleDetailResponse, error)
+	GetRoleByName(name string) (*response.RoleDetailResponse, error)
+	GetAllRoles() ([]response.RoleDetailResponse, error)
+	UpdateRole(id string, req request.RoleUpdateRequest) (*response.RoleDetailResponse, error)
 	DeleteRole(id string) error
 	SyncRolePermissions(roleID string, permissionNames []string) error
 }
@@ -31,7 +31,7 @@ func NewRoleService(roleRepo repository.RoleRepository, permissionRepo repositor
 	}
 }
 
-func (s *roleService) CreateRole(req request.RoleCreateRequest) (*response.RoleResponse, error) {
+func (s *roleService) CreateRole(req request.RoleCreateRequest) (*response.RoleDetailResponse, error) {
 	// Check if role already exists
 	existingRole, _ := s.roleRepo.FindByName(req.Name)
 	if existingRole != nil {
@@ -84,7 +84,7 @@ func (s *roleService) SyncRolePermissions(roleID string, permissionNames []strin
 	return s.roleRepo.SyncPermissions(roleID, permissionIDs)
 }
 
-func (s *roleService) GetRoleByID(id string) (*response.RoleResponse, error) {
+func (s *roleService) GetRoleByID(id string) (*response.RoleDetailResponse, error) {
 	role, err := s.roleRepo.FindByID(id)
 	if err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (s *roleService) GetRoleByID(id string) (*response.RoleResponse, error) {
 	return s.convertToResponse(role), nil
 }
 
-func (s *roleService) GetRoleByName(name string) (*response.RoleResponse, error) {
+func (s *roleService) GetRoleByName(name string) (*response.RoleDetailResponse, error) {
 	role, err := s.roleRepo.FindByName(name)
 	if err != nil {
 		return nil, err
@@ -106,13 +106,13 @@ func (s *roleService) GetRoleByName(name string) (*response.RoleResponse, error)
 	return s.convertToResponse(role), nil
 }
 
-func (s *roleService) GetAllRoles() ([]response.RoleResponse, error) {
+func (s *roleService) GetAllRoles() ([]response.RoleDetailResponse, error) {
 	roles, err := s.roleRepo.FindAll()
 	if err != nil {
 		return nil, err
 	}
 
-	var responses []response.RoleResponse
+	var responses []response.RoleDetailResponse
 	for _, role := range roles {
 		responses = append(responses, *s.convertToResponse(&role))
 	}
@@ -120,7 +120,7 @@ func (s *roleService) GetAllRoles() ([]response.RoleResponse, error) {
 	return responses, nil
 }
 
-func (s *roleService) UpdateRole(id string, req request.RoleUpdateRequest) (*response.RoleResponse, error) {
+func (s *roleService) UpdateRole(id string, req request.RoleUpdateRequest) (*response.RoleDetailResponse, error) {
 	role, err := s.roleRepo.FindByID(id)
 	if err != nil {
 		return nil, err
@@ -184,7 +184,7 @@ func (s *roleService) DeleteRole(id string) error {
 	return s.roleRepo.Delete(id)
 }
 
-func (s *roleService) convertToResponse(role *domain.Role) *response.RoleResponse {
+func (s *roleService) convertToResponse(role *domain.Role) *response.RoleDetailResponse {
 	var permissionResponses []response.PermissionResponse
 	for _, perm := range role.Permissions {
 		permissionResponses = append(permissionResponses, response.PermissionResponse{
@@ -196,7 +196,7 @@ func (s *roleService) convertToResponse(role *domain.Role) *response.RoleRespons
 		})
 	}
 
-	return &response.RoleResponse{
+	return &response.RoleDetailResponse{
 		ID:          role.ID,
 		Name:        role.Name,
 		Description: role.Description,

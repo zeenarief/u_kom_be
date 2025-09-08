@@ -23,6 +23,9 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
+	// Pastikan tidak ada role IDs yang dikirim melalui register publik
+	req.RoleIDs = nil
+
 	user, err := h.authService.Register(req)
 	if err != nil {
 		if strings.Contains(err.Error(), "already exists") {

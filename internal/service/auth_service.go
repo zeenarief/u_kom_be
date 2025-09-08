@@ -42,7 +42,6 @@ func NewAuthService(userRepo repository.UserRepository, jwtSecret, refreshSecret
 }
 
 func (s *authService) Register(req request.UserCreateRequest) (*response.UserResponse, error) {
-	//func (s *userService) Register(req request.UserCreateRequest) (*response.UserResponse, error) {
 	// Check if email already exists
 	existingUser, err := s.userRepo.FindByEmail(req.Email)
 	if err != nil {
@@ -78,6 +77,22 @@ func (s *authService) Register(req request.UserCreateRequest) (*response.UserRes
 
 	// Save to database
 	err = s.userRepo.Create(user)
+	if err != nil {
+		return nil, err
+	}
+
+	// Assign default user role
+	defaultRole, err := s.userRepo.GetDefaultRole()
+	if err != nil {
+		return nil, err
+	}
+
+	if defaultRole == nil {
+		return nil, errors.New("default role not found")
+	}
+
+	// Assign default user role
+	err = s.userRepo.AssignRole(user.ID, defaultRole.ID)
 	if err != nil {
 		return nil, err
 	}
