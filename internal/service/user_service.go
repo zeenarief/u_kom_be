@@ -268,12 +268,22 @@ func (s *userService) convertToResponse(user *domain.User) *response.UserRespons
 
 func (s *userService) convertToUserWithRolesResponse(user *domain.User) *response.UserWithRolesResponse {
 
+	// Convert roles to response
+	var roleResponses []response.RoleListResponse
+	for _, role := range user.Roles {
+		roleResponses = append(roleResponses, response.RoleListResponse{
+			ID:          role.ID,
+			Name:        role.Name,
+			Description: role.Description,
+		})
+	}
+
 	return &response.UserWithRolesResponse{
 		ID:          user.ID,
 		Username:    user.Username,
 		Name:        user.Name,
 		Email:       user.Email,
-		Roles:       user.GetRoles(),       // Use the method from domain
+		Roles:       roleResponses,
 		Permissions: user.GetPermissions(), // Use the method from domain
 		CreatedAt:   user.CreatedAt,
 		UpdatedAt:   user.UpdatedAt,

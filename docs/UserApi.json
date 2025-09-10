@@ -1545,12 +1545,29 @@
                 "type": "string",
                 "format": "email"
               },
-              "profile_complete": {
-                "type": "boolean"
+              "roles": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "admin"
+                    },
+                    "description": {
+                      "type": "string"
+                    }
+                  }
+                }
               },
-              "avatar_url": {
-                "type": "string",
-                "nullable": true
+              "permission": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               },
               "created_at": {
                 "type": "string",

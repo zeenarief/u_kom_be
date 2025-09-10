@@ -33,7 +33,7 @@ func RegisterUserRoutes(router *gin.RouterGroup, userHandler *handler.UserHandle
 			middleware.PermissionMiddleware("users.delete", authService),
 			userHandler.DeleteUser)
 
-		// Role and permission management
+		// RoleIDs and permission management
 		protected.POST("/users/:id/sync-roles",
 			middleware.PermissionMiddleware("users.manage_roles", authService),
 			userHandler.SyncUserRoles)

@@ -25,14 +25,14 @@ func (h *RoleHandler) CreateRole(c *gin.Context) {
 	role, err := h.roleService.CreateRole(req)
 	if err != nil {
 		if err.Error() == "role already exists" {
-			BadRequestError(c, "Role creation failed", err.Error())
+			BadRequestError(c, "RoleIDs creation failed", err.Error())
 		} else {
 			InternalServerError(c, err.Error())
 		}
 		return
 	}
 
-	CreatedResponse(c, "Role created successfully", role)
+	CreatedResponse(c, "RoleIDs created successfully", role)
 }
 
 func (h *RoleHandler) GetAllRoles(c *gin.Context) {
@@ -51,14 +51,14 @@ func (h *RoleHandler) GetRoleByID(c *gin.Context) {
 	role, err := h.roleService.GetRoleByID(id)
 	if err != nil {
 		if err.Error() == "role not found" {
-			NotFoundError(c, "Role not found")
+			NotFoundError(c, "RoleIDs not found")
 		} else {
 			InternalServerError(c, err.Error())
 		}
 		return
 	}
 
-	SuccessResponse(c, "Role retrieved successfully", role)
+	SuccessResponse(c, "RoleIDs retrieved successfully", role)
 }
 
 func (h *RoleHandler) UpdateRole(c *gin.Context) {
@@ -73,16 +73,16 @@ func (h *RoleHandler) UpdateRole(c *gin.Context) {
 	role, err := h.roleService.UpdateRole(id, req)
 	if err != nil {
 		if err.Error() == "role not found" {
-			NotFoundError(c, "Role not found")
+			NotFoundError(c, "RoleIDs not found")
 		} else if err.Error() == "role name already exists" {
-			BadRequestError(c, "Role update failed", err.Error())
+			BadRequestError(c, "RoleIDs update failed", err.Error())
 		} else {
 			InternalServerError(c, err.Error())
 		}
 		return
 	}
 
-	SuccessResponse(c, "Role updated successfully", role)
+	SuccessResponse(c, "RoleIDs updated successfully", role)
 }
 
 func (h *RoleHandler) DeleteRole(c *gin.Context) {
@@ -91,7 +91,7 @@ func (h *RoleHandler) DeleteRole(c *gin.Context) {
 	err := h.roleService.DeleteRole(id)
 	if err != nil {
 		if err.Error() == "role not found" {
-			NotFoundError(c, "Role not found")
+			NotFoundError(c, "RoleIDs not found")
 		} else if err.Error() == "cannot delete default role" {
 			BadRequestError(c, "Cannot delete default role", nil)
 		} else {
@@ -100,7 +100,7 @@ func (h *RoleHandler) DeleteRole(c *gin.Context) {
 		return
 	}
 
-	SuccessResponse(c, "Role deleted successfully", nil)
+	SuccessResponse(c, "RoleIDs deleted successfully", nil)
 }
 
 func (h *RoleHandler) SyncRolePermissions(c *gin.Context) {
@@ -118,5 +118,5 @@ func (h *RoleHandler) SyncRolePermissions(c *gin.Context) {
 		return
 	}
 
-	SuccessResponse(c, "Role permissions synced successfully", nil)
+	SuccessResponse(c, "RoleIDs permissions synced successfully", nil)
 }
