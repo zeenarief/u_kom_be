@@ -12,6 +12,9 @@ type UserRepository interface {
 	FindByID(id string) (*domain.User, error)
 	FindByEmail(email string) (*domain.User, error)
 	FindByUsername(username string) (*domain.User, error)
+	FindByIDWithRelations(id string) (*domain.User, error)
+	FindByEmailWithRelations(email string) (*domain.User, error)
+	FindByUsernameWithRelations(username string) (*domain.User, error)
 	FindAll() ([]domain.User, error)
 	Update(user *domain.User) error
 	Delete(id string) error
@@ -55,34 +58,92 @@ func (r *userRepository) FindByID(id string) (*domain.User, error) {
 	return &user, err
 }
 
+func (r *userRepository) FindByIDWithRelations(id string) (*domain.User, error) {
+	var user domain.User
+	err := r.db.
+		Preload("Roles").
+		Preload("Roles.Permissions").
+		Preload("Permissions").
+		First(&user, "id = ?", id).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return &user, err
+}
+
 func (r *userRepository) FindByEmail(email string) (*domain.User, error) {
 	var user domain.User
 	err := r.db.First(&user, "email = ?", email).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil // Return nil, nil jika tidak ditemukan
 	}
+
 	if err != nil {
 		return nil, err
 	}
+
 	return &user, nil
+}
+
+func (r *userRepository) FindByEmailWithRelations(email string) (*domain.User, error) {
+	var user domain.User
+	err := r.db.
+		Preload("Roles").
+		Preload("Roles.Permissions").
+		Preload("Permissions").
+		First(&user, "email = ?", email).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return &user, err
 }
 
 func (r *userRepository) FindByUsername(username string) (*domain.User, error) {
 	var user domain.User
 	err := r.db.First(&user, "username = ?", username).Error
+
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil // Return nil, nil jika tidak ditemukan
 	}
+
 	if err != nil {
 		return nil, err
 	}
+
 	return &user, nil
+}
+
+func (r *userRepository) FindByUsernameWithRelations(username string) (*domain.User, error) {
+	var user domain.User
+	err := r.db.
+		Preload("Roles").
+		Preload("Roles.Permissions").
+		Preload("Permissions").
+		First(&user, "username = ?", username).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return &user, err
 }
 
 func (r *userRepository) FindAll() ([]domain.User, error) {
 	var users []domain.User
-	err := r.db.Find(&users).Error
-	return users, err
+
+	err := r.db.
+		Preload("Roles").
+		Preload("Roles.Permissions").
+		Preload("Permissions").
+		Find(&users).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }
 
 func (r *userRepository) Update(user *domain.User) error {

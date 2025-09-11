@@ -1,6 +1,7 @@
 package service
 
 import (
+	"belajar-golang/internal/converter"
 	"belajar-golang/internal/model/domain"
 	"belajar-golang/internal/model/request"
 	"belajar-golang/internal/model/response"
@@ -8,21 +9,19 @@ import (
 	"belajar-golang/internal/utils"
 	"errors"
 	"fmt"
-
-	"github.com/google/uuid"
 )
 
 type UserService interface {
-	CreateUser(req request.UserCreateRequest) (*response.UserResponse, error)
-	GetUserByID(id string) (*response.UserWithRolesResponse, error)
-	GetAllUsers() ([]response.UserResponse, error)
-	UpdateUser(id string, req request.UserUpdateRequest) (*response.UserResponse, error)
+	CreateUser(req request.UserCreateRequest) (*response.UserWithRoleResponse, error)
+	GetUserByID(id string) (*response.UserWithRolesResponseAndPermissions, error)
+	GetAllUsers() ([]response.UserWithRoleResponse, error)
+	UpdateUser(id string, req request.UserUpdateRequest) (*response.UserWithRoleResponse, error)
 	DeleteUser(id string) error
 	ChangePassword(id string, currentPassword, newPassword string) error
 	GetProfile(userID string) (*response.ProfileResponse, error)
 	SyncUserRoles(userID string, roleNames []string) error
 	SyncUserPermissions(userID string, permissionNames []string) error
-	GetUserWithRolesAndPermissions(userID string) (*response.UserWithRolesResponse, error)
+	GetUserWithRolesAndPermissions(userID string) (*response.UserWithRolesResponseAndPermissions, error)
 }
 
 type userService struct {
@@ -43,7 +42,7 @@ func NewUserService(
 	}
 }
 
-func (s *userService) CreateUser(req request.UserCreateRequest) (*response.UserResponse, error) {
+func (s *userService) CreateUser(req request.UserCreateRequest) (*response.UserWithRoleResponse, error) {
 	// Check if email already exists
 	existingUser, err := s.userRepo.FindByEmail(req.Email)
 	if err != nil {
@@ -70,7 +69,7 @@ func (s *userService) CreateUser(req request.UserCreateRequest) (*response.UserR
 
 	// Convert request to domain model
 	user := &domain.User{
-		ID:       uuid.New().String(),
+		ID:       utils.GenerateUUID(),
 		Username: req.Username,
 		Name:     req.Name,
 		Email:    req.Email,
@@ -107,34 +106,39 @@ func (s *userService) CreateUser(req request.UserCreateRequest) (*response.UserR
 		}
 	}
 
-	// Convert domain model to response
-	return s.convertToResponse(user), nil
+	// Reload user dengan roles dan permissions
+	createdUser, err := s.userRepo.GetUserWithRolesAndPermissions(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return converter.ToUserWithRoleResponse(createdUser), nil
 }
 
-func (s *userService) GetUserByID(id string) (*response.UserWithRolesResponse, error) {
+func (s *userService) GetUserByID(id string) (*response.UserWithRolesResponseAndPermissions, error) {
 	user, err := s.userRepo.GetUserWithRolesAndPermissions(id)
 	if err != nil {
 		return nil, errors.New("user not found")
 	}
 
-	return s.convertToUserWithRolesResponse(user), nil
+	return converter.ToUserWithRolesResponseAndPermissions(user), nil
 }
 
-func (s *userService) GetAllUsers() ([]response.UserResponse, error) {
+func (s *userService) GetAllUsers() ([]response.UserWithRoleResponse, error) {
 	users, err := s.userRepo.FindAll()
 	if err != nil {
 		return nil, err
 	}
 
-	var responses []response.UserResponse
+	var responses []response.UserWithRoleResponse
 	for _, user := range users {
-		responses = append(responses, *s.convertToResponse(&user))
+		responses = append(responses, *converter.ToUserWithRoleResponse(&user))
 	}
 
 	return responses, nil
 }
 
-func (s *userService) UpdateUser(id string, req request.UserUpdateRequest) (*response.UserResponse, error) {
+func (s *userService) UpdateUser(id string, req request.UserUpdateRequest) (*response.UserWithRoleResponse, error) {
 	user, err := s.userRepo.FindByID(id)
 	if err != nil {
 		return nil, errors.New("user not found")
@@ -158,7 +162,13 @@ func (s *userService) UpdateUser(id string, req request.UserUpdateRequest) (*res
 		return nil, err
 	}
 
-	return s.convertToResponse(user), nil
+	// Reload user dengan roles dan permissions
+	createdUser, err := s.userRepo.GetUserWithRolesAndPermissions(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return converter.ToUserWithRoleResponse(createdUser), nil
 }
 
 func (s *userService) DeleteUser(id string) error {
@@ -246,46 +256,11 @@ func (s *userService) SyncUserPermissions(userID string, permissionNames []strin
 	return s.userRepo.SyncPermissions(userID, permissionIDs)
 }
 
-func (s *userService) GetUserWithRolesAndPermissions(userID string) (*response.UserWithRolesResponse, error) {
+func (s *userService) GetUserWithRolesAndPermissions(userID string) (*response.UserWithRolesResponseAndPermissions, error) {
 	user, err := s.userRepo.GetUserWithRolesAndPermissions(userID)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.convertToUserWithRolesResponse(user), nil
-}
-
-func (s *userService) convertToResponse(user *domain.User) *response.UserResponse {
-	return &response.UserResponse{
-		ID:        user.ID,
-		Username:  user.Username,
-		Name:      user.Name,
-		Email:     user.Email,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
-	}
-}
-
-func (s *userService) convertToUserWithRolesResponse(user *domain.User) *response.UserWithRolesResponse {
-
-	// Convert roles to response
-	var roleResponses []response.RoleListResponse
-	for _, role := range user.Roles {
-		roleResponses = append(roleResponses, response.RoleListResponse{
-			ID:          role.ID,
-			Name:        role.Name,
-			Description: role.Description,
-		})
-	}
-
-	return &response.UserWithRolesResponse{
-		ID:          user.ID,
-		Username:    user.Username,
-		Name:        user.Name,
-		Email:       user.Email,
-		Roles:       roleResponses,
-		Permissions: user.GetPermissions(), // Use the method from domain
-		CreatedAt:   user.CreatedAt,
-		UpdatedAt:   user.UpdatedAt,
-	}
+	return converter.ToUserWithRolesResponseAndPermissions(user), nil
 }

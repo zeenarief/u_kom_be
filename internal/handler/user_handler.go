@@ -63,19 +63,16 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 
 	var req request.UserUpdateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		//c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		BadRequestError(c, "Invalid request payload", err.Error())
 		return
 	}
 
 	user, err := h.userService.UpdateUser(id, req)
 	if err != nil {
-		//c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		NotFoundError(c, err.Error())
 		return
 	}
 
-	//c.JSON(http.StatusOK, user)
 	SuccessResponse(c, "User updated successfully", user)
 }
 

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"belajar-golang/internal/converter"
 	"belajar-golang/internal/model/domain"
 	"belajar-golang/internal/model/request"
 	"belajar-golang/internal/model/response"
@@ -15,7 +16,7 @@ import (
 )
 
 type AuthService interface {
-	Register(req request.UserCreateRequest) (*response.UserResponse, error)
+	Register(req request.UserCreateRequest) (*response.UserWithRoleResponse, error)
 	Login(req request.LoginRequest) (*response.AuthResponse, error)
 	RefreshToken(refreshToken string) (*response.AuthResponse, error)
 	ValidateToken(tokenString string) (string, error)
@@ -41,9 +42,9 @@ func NewAuthService(userRepo repository.UserRepository, jwtSecret, refreshSecret
 	}
 }
 
-func (s *authService) Register(req request.UserCreateRequest) (*response.UserResponse, error) {
+func (s *authService) Register(req request.UserCreateRequest) (*response.UserWithRoleResponse, error) {
 	// Check if email already exists
-	existingUser, err := s.userRepo.FindByEmail(req.Email)
+	existingUser, err := s.userRepo.FindByEmailWithRelations(req.Email)
 	if err != nil {
 		return nil, fmt.Errorf("error checking email: %v", err)
 	}
@@ -52,7 +53,7 @@ func (s *authService) Register(req request.UserCreateRequest) (*response.UserRes
 	}
 
 	// Check if username already exists
-	existingUser, err = s.userRepo.FindByUsername(req.Username)
+	existingUser, err = s.userRepo.FindByUsernameWithRelations(req.Username)
 	if err != nil {
 		return nil, fmt.Errorf("error checking username: %v", err)
 	}
@@ -97,8 +98,14 @@ func (s *authService) Register(req request.UserCreateRequest) (*response.UserRes
 		return nil, err
 	}
 
-	// Convert domain model to response
-	return s.convertToResponse(user), nil
+	// Reload user dengan roles dan permissions
+	createdUser, err := s.userRepo.GetUserWithRolesAndPermissions(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return converter.ToUserWithRoleResponse(createdUser), nil
+
 }
 
 func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, error) {
@@ -106,14 +113,14 @@ func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, e
 	var err error
 
 	// Coba sebagai email dulu
-	user, err = s.userRepo.FindByEmail(req.Login)
+	user, err = s.userRepo.FindByEmailWithRelations(req.Login)
 	if err != nil {
 		return nil, errors.New("invalid login or password")
 	}
 
 	// Jika tidak ditemukan sebagai email, coba sebagai username
 	if user == nil {
-		user, err = s.userRepo.FindByUsername(req.Login)
+		user, err = s.userRepo.FindByUsernameWithRelations(req.Login)
 		if err != nil {
 			return nil, errors.New("invalid login or password")
 		}
@@ -145,14 +152,16 @@ func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, e
 	}
 
 	// Convert user to response
-	userResponse := response.UserResponse{
-		ID:        user.ID,
-		Username:  user.Username,
-		Name:      user.Name,
-		Email:     user.Email,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
-	}
+	//userResponse := response.UserWithRoleResponse{
+	//	ID:       user.ID,
+	//	Username: user.Username,
+	//	Name:     user.Name,
+	//	Email:    user.Email,
+	//
+	//	CreatedAt: user.CreatedAt,
+	//	UpdatedAt: user.UpdatedAt,
+	//}
+	userResponse := *converter.ToUserWithRoleResponse(user)
 
 	return &response.AuthResponse{
 		AccessToken:  accessToken,
@@ -198,7 +207,7 @@ func (s *authService) RefreshToken(refreshToken string) (*response.AuthResponse,
 		return nil, err
 	}
 
-	userResponse := response.UserResponse{
+	userResponse := response.UserWithRoleResponse{
 		ID:        user.ID,
 		Username:  user.Username,
 		Name:      user.Name,
@@ -310,8 +319,8 @@ func (s *authService) validateRefreshToken(tokenString string) (string, error) {
 	return userID, nil
 }
 
-func (s *authService) convertToResponse(user *domain.User) *response.UserResponse {
-	return &response.UserResponse{
+func (s *authService) convertToResponse(user *domain.User) *response.UserWithRoleResponse {
+	return &response.UserWithRoleResponse{
 		ID:        user.ID,
 		Username:  user.Username,
 		Name:      user.Name,

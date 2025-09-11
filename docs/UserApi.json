@@ -1398,6 +1398,26 @@
             "format": "email",
             "example": "john.doe@example.com"
           },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "example": "uuid"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "admin"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "Regular Role"
+                }
+              }
+            }
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",

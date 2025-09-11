@@ -148,12 +148,18 @@ Content-Type: {{contentType}}
         // Check if user has admin role
         let isAdmin = false;
         for (let role of response.body.data.roles) {
-            if (role === "admin") {
+            if (role.name === "admin") {
                 isAdmin = true;
                 break;
             }
         }
         client.assert(isAdmin, "User is not an admin");
+
+        // Simpan role id pertama (opsional, bisa pilih yang name == admin)
+        const adminRole = response.body.data.roles.find(role => role.name === "admin");
+        if (adminRole) {
+            client.global.set("adminRoleId", adminRole.id);
+        }
     });
 %}
 
@@ -178,6 +184,10 @@ Content-Type: {{contentType}}
 
         // Simpan user ID untuk test selanjutnya
         client.global.set("adminCreatedUserId", response.body.data.id);
+        const userRole = response.body.data.roles.find(role => role.name === "user");
+        if (userRole) {
+            client.global.set("userRoleId", userRole.id);
+        }
     });
 %}
 
@@ -192,7 +202,7 @@ Content-Type: {{contentType}}
   "password": "Password123!",
   "name": "Admin Created User With Role {{$timestamp}}",
   "email": "admincreatedwithrole{{$timestamp}}@example.com",
-  "role_ids": ["{{adminRoleId}}"]
+  "role_ids": ["{{adminRoleId}}","{{userRoleId}}"]
 }
 
 > {%
@@ -289,10 +299,9 @@ Authorization: Bearer {{authToken}}
 Content-Type: {{contentType}}
 
 > {%
-    client.test("Get Own User By ID as Regular User - Success", function() {
-        client.assert(response.status === 200, "Response status is not 200");
-        client.assert(response.body.status === "success", "Status is not success");
-        client.assert(response.body.data.id === client.global.get("userId"), "User ID mismatch");
+    client.test("Get Own User By ID as Regular User - Should Fail", function() {
+        client.assert(response.status === 403, "Expected 403 Forbidden for accessing other user's data");
+        client.assert(response.body.status === "error", "Expected error status");
     });
 %}
 
