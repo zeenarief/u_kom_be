@@ -15,13 +15,14 @@ type UserService interface {
 	CreateUser(req request.UserCreateRequest) (*response.UserWithRoleResponse, error)
 	GetUserByID(id string) (*response.UserWithRolesResponseAndPermissions, error)
 	GetAllUsers() ([]response.UserWithRoleResponse, error)
-	UpdateUser(id string, req request.UserUpdateRequest) (*response.UserWithRoleResponse, error)
-	DeleteUser(id string) error
-	ChangePassword(id string, currentPassword, newPassword string) error
+	UpdateUser(id string, req request.UserUpdateRequest, currentUserID string, currentUserPermissions []string) (*response.UserWithRoleResponse, error) // Tambahkan parameter
+	DeleteUser(id string, currentUserID string, currentUserPermissions []string) error                                                                  // Tambahkan parameter
+	ChangePassword(id string, currentPassword, newPassword string, currentUserID string, currentUserPermissions []string) error                         // Tambahkan parameter
 	GetProfile(userID string) (*response.ProfileResponse, error)
-	SyncUserRoles(userID string, roleNames []string) error
-	SyncUserPermissions(userID string, permissionNames []string) error
+	SyncUserRoles(userID string, roleNames []string, currentUserID string, currentUserPermissions []string) error             // Tambahkan parameter
+	SyncUserPermissions(userID string, permissionNames []string, currentUserID string, currentUserPermissions []string) error // Tambahkan parameter
 	GetUserWithRolesAndPermissions(userID string) (*response.UserWithRolesResponseAndPermissions, error)
+	GetUserPermissions(userID string) ([]string, error) // Tambahkan method baru
 }
 
 type userService struct {
@@ -138,10 +139,15 @@ func (s *userService) GetAllUsers() ([]response.UserWithRoleResponse, error) {
 	return responses, nil
 }
 
-func (s *userService) UpdateUser(id string, req request.UserUpdateRequest) (*response.UserWithRoleResponse, error) {
+func (s *userService) UpdateUser(id string, req request.UserUpdateRequest, currentUserID string, currentUserPermissions []string) (*response.UserWithRoleResponse, error) {
 	user, err := s.userRepo.FindByID(id)
 	if err != nil {
 		return nil, errors.New("user not found")
+	}
+
+	// Validasi: user hanya bisa mengupdate dirinya sendiri kecuali memiliki permission users.update.others
+	if id != currentUserID && !s.hasPermission(currentUserPermissions, "users.update.others") {
+		return nil, errors.New("unauthorized: you can only update your own profile")
 	}
 
 	// Update fields if provided
@@ -163,15 +169,24 @@ func (s *userService) UpdateUser(id string, req request.UserUpdateRequest) (*res
 	}
 
 	// Reload user dengan roles dan permissions
-	createdUser, err := s.userRepo.GetUserWithRolesAndPermissions(user.ID)
+	updatedUser, err := s.userRepo.GetUserWithRolesAndPermissions(user.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	return converter.ToUserWithRoleResponse(createdUser), nil
+	return converter.ToUserWithRoleResponse(updatedUser), nil
 }
 
-func (s *userService) DeleteUser(id string) error {
+func (s *userService) DeleteUser(id string, currentUserID string, currentUserPermissions []string) error {
+	// Validasi: user tidak bisa menghapus dirinya sendiri dan harus memiliki permission users.delete
+	if id == currentUserID {
+		return errors.New("cannot delete your own account")
+	}
+
+	if !s.hasPermission(currentUserPermissions, "users.delete") {
+		return errors.New("unauthorized: insufficient permissions")
+	}
+
 	_, err := s.userRepo.FindByID(id)
 	if err != nil {
 		return errors.New("user not found")
@@ -180,15 +195,22 @@ func (s *userService) DeleteUser(id string) error {
 	return s.userRepo.Delete(id)
 }
 
-func (s *userService) ChangePassword(id string, currentPassword, newPassword string) error {
+func (s *userService) ChangePassword(id string, currentPassword, newPassword string, currentUserID string, currentUserPermissions []string) error {
+	// Validasi: user hanya bisa mengubah password sendiri kecuali memiliki permission users.change_password.others
+	if id != currentUserID && !s.hasPermission(currentUserPermissions, "users.change_password.others") {
+		return errors.New("unauthorized: you can only change your own password")
+	}
+
 	user, err := s.userRepo.FindByID(id)
 	if err != nil {
 		return errors.New("user not found")
 	}
 
-	// Verify current password
-	if !utils.CheckPasswordHash(currentPassword, user.Password) {
-		return errors.New("current password is incorrect")
+	// Jika mengubah password orang lain, skip current password verification
+	if id == currentUserID {
+		if !utils.CheckPasswordHash(currentPassword, user.Password) {
+			return errors.New("current password is incorrect")
+		}
 	}
 
 	// Hash new password
@@ -222,7 +244,11 @@ func (s *userService) GetProfile(userID string) (*response.ProfileResponse, erro
 	}, nil
 }
 
-func (s *userService) SyncUserRoles(userID string, roleNames []string) error {
+func (s *userService) SyncUserRoles(userID string, roleNames []string, currentUserID string, currentUserPermissions []string) error {
+	if !s.hasPermission(currentUserPermissions, "users.manage_roles") {
+		return errors.New("unauthorized: insufficient permissions")
+	}
+
 	// Convert role names to IDs
 	var roleIDs []string
 	for _, roleName := range roleNames {
@@ -239,7 +265,11 @@ func (s *userService) SyncUserRoles(userID string, roleNames []string) error {
 	return s.userRepo.SyncRoles(userID, roleIDs)
 }
 
-func (s *userService) SyncUserPermissions(userID string, permissionNames []string) error {
+func (s *userService) SyncUserPermissions(userID string, permissionNames []string, currentUserID string, currentUserPermissions []string) error {
+	if !s.hasPermission(currentUserPermissions, "users.manage_permissions") {
+		return errors.New("unauthorized: insufficient permissions")
+	}
+
 	// Convert permission names to IDs
 	var permissionIDs []string
 	for _, permName := range permissionNames {
@@ -263,4 +293,38 @@ func (s *userService) GetUserWithRolesAndPermissions(userID string) (*response.U
 	}
 
 	return converter.ToUserWithRolesResponseAndPermissions(user), nil
+}
+
+func (s *userService) GetUserPermissions(userID string) ([]string, error) {
+	user, err := s.userRepo.GetUserWithRolesAndPermissions(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var permissions []string
+
+	// Ambil permissions dari roles
+	for _, role := range user.Roles {
+		for _, permission := range role.Permissions {
+			permissions = append(permissions, permission.Name)
+		}
+	}
+
+	// Ambil permissions langsung
+	for _, permission := range user.Permissions {
+		permissions = append(permissions, permission.Name)
+	}
+
+	// Remove duplicates
+	return utils.RemoveDuplicates(permissions), nil
+}
+
+// Helper function untuk mengecek permission
+func (s *userService) hasPermission(permissions []string, requiredPermission string) bool {
+	for _, perm := range permissions {
+		if perm == requiredPermission {
+			return true
+		}
+	}
+	return false
 }

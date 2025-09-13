@@ -13,6 +13,8 @@ INSERT INTO permissions (id, name, description, created_at, updated_at) VALUES
                                                                             (UUID(), 'users.read', 'Read all users', NOW(), NOW()),
                                                                             (UUID(), 'users.create', 'Create new users', NOW(), NOW()),
                                                                             (UUID(), 'users.update', 'Update users', NOW(), NOW()),
+                                                                            (UUID(), 'users.update.others', 'Update other users', NOW(), NOW()),
+                                                                            (UUID(), 'users.change_password.others', 'Change password other users', NOW(), NOW()),
                                                                             (UUID(), 'users.delete', 'Delete users', NOW(), NOW()),
                                                                             (UUID(), 'users.manage_roles', 'Manage user roles', NOW(), NOW()),
                                                                             (UUID(), 'users.manage_permissions', 'Manage user permissions', NOW(), NOW()),

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"belajar-golang/internal/handler"
+	"belajar-golang/internal/model/domain"
 	"belajar-golang/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -10,39 +11,22 @@ import (
 // PermissionMiddleware checks if user has required permission
 func PermissionMiddleware(permission string, authService service.AuthService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userID, exists := c.Get("userID")
+		user, exists := c.Get("user")
 		if !exists {
-			//c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found"})
-			handler.UnauthorizedError(c, "User ID not found")
+			handler.UnauthorizedError(c, "User not found")
 			c.Abort()
 			return
 		}
 
-		userIDStr, ok := userID.(string)
+		userDomain, ok := user.(*domain.User)
 		if !ok {
-			//c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
-			handler.InternalServerError(c, "Invalid user ID")
-			c.Abort()
-			return
-		}
-
-		// Get user with roles and permissions
-		user, err := authService.GetUserWithPermissions(userIDStr)
-		if err != nil {
-			//c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user permissions"})
-			handler.InternalServerError(c, "Failed to get user permissions")
+			handler.InternalServerError(c, "Invalid user object")
 			c.Abort()
 			return
 		}
 
 		// Check if user has the required permission
-		if !user.HasPermission(permission) {
-			//c.JSON(http.StatusForbidden, gin.H{
-			//	"error":               "Access denied",
-			//	"message":             "You don't have permission to access this resource",
-			//	"required_permission": permission,
-			//	"your_permissions":    user.GetPermissions(),
-			//})
+		if !userDomain.HasPermission(permission) {
 			handler.ForbiddenError(c, "You don't have permission to access this resource")
 			c.Abort()
 			return

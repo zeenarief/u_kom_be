@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"belajar-golang/internal/model/domain"
 	"belajar-golang/internal/model/request"
 	"belajar-golang/internal/service"
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -63,30 +65,64 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 
 	var req request.UserUpdateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		//c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		BadRequestError(c, "Invalid request payload", err.Error())
 		return
 	}
 
-	user, err := h.userService.UpdateUser(id, req)
-	if err != nil {
-		NotFoundError(c, err.Error())
+	// Dapatkan current user dari context
+	currentUser, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "user not found in context"})
+		UnauthorizedError(c, "user not found in context")
 		return
 	}
 
-	SuccessResponse(c, "User updated successfully", user)
+	currentUserDomain := currentUser.(*domain.User)
+
+	// Dapatkan permissions current user
+	currentPermissions, err := h.userService.GetUserPermissions(currentUserDomain.ID)
+	if err != nil {
+		//c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get user permissions"})
+		InternalServerError(c, err.Error())
+		return
+	}
+
+	updatedUser, err := h.userService.UpdateUser(id, req, currentUserDomain.ID, currentPermissions)
+	if err != nil {
+		//c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		BadRequestError(c, "Bad request", err.Error())
+		return
+	}
+
+	//c.JSON(http.StatusOK, updatedUser)
+	SuccessResponse(c, "User updated successfully", updatedUser)
 }
 
 func (h *UserHandler) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
 
-	err := h.userService.DeleteUser(id)
+	// Dapatkan current user dari context
+	currentUser, exists := c.Get("user")
+	if !exists {
+		UnauthorizedError(c, "user not found in context")
+		return
+	}
+	currentUserDomain := currentUser.(*domain.User)
+
+	// Dapatkan permissions current user
+	currentPermissions, err := h.userService.GetUserPermissions(currentUserDomain.ID)
 	if err != nil {
-		//c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		InternalServerError(c, "failed to get user permissions")
+		return
+	}
+
+	err = h.userService.DeleteUser(id, currentUserDomain.ID, currentPermissions)
+	if err != nil {
 		InternalServerError(c, err.Error())
 		return
 	}
 
-	//c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 	SuccessResponse(c, "User deleted successfully", nil)
 }
 
@@ -99,19 +135,31 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		//c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		BadRequestError(c, "Invalid request payload", err.Error())
 		return
 	}
 
-	err := h.userService.ChangePassword(id, req.CurrentPassword, req.NewPassword)
+	// Dapatkan current user dari context
+	currentUser, exists := c.Get("user")
+	if !exists {
+		UnauthorizedError(c, "user not found in context")
+		return
+	}
+	currentUserDomain := currentUser.(*domain.User)
+
+	// Dapatkan permissions current user
+	currentPermissions, err := h.userService.GetUserPermissions(currentUserDomain.ID)
 	if err != nil {
-		//c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		InternalServerError(c, err.Error())
+		InternalServerError(c, "failed to get user permissions")
 		return
 	}
 
-	//c.JSON(http.StatusOK, gin.H{"message": "Password changed successfully"})
+	err = h.userService.ChangePassword(id, req.CurrentPassword, req.NewPassword, currentUserDomain.ID, currentPermissions)
+	if err != nil {
+		ForbiddenError(c, err.Error())
+		return
+	}
+
 	SuccessResponse(c, "Password changed successfully", nil)
 }
 
@@ -149,7 +197,22 @@ func (h *UserHandler) SyncUserRoles(c *gin.Context) {
 		return
 	}
 
-	err := h.userService.SyncUserRoles(userID, req.Roles)
+	// Dapatkan current user dari context
+	currentUser, exists := c.Get("user")
+	if !exists {
+		UnauthorizedError(c, "user not found in context")
+		return
+	}
+	currentUserDomain := currentUser.(*domain.User)
+
+	// Dapatkan permissions current user
+	currentPermissions, err := h.userService.GetUserPermissions(currentUserDomain.ID)
+	if err != nil {
+		InternalServerError(c, "failed to get user permissions")
+		return
+	}
+
+	err = h.userService.SyncUserRoles(userID, req.Roles, currentUserDomain.ID, currentPermissions)
 	if err != nil {
 		InternalServerError(c, err.Error())
 		return
@@ -170,7 +233,22 @@ func (h *UserHandler) SyncUserPermissions(c *gin.Context) {
 		return
 	}
 
-	err := h.userService.SyncUserPermissions(userID, req.Permissions)
+	// Dapatkan current user dari context
+	currentUser, exists := c.Get("user")
+	if !exists {
+		UnauthorizedError(c, "user not found in context")
+		return
+	}
+	currentUserDomain := currentUser.(*domain.User)
+
+	// Dapatkan permissions current user
+	currentPermissions, err := h.userService.GetUserPermissions(currentUserDomain.ID)
+	if err != nil {
+		InternalServerError(c, "failed to get user permissions")
+		return
+	}
+
+	err = h.userService.SyncUserPermissions(userID, req.Permissions, currentUserDomain.ID, currentPermissions)
 	if err != nil {
 		InternalServerError(c, err.Error())
 		return

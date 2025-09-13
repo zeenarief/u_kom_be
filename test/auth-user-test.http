@@ -381,7 +381,8 @@ Authorization: Bearer {{adminAuthToken}}
 Content-Type: {{contentType}}
 
 {
-  "new_password": "AdminChangedPassword123!"
+  "new_password": "AdminChangedPassword123!",
+  "current_password": "Password123!"
 }
 
 > {%
