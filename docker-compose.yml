@@ -1,0 +1,39 @@
+#version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: belajar-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: belajar_golang
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - belajar_net
+
+  api:
+    build: .
+    container_name: golang-restfull-api
+    depends_on:
+      - db
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db   # Override agar mengarah ke container MySQL, bukan localhost
+    networks:
+      - belajar_net
+
+volumes:
+  db_data:
+
+networks:
+  belajar_net:
