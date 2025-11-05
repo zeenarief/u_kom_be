@@ -45,6 +45,10 @@ type Config struct {
 	RateLimitEnabled    bool
 	RateLimitRequests   int
 	RateLimitTimeWindow time.Duration
+
+	// Auto migration & seeding
+	AutoMigrate bool
+	AutoSeed    bool
 }
 
 func LoadConfig() *Config {
@@ -89,6 +93,10 @@ func LoadConfig() *Config {
 		RateLimitEnabled:    getEnvAsBool("RATE_LIMIT_ENABLED", false),
 		RateLimitRequests:   getEnvAsInt("RATE_LIMIT_REQUESTS", 100),
 		RateLimitTimeWindow: time.Duration(getEnvAsInt("RATE_LIMIT_TIME_WINDOW", 3600)) * time.Second,
+
+		// Auto migration settings
+		AutoMigrate: getEnvAsBool("AUTO_MIGRATE", true),
+		AutoSeed:    getEnvAsBool("AUTO_SEED", true),
 	}
 }
 

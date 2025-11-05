@@ -9,11 +9,11 @@ import (
 
 type User struct {
 	ID               string       `gorm:"primaryKey;type:char(36)" json:"id"`
-	Username         string       `gorm:"uniqueIndex;not null" json:"username"`
-	Name             string       `gorm:"not null" json:"name"`
-	Email            string       `gorm:"uniqueIndex;not null" json:"email"`
-	Password         string       `gorm:"not null" json:"-"`
-	CurrentTokenHash string       `gorm:"type:varchar(255)" json:"-"`
+	Username         string       `gorm:"type:varchar(255);uniqueIndex;not null" json:"username"`
+	Name             string       `gorm:"type:varchar(255);not null" json:"name"`
+	Email            string       `gorm:"type:varchar(255);uniqueIndex;not null" json:"email"`
+	Password         string       `gorm:"type:varchar(255);not null" json:"-"`
+	CurrentTokenHash *string      `gorm:"type:varchar(255);null" json:"-"` // Changed to pointer untuk NULL
 	Roles            []Role       `gorm:"many2many:user_role;" json:"roles,omitempty"`
 	Permissions      []Permission `gorm:"many2many:user_permission;" json:"permissions,omitempty"`
 	CreatedAt        time.Time    `json:"created_at"`

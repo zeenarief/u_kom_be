@@ -5,11 +5,13 @@ services:
     image: mariadb:10.6
     container_name: belajar-mariadb
     restart: unless-stopped
+    env_file:
+      - .env.prod
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: belajar_golang
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
@@ -23,20 +25,49 @@ services:
           memory: 512M
         reservations:
           memory: 256M
+    # TAMBAHKAN HEALTHCHECK agar kita tahu kapan DB siap
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${DB_USER}", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # SERVICE BARU UNTUK MIGRASI
+  migrate:
+    build: . # Build image yang sama dengan 'api'
+    container_name: golang-migration-runner
+    # 'depends_on' dengan 'condition: service_healthy'
+    # Ini memastikan 'migrate' baru jalan setelah 'db' 100% siap
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env.prod
+    environment:
+      DB_HOST: db # Pastikan ini mengarah ke service 'db'
+    networks:
+      - belajar_net
+    # Override CMD default. Jalankan migrasi, lalu exit.
+    command: [ "./server", "-migrate-sql" ]
+    # 'on-failure' akan coba lagi jika migrasi gagal (misal DB belum siap)
+    restart: on-failure
 
 
   api:
     build: .
     container_name: golang-restfull-api
+    # 'api' SEKARANG bergantung pada 'migrate'
+    # Ini memastikan 'api' baru start SETELAH 'migrate' selesai sukses
     depends_on:
-      - db
+      - migrate
     restart: unless-stopped
     ports:
       - "8080:8080"
     env_file:
-      - .env
+      - .env.prod
     environment:
-      DB_HOST: db   # Override agar mengarah ke container MariaDB, bukan localhost
+      DB_HOST: db
     networks:
       - belajar_net
     deploy:
@@ -45,7 +76,6 @@ services:
           memory: 256M
         reservations:
           memory: 128M
-
 
 volumes:
   db_data:
