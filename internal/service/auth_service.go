@@ -147,20 +147,10 @@ func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, e
 
 	// Hash the access token and save to database
 	tokenHash := utils.HashToken(accessToken)
-	if err := s.userRepo.UpdateTokenHash(user.ID, tokenHash); err != nil {
+	if err := s.userRepo.UpdateTokenHash(user.ID, &tokenHash); err != nil {
 		return nil, err
 	}
 
-	// Convert user to response
-	//userResponse := response.UserWithRoleResponse{
-	//	ID:       user.ID,
-	//	Username: user.Username,
-	//	Name:     user.Name,
-	//	Email:    user.Email,
-	//
-	//	CreatedAt: user.CreatedAt,
-	//	UpdatedAt: user.UpdatedAt,
-	//}
 	userResponse := *converter.ToUserWithRoleResponse(user)
 
 	return &response.AuthResponse{
@@ -174,7 +164,7 @@ func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, e
 
 func (s *authService) Logout(userID string) error {
 	// Set token hash menjadi empty string, sehingga token sekarang tidak valid
-	return s.userRepo.UpdateTokenHash(userID, "")
+	return s.userRepo.UpdateTokenHash(userID, nil)
 }
 
 func (s *authService) RefreshToken(refreshToken string) (*response.AuthResponse, error) {
@@ -203,7 +193,7 @@ func (s *authService) RefreshToken(refreshToken string) (*response.AuthResponse,
 
 	// ✅ Update token hash for the new token
 	tokenHash := utils.HashToken(newAccessToken)
-	if err := s.userRepo.UpdateTokenHash(user.ID, tokenHash); err != nil {
+	if err := s.userRepo.UpdateTokenHash(user.ID, &tokenHash); err != nil {
 		return nil, err
 	}
 
@@ -255,13 +245,13 @@ func (s *authService) ValidateToken(tokenString string) (string, error) {
 	}
 
 	// Jika token hash kosong, berarti user sudah logout
-	if currentTokenHash == "" {
+	if currentTokenHash == nil {
 		return "", errors.New("token revoked - user logged out")
 	}
 
 	// Hash the incoming token and compare with stored hash
 	incomingTokenHash := utils.HashToken(tokenString)
-	if incomingTokenHash != currentTokenHash {
+	if incomingTokenHash != *currentTokenHash {
 		return "", errors.New("token revoked - new login detected")
 	}
 

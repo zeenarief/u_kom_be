@@ -18,8 +18,8 @@ type UserRepository interface {
 	FindAll() ([]domain.User, error)
 	Update(user *domain.User) error
 	Delete(id string) error
-	UpdateTokenHash(id string, tokenHash string) error
-	GetTokenHash(id string) (string, error)
+	UpdateTokenHash(id string, tokenHash *string) error
+	GetTokenHash(id string) (*string, error)
 	GetUserWithRolesAndPermissions(id string) (*domain.User, error)
 	SyncRoles(id string, roleIDs []string) error
 	SyncPermissions(id string, permissionIDs []string) error
@@ -35,16 +35,16 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	return &userRepository{db: db}
 }
 
-func (r *userRepository) GetTokenHash(id string) (string, error) {
+func (r *userRepository) GetTokenHash(id string) (*string, error) {
 	var user domain.User
 	err := r.db.Select("current_token_hash").First(&user, "id = ?", id).Error
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	return user.CurrentTokenHash, nil
 }
 
-func (r *userRepository) UpdateTokenHash(id string, tokenHash string) error {
+func (r *userRepository) UpdateTokenHash(id string, tokenHash *string) error {
 	return r.db.Model(&domain.User{}).Where("id = ?", id).Update("current_token_hash", tokenHash).Error
 }
 
