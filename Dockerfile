@@ -4,7 +4,7 @@ LABEL authors="zeen"
 ENTRYPOINT ["top", "-b"]
 
 # Tahap 1: Build
-FROM golang:1.22-alpine AS builder
+FROM golang:1.25-alpine AS builder
 
 # Set direktori kerja di dalam container
 WORKDIR /app
@@ -19,7 +19,7 @@ RUN go mod download
 COPY . .
 
 # Build binary
-RUN go build -o server ./cmd/server/main.go
+RUN go build -o server ./cmd/server
 
 # Tahap 2: Runtime
 FROM alpine:latest
@@ -38,3 +38,4 @@ EXPOSE 8080
 
 # Jalankan aplikasi
 CMD ["./server"]
+
