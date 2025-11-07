@@ -3,11 +3,13 @@ package main
 import (
 	"belajar-golang/cmd/server/routes"
 	"belajar-golang/internal/config"
+	"belajar-golang/internal/converter"
 	"belajar-golang/internal/database"
 	"belajar-golang/internal/handler"
 	"belajar-golang/internal/middleware"
 	"belajar-golang/internal/repository"
 	"belajar-golang/internal/service"
+	"belajar-golang/internal/utils"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -22,6 +24,7 @@ type Server struct {
 	AuthHandler       *handler.AuthHandler
 	RoleHandler       *handler.RoleHandler
 	PermissionHandler *handler.PermissionHandler
+	StudentHandler    *handler.StudentHandler
 	AuthService       service.AuthService
 }
 
@@ -48,11 +51,22 @@ func NewServer() *Server {
 	userRepo := repository.NewUserRepository(db)
 	roleRepo := repository.NewRoleRepository(db)
 	permissionRepo := repository.NewPermissionRepository(db)
+	studentRepo := repository.NewStudentRepository(db)
+
+	// Initialize utils
+	encryptionUtil, err := utils.NewEncryptionUtil(cfg.EncryptionKey)
+	if err != nil {
+		log.Fatal("Failed to create encryption util:", err)
+	}
+
+	// Initialize converters
+	studentConverter := converter.NewStudentConverter(encryptionUtil)
 
 	// Initialize services
 	userService := service.NewUserService(userRepo, roleRepo, permissionRepo)
 	roleService := service.NewRoleService(roleRepo, permissionRepo)
 	permissionService := service.NewPermissionService(permissionRepo)
+	studentService := service.NewStudentService(studentRepo, encryptionUtil, studentConverter)
 	authService := service.NewAuthService(
 		userRepo,
 		cfg.JWTSecret,
@@ -66,6 +80,7 @@ func NewServer() *Server {
 	authHandler := handler.NewAuthHandler(authService)
 	roleHandler := handler.NewRoleHandler(roleService)
 	permissionHandler := handler.NewPermissionHandler(permissionService)
+	studentHandler := handler.NewStudentHandler(studentService)
 
 	// Setup router with middleware
 	router := setupRouter(cfg, authService)
@@ -77,6 +92,7 @@ func NewServer() *Server {
 		AuthHandler:       authHandler,
 		RoleHandler:       roleHandler,
 		PermissionHandler: permissionHandler,
+		StudentHandler:    studentHandler,
 		AuthService:       authService,
 	}
 }
@@ -107,6 +123,7 @@ func (s *Server) Start() error {
 		s.AuthService,
 		s.RoleHandler,
 		s.PermissionHandler,
+		s.StudentHandler,
 	)
 
 	// Start server

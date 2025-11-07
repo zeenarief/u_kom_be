@@ -26,6 +26,9 @@ type Config struct {
 	JWTAccessTokenExpire  time.Duration
 	JWTRefreshTokenExpire time.Duration
 
+	// Encryption
+	EncryptionKey string
+
 	// Server
 	ServerPort string
 	ServerHost string
@@ -73,6 +76,9 @@ func LoadConfig() *Config {
 		JWTRefreshSecret:      getEnv("JWT_REFRESH_SECRET", "very-secret-refresh-key-change-in-production"),
 		JWTAccessTokenExpire:  time.Duration(getEnvAsInt("JWT_ACCESS_TOKEN_EXPIRE", 15)) * time.Minute,
 		JWTRefreshTokenExpire: time.Duration(getEnvAsInt("JWT_REFRESH_TOKEN_EXPIRE", 10080)) * time.Minute,
+
+		// Encryption
+		EncryptionKey: getEnv("ENCRYPTION_KEY", "default_32_byte_key_1234567890!@"),
 
 		// Server
 		ServerPort: getEnv("SERVER_PORT", "8080"),
