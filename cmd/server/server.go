@@ -26,6 +26,7 @@ type Server struct {
 	PermissionHandler *handler.PermissionHandler
 	StudentHandler    *handler.StudentHandler
 	ParentHandler     *handler.ParentHandler
+	GuardianHandler   *handler.GuardianHandler
 	AuthService       service.AuthService
 }
 
@@ -54,6 +55,7 @@ func NewServer() *Server {
 	permissionRepo := repository.NewPermissionRepository(db)
 	studentRepo := repository.NewStudentRepository(db)
 	parentRepo := repository.NewParentRepository(db)
+	guardianRepo := repository.NewGuardianRepository(db)
 
 	// Initialize utils
 	encryptionUtil, err := utils.NewEncryptionUtil(cfg.EncryptionKey)
@@ -64,6 +66,7 @@ func NewServer() *Server {
 	// Initialize converters
 	studentConverter := converter.NewStudentConverter(encryptionUtil)
 	parentConverter := converter.NewParentConverter(encryptionUtil)
+	guardianConverter := converter.NewGuardianConverter(encryptionUtil)
 
 	// Initialize services
 	userService := service.NewUserService(userRepo, roleRepo, permissionRepo)
@@ -71,6 +74,7 @@ func NewServer() *Server {
 	permissionService := service.NewPermissionService(permissionRepo)
 	studentService := service.NewStudentService(studentRepo, encryptionUtil, studentConverter)
 	parentService := service.NewParentService(parentRepo, encryptionUtil, parentConverter)
+	guardianService := service.NewGuardianService(guardianRepo, encryptionUtil, guardianConverter)
 	authService := service.NewAuthService(
 		userRepo,
 		cfg.JWTSecret,
@@ -86,6 +90,7 @@ func NewServer() *Server {
 	permissionHandler := handler.NewPermissionHandler(permissionService)
 	studentHandler := handler.NewStudentHandler(studentService)
 	parentHandler := handler.NewParentHandler(parentService)
+	guardianHandler := handler.NewGuardianHandler(guardianService)
 
 	// Setup router with middleware
 	router := setupRouter(cfg, authService)
@@ -99,6 +104,7 @@ func NewServer() *Server {
 		PermissionHandler: permissionHandler,
 		StudentHandler:    studentHandler,
 		ParentHandler:     parentHandler,
+		GuardianHandler:   guardianHandler,
 		AuthService:       authService,
 	}
 }
@@ -131,6 +137,7 @@ func (s *Server) Start() error {
 		s.PermissionHandler,
 		s.StudentHandler,
 		s.ParentHandler,
+		s.GuardianHandler,
 	)
 
 	// Start server

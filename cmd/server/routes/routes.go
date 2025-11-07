@@ -18,6 +18,7 @@ func SetupRoutes(
 	permissionHandler *handler.PermissionHandler,
 	studentHandler *handler.StudentHandler,
 	parentHandler *handler.ParentHandler,
+	guardianHandler *handler.GuardianHandler,
 ) {
 	// API v1 group
 	apiV1 := router.Group("/api/v1")
@@ -29,6 +30,7 @@ func SetupRoutes(
 	RegisterPermissionRoutes(apiV1, permissionHandler, authService)
 	RegisterStudentRoutes(apiV1, studentHandler, authService)
 	RegisterParentRoutes(apiV1, parentHandler, authService)
+	RegisterGuardianRoutes(apiV1, guardianHandler, authService)
 
 	// Health check route
 	apiV1.GET("/health", healthCheck)
