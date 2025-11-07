@@ -17,21 +17,25 @@ type StudentService interface {
 	GetAllStudents() ([]response.StudentListResponse, error)
 	UpdateStudent(id string, req request.StudentUpdateRequest) (*response.StudentDetailResponse, error)
 	DeleteStudent(id string) error
+	SyncParents(studentID string, req request.StudentSyncParentsRequest) error
 }
 
 type studentService struct {
 	studentRepo    repository.StudentRepository
+	parentRepo     repository.ParentRepository
 	encryptionUtil utils.EncryptionUtil                // <-- Untuk ENKRIPSI
 	converter      converter.StudentConverterInterface // <-- Untuk DEKRIPSI/Response
 }
 
 func NewStudentService(
 	studentRepo repository.StudentRepository,
+	parentRepo repository.ParentRepository,
 	encryptionUtil utils.EncryptionUtil,
 	converter converter.StudentConverterInterface,
 ) StudentService {
 	return &studentService{
 		studentRepo:    studentRepo,
+		parentRepo:     parentRepo,
 		encryptionUtil: encryptionUtil,
 		converter:      converter,
 	}
@@ -109,7 +113,7 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 
 // GetStudentByID mengambil satu siswa
 func (s *studentService) GetStudentByID(id string) (*response.StudentDetailResponse, error) {
-	student, err := s.studentRepo.FindByID(id)
+	student, err := s.studentRepo.FindByIDWithParents(id)
 	if err != nil {
 		return nil, err
 	}
@@ -241,4 +245,47 @@ func (s *studentService) DeleteStudent(id string) error {
 	// }
 
 	return s.studentRepo.Delete(id)
+}
+
+// SyncParents menangani logika bisnis untuk sinkronisasi orang tua
+func (s *studentService) SyncParents(studentID string, req request.StudentSyncParentsRequest) error {
+	// 1. Validasi apakah student-nya ada
+	student, err := s.studentRepo.FindByID(studentID) // Cukup FindByID, tidak perlu preload
+	if err != nil {
+		return err
+	}
+	if student == nil {
+		return errors.New("student not found")
+	}
+
+	var parentRelations []domain.StudentParent
+	parentIDMap := make(map[string]bool) // Untuk cek duplikat parent_id di request
+
+	// 2. Validasi setiap parent_id di request
+	for _, p := range req.Parents {
+		// Cek duplikat di request
+		if parentIDMap[p.ParentID] {
+			return fmt.Errorf("duplicate parent_id in request: %s", p.ParentID)
+		}
+		parentIDMap[p.ParentID] = true
+
+		// Cek apakah parent_id ada di database
+		parent, err := s.parentRepo.FindByID(p.ParentID)
+		if err != nil {
+			return fmt.Errorf("error checking parent: %w", err)
+		}
+		if parent == nil {
+			return fmt.Errorf("parent not found with id: %s", p.ParentID)
+		}
+
+		// Jika valid, siapkan data untuk repository
+		parentRelations = append(parentRelations, domain.StudentParent{
+			StudentID:        studentID, // Repository juga akan set ini, tapi lebih baik eksplisit
+			ParentID:         p.ParentID,
+			RelationshipType: p.RelationshipType,
+		})
+	}
+
+	// 3. Panggil Repository untuk melakukan sinkronisasi
+	return s.studentRepo.SyncParents(studentID, parentRelations)
 }

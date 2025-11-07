@@ -16,13 +16,18 @@ type StudentConverterInterface interface {
 
 // studentConverter adalah implementasi dengan dependensi
 type studentConverter struct {
-	encryptionUtil utils.EncryptionUtil
+	encryptionUtil  utils.EncryptionUtil
+	parentConverter ParentConverterInterface
 }
 
 // NewStudentConverter membuat instance konverter baru
-func NewStudentConverter(encryptionUtil utils.EncryptionUtil) StudentConverterInterface {
+func NewStudentConverter(
+	encryptionUtil utils.EncryptionUtil,
+	parentConverter ParentConverterInterface,
+) StudentConverterInterface {
 	return &studentConverter{
-		encryptionUtil: encryptionUtil,
+		encryptionUtil:  encryptionUtil,
+		parentConverter: parentConverter,
 	}
 }
 
@@ -50,6 +55,21 @@ func (c *studentConverter) ToStudentDetailResponse(student *domain.Student) *res
 		}
 	}
 
+	var parentResponses []response.ParentRelationshipResponse
+	// Cek apakah relasi Parents di-load (tidak nil)
+	if student.Parents != nil {
+		for _, sp := range student.Parents {
+			// sp.Parent akan terisi jika kita Preload("Parents.Parent")
+			if sp.Parent.ID != "" { // Pastikan data parent ada
+				parentResponses = append(parentResponses, response.ParentRelationshipResponse{
+					RelationshipType: sp.RelationshipType,
+					// Kita gunakan parentConverter untuk mengubah domain.Parent -> response.ParentListResponse
+					Parent: *c.parentConverter.ToParentListResponse(&sp.Parent),
+				})
+			}
+		}
+	}
+
 	return &response.StudentDetailResponse{
 		ID:           student.ID,
 		FullName:     student.FullName,
@@ -70,6 +90,7 @@ func (c *studentConverter) ToStudentDetailResponse(student *domain.Student) *res
 		PostalCode:   student.PostalCode,
 		CreatedAt:    student.CreatedAt,
 		UpdatedAt:    student.UpdatedAt,
+		Parents:      parentResponses,
 	}
 }
 

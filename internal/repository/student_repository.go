@@ -15,6 +15,8 @@ type StudentRepository interface {
 	FindAll() ([]domain.Student, error)
 	Update(student *domain.Student) error
 	Delete(id string) error
+	FindByIDWithParents(id string) (*domain.Student, error)
+	SyncParents(studentID string, parents []domain.StudentParent) error
 }
 
 type studentRepository struct {
@@ -78,4 +80,50 @@ func (r *studentRepository) Update(student *domain.Student) error {
 
 func (r *studentRepository) Delete(id string) error {
 	return r.db.Delete(&domain.Student{}, "id = ?", id).Error
+}
+
+// FindByIDWithParents mengambil Student beserta relasi Parents dan data Parent-nya
+func (r *studentRepository) FindByIDWithParents(id string) (*domain.Student, error) {
+	var student domain.Student
+	err := r.db.
+		Preload("Parents").        // 1. Ambil data dari pivot table (student_parent)
+		Preload("Parents.Parent"). // 2. Untuk setiap data pivot, ambil data dari tabel parents
+		First(&student, "id = ?", id).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &student, nil
+}
+
+// SyncParents menghapus semua relasi lama dan membuat yang baru dalam satu transaksi
+func (r *studentRepository) SyncParents(studentID string, parents []domain.StudentParent) error {
+	// Gunakan Transaksi agar atomik (semua berhasil atau semua gagal)
+	return r.db.Transaction(func(tx *gorm.DB) error {
+
+		// 1. Hapus semua relasi parent yang ada untuk student ini
+		if err := tx.Where("student_id = ?", studentID).Delete(&domain.StudentParent{}).Error; err != nil {
+			return err
+		}
+
+		// 2. Tambahkan relasi baru (jika list tidak kosong)
+		if len(parents) == 0 {
+			return nil // Tidak ada yang perlu ditambahkan, selesai.
+		}
+
+		// Pastikan StudentID ter-set untuk setiap entri (meski service harusnya sudah)
+		for i := range parents {
+			parents[i].StudentID = studentID
+		}
+
+		// 3. Buat (batch insert) relasi baru
+		if err := tx.Create(&parents).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

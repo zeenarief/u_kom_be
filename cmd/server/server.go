@@ -64,15 +64,14 @@ func NewServer() *Server {
 	}
 
 	// Initialize converters
-	studentConverter := converter.NewStudentConverter(encryptionUtil)
 	parentConverter := converter.NewParentConverter(encryptionUtil)
 	guardianConverter := converter.NewGuardianConverter(encryptionUtil)
+	studentConverter := converter.NewStudentConverter(encryptionUtil, parentConverter)
 
 	// Initialize services
 	userService := service.NewUserService(userRepo, roleRepo, permissionRepo)
 	roleService := service.NewRoleService(roleRepo, permissionRepo)
 	permissionService := service.NewPermissionService(permissionRepo)
-	studentService := service.NewStudentService(studentRepo, encryptionUtil, studentConverter)
 	parentService := service.NewParentService(parentRepo, encryptionUtil, parentConverter)
 	guardianService := service.NewGuardianService(guardianRepo, encryptionUtil, guardianConverter)
 	authService := service.NewAuthService(
@@ -81,6 +80,12 @@ func NewServer() *Server {
 		cfg.JWTRefreshSecret,
 		cfg.JWTAccessTokenExpire,
 		cfg.JWTRefreshTokenExpire,
+	)
+	studentService := service.NewStudentService(
+		studentRepo,
+		parentRepo,
+		encryptionUtil,
+		studentConverter,
 	)
 
 	// Initialize handlers

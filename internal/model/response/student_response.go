@@ -12,6 +12,12 @@ type StudentListResponse struct {
 	City     string `json:"city"`
 }
 
+// ParentRelationshipResponse adalah DTO untuk menampilkan relasi orang tua
+type ParentRelationshipResponse struct {
+	RelationshipType string             `json:"relationship_type"`
+	Parent           ParentListResponse `json:"parent_info"` // Kita gunakan ListResponse yang ringkas
+}
+
 // StudentDetailResponse adalah DTO untuk tampilan detail (lengkap)
 type StudentDetailResponse struct {
 	ID           string    `json:"id"`
@@ -33,4 +39,6 @@ type StudentDetailResponse struct {
 	PostalCode   string    `json:"postal_code"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
+
+	Parents []ParentRelationshipResponse `json:"parents,omitempty"`
 }

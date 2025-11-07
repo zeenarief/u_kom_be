@@ -31,6 +31,9 @@ type Parent struct {
 	PostalCode     string    `gorm:"type:varchar(5)" json:"postal_code"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
+
+	// Relasi ke tabel pivot StudentParent
+	Students []StudentParent `gorm:"foreignKey:ParentID" json:"students,omitempty"`
 }
 
 // Hook BeforeCreate untuk generate UUID, sama seperti Student/Role

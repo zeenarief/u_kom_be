@@ -36,5 +36,9 @@ func RegisterStudentRoutes(
 		students.DELETE("/:id",
 			middleware.PermissionMiddleware("students.delete", authService),
 			studentHandler.DeleteStudent)
+
+		students.POST("/:id/sync-parents",
+			middleware.PermissionMiddleware("students.manage_parents", authService),
+			studentHandler.SyncParents)
 	}
 }

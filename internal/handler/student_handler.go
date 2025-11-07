@@ -101,3 +101,32 @@ func (h *StudentHandler) DeleteStudent(c *gin.Context) {
 
 	SuccessResponse(c, "Student deleted successfully", nil)
 }
+
+// SyncParents adalah handler untuk POST /students/:id/sync-parents
+func (h *StudentHandler) SyncParents(c *gin.Context) {
+	id := c.Param("id")
+
+	var req request.StudentSyncParentsRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		BadRequestError(c, "Invalid request payload", err.Error())
+		return
+	}
+
+	// Panggil service
+	err := h.studentService.SyncParents(id, req)
+	if err != nil {
+		// Tangani error spesifik dari service
+		if strings.Contains(err.Error(), "student not found") {
+			NotFoundError(c, err.Error())
+		} else if strings.Contains(err.Error(), "parent not found") {
+			BadRequestError(c, "Invalid parent ID", err.Error())
+		} else if strings.Contains(err.Error(), "duplicate parent_id") {
+			BadRequestError(c, "Invalid request", err.Error())
+		} else {
+			InternalServerError(c, err.Error())
+		}
+		return
+	}
+
+	SuccessResponse(c, "Student parents synced successfully", nil)
+}
