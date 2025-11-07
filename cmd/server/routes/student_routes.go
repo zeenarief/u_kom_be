@@ -40,5 +40,15 @@ func RegisterStudentRoutes(
 		students.POST("/:id/sync-parents",
 			middleware.PermissionMiddleware("students.manage_parents", authService),
 			studentHandler.SyncParents)
+
+		// Rute 1:1 Polymorphic Guardian (Set/Update)
+		students.PUT("/:id/set-guardian",
+			middleware.PermissionMiddleware("students.manage_guardian", authService),
+			studentHandler.SetGuardian)
+
+		// Rute 1:1 Polymorphic Guardian (Remove)
+		students.DELETE("/:id/remove-guardian",
+			middleware.PermissionMiddleware("students.manage_guardian", authService),
+			studentHandler.RemoveGuardian)
 	}
 }

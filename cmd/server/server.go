@@ -84,6 +84,7 @@ func NewServer() *Server {
 	studentService := service.NewStudentService(
 		studentRepo,
 		parentRepo,
+		guardianRepo,
 		encryptionUtil,
 		studentConverter,
 	)

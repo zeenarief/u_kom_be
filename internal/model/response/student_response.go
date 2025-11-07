@@ -18,6 +18,19 @@ type ParentRelationshipResponse struct {
 	Parent           ParentListResponse `json:"parent_info"` // Kita gunakan ListResponse yang ringkas
 }
 
+// GuardianInfoResponse adalah DTO generik untuk menampilkan data wali
+// Ini bisa berisi data dari 'parent' ATAU 'guardian'
+type GuardianInfoResponse struct {
+	ID          string `json:"id"`
+	FullName    string `json:"full_name"`
+	PhoneNumber string `json:"phone_number"`
+	Email       string `json:"email"`
+	// Field ini memberi tahu dari tabel mana data ini berasal
+	Type string `json:"type"` // 'parent' or 'guardian'
+	// Field ini memberi tahu apa hubungannya (cth: 'FATHER', 'MOTHER', 'UNCLE')
+	Relationship string `json:"relationship"`
+}
+
 // StudentDetailResponse adalah DTO untuk tampilan detail (lengkap)
 type StudentDetailResponse struct {
 	ID           string    `json:"id"`
@@ -40,5 +53,9 @@ type StudentDetailResponse struct {
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 
+	// Relasi M:N ke Parents (Sudah ada)
 	Parents []ParentRelationshipResponse `json:"parents,omitempty"`
+
+	// Guardian adalah relasi polimorfik 1:1. Pointer digunakan agar bisa 'null' jika tidak di-set
+	Guardian *GuardianInfoResponse `json:"guardian,omitempty"`
 }

@@ -17,6 +17,7 @@ type StudentRepository interface {
 	Delete(id string) error
 	FindByIDWithParents(id string) (*domain.Student, error)
 	SyncParents(studentID string, parents []domain.StudentParent) error
+	SetGuardian(studentID string, guardianID *string, guardianType *string) error
 }
 
 type studentRepository struct {
@@ -126,4 +127,14 @@ func (r *studentRepository) SyncParents(studentID string, parents []domain.Stude
 
 		return nil
 	})
+}
+
+// SetGuardian meng-update penanda wali (polymorphic) pada tabel student
+func (r *studentRepository) SetGuardian(studentID string, guardianID *string, guardianType *string) error {
+	// Jika nil, GORM akan meng-set kolom ke NULL
+	// Jika tidak nil, GORM akan meng-set ke nilainya
+	return r.db.Model(&domain.Student{}).Where("id = ?", studentID).Updates(map[string]interface{}{
+		"guardian_id":   guardianID,
+		"guardian_type": guardianType,
+	}).Error
 }

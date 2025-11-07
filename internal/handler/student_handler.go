@@ -130,3 +130,49 @@ func (h *StudentHandler) SyncParents(c *gin.Context) {
 
 	SuccessResponse(c, "Student parents synced successfully", nil)
 }
+
+// SetGuardian adalah handler untuk PUT /students/:id/set-guardian
+func (h *StudentHandler) SetGuardian(c *gin.Context) {
+	id := c.Param("id")
+
+	var req request.StudentSetGuardianRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		// Validasi 'oneof' gagal akan ditangkap di sini
+		BadRequestError(c, "Invalid request payload", err.Error())
+		return
+	}
+
+	// Panggil service
+	err := h.studentService.SetGuardian(id, req)
+	if err != nil {
+		// Tangani error spesifik dari service
+		if strings.Contains(err.Error(), "student not found") {
+			NotFoundError(c, err.Error())
+		} else if strings.Contains(err.Error(), "parent not found") || strings.Contains(err.Error(), "guardian not found") {
+			BadRequestError(c, "Invalid guardian_id", err.Error())
+		} else {
+			InternalServerError(c, err.Error())
+		}
+		return
+	}
+
+	SuccessResponse(c, "Student guardian set successfully", nil)
+}
+
+// RemoveGuardian adalah handler untuk DELETE /students/:id/remove-guardian
+func (h *StudentHandler) RemoveGuardian(c *gin.Context) {
+	id := c.Param("id")
+
+	// Panggil service
+	err := h.studentService.RemoveGuardian(id)
+	if err != nil {
+		if strings.Contains(err.Error(), "student not found") {
+			NotFoundError(c, err.Error())
+		} else {
+			InternalServerError(c, err.Error())
+		}
+		return
+	}
+
+	SuccessResponse(c, "Student guardian removed successfully", nil)
+}

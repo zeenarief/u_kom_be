@@ -30,6 +30,9 @@ type Student struct {
 
 	// Relasi ke tabel pivot StudentParent
 	Parents []StudentParent `gorm:"foreignKey:StudentID" json:"parents,omitempty"`
+
+	GuardianID   *string `gorm:"type:char(36);index:idx_student_guardian" json:"guardian_id"`
+	GuardianType *string `gorm:"type:varchar(20);index:idx_student_guardian" json:"guardian_type"`
 }
 
 // Hook BeforeCreate untuk generate UUID

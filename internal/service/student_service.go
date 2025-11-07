@@ -18,11 +18,14 @@ type StudentService interface {
 	UpdateStudent(id string, req request.StudentUpdateRequest) (*response.StudentDetailResponse, error)
 	DeleteStudent(id string) error
 	SyncParents(studentID string, req request.StudentSyncParentsRequest) error
+	SetGuardian(studentID string, req request.StudentSetGuardianRequest) error
+	RemoveGuardian(studentID string) error // Helper untuk menghapus wali
 }
 
 type studentService struct {
 	studentRepo    repository.StudentRepository
 	parentRepo     repository.ParentRepository
+	guardianRepo   repository.GuardianRepository
 	encryptionUtil utils.EncryptionUtil                // <-- Untuk ENKRIPSI
 	converter      converter.StudentConverterInterface // <-- Untuk DEKRIPSI/Response
 }
@@ -30,12 +33,14 @@ type studentService struct {
 func NewStudentService(
 	studentRepo repository.StudentRepository,
 	parentRepo repository.ParentRepository,
+	guardianRepo repository.GuardianRepository,
 	encryptionUtil utils.EncryptionUtil,
 	converter converter.StudentConverterInterface,
 ) StudentService {
 	return &studentService{
 		studentRepo:    studentRepo,
 		parentRepo:     parentRepo,
+		guardianRepo:   guardianRepo,
 		encryptionUtil: encryptionUtil,
 		converter:      converter,
 	}
@@ -111,8 +116,9 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 	return s.converter.ToStudentDetailResponse(createdStudent), nil
 }
 
-// GetStudentByID mengambil satu siswa
+// GetStudentByID mengambil satu siswa (termasuk M:N Parents dan 1:1 Guardian)
 func (s *studentService) GetStudentByID(id string) (*response.StudentDetailResponse, error) {
+	// 1. Ambil data student (beserta kolom guardian_id/type) DAN relasi M:N Parents
 	student, err := s.studentRepo.FindByIDWithParents(id)
 	if err != nil {
 		return nil, err
@@ -120,8 +126,29 @@ func (s *studentService) GetStudentByID(id string) (*response.StudentDetailRespo
 	if student == nil {
 		return nil, errors.New("student not found")
 	}
-	// Panggil konverter
-	return s.converter.ToStudentDetailResponse(student), nil
+
+	// 2. Panggil konverter
+	// Konverter akan menangani:
+	// - Data dasar student (NIK, Nama, dll.)
+	// - Relasi M:N Parents (yang sudah di-preload)
+	responseDTO := s.converter.ToStudentDetailResponse(student)
+
+	// 3. (LOGIKA BARU) Ambil data Wali Polimorfik secara manual
+	// Kita lakukan di service, bukan di converter, karena butuh I/O (repo)
+	if student.GuardianID != nil && student.GuardianType != nil {
+
+		guardianInfo, err := s.fetchGuardianInfo(student.GuardianID, student.GuardianType)
+		if err != nil {
+			// Log error tapi jangan gagalkan request? Tergantung kebutuhan.
+			// Untuk sekarang, kita gagalkan jika data wali korup.
+			return nil, fmt.Errorf("failed to fetch guardian info: %w", err)
+		}
+		// Lampirkan data wali ke DTO
+		responseDTO.Guardian = guardianInfo
+	}
+
+	// 4. Kembalikan DTO yang sudah lengkap
+	return responseDTO, nil
 }
 
 // GetAllStudents mengambil semua siswa
@@ -288,4 +315,112 @@ func (s *studentService) SyncParents(studentID string, req request.StudentSyncPa
 
 	// 3. Panggil Repository untuk melakukan sinkronisasi
 	return s.studentRepo.SyncParents(studentID, parentRelations)
+}
+
+// SetGuardian memvalidasi dan menetapkan wali polimorfik untuk seorang siswa
+func (s *studentService) SetGuardian(studentID string, req request.StudentSetGuardianRequest) error {
+	// 1. Validasi apakah student-nya ada
+	student, err := s.studentRepo.FindByID(studentID)
+	if err != nil {
+		return err
+	}
+	if student == nil {
+		return errors.New("student not found")
+	}
+
+	// 2. Validasi apakah guardian_id yang diberikan ada di tabel yang benar
+	switch req.GuardianType {
+	case "parent":
+		parent, err := s.parentRepo.FindByID(req.GuardianID)
+		if err != nil {
+			return fmt.Errorf("error checking parent: %w", err)
+		}
+		if parent == nil {
+			return fmt.Errorf("parent not found with id: %s", req.GuardianID)
+		}
+	case "guardian":
+		guardian, err := s.guardianRepo.FindByID(req.GuardianID)
+		if err != nil {
+			return fmt.Errorf("error checking guardian: %w", err)
+		}
+		if guardian == nil {
+			return fmt.Errorf("guardian not found with id: %s", req.GuardianID)
+		}
+	default:
+		// Sebenarnya sudah ditangani oleh validasi 'oneof' di DTO, tapi
+		// ini adalah pengaman tambahan.
+		return errors.New("invalid guardian_type")
+	}
+
+	// 3. Panggil Repository untuk meng-set datanya
+	// Kita teruskan pointer ke string dari request
+	return s.studentRepo.SetGuardian(studentID, &req.GuardianID, &req.GuardianType)
+}
+
+// RemoveGuardian adalah helper untuk menghapus (me-NULL-kan) wali
+func (s *studentService) RemoveGuardian(studentID string) error {
+	// 1. Validasi apakah student-nya ada
+	student, err := s.studentRepo.FindByID(studentID)
+	if err != nil {
+		return err
+	}
+	if student == nil {
+		return errors.New("student not found")
+	}
+
+	// 2. Panggil repository dengan nil untuk menghapus
+	return s.studentRepo.SetGuardian(studentID, nil, nil)
+}
+
+// fetchGuardianInfo adalah helper internal untuk mengambil data wali berdasarkan tipe polimorfiknya.
+func (s *studentService) fetchGuardianInfo(guardianID *string, guardianType *string) (*response.GuardianInfoResponse, error) {
+	// Cek jika nil (meskipun GetStudentByID sudah cek, ini pengaman)
+	if guardianID == nil || guardianType == nil {
+		return nil, nil
+	}
+
+	id := *guardianID
+	tipe := *guardianType
+
+	switch tipe {
+	case "parent":
+		parent, err := s.parentRepo.FindByID(id)
+		if err != nil {
+			return nil, err
+		}
+		if parent == nil {
+			return nil, fmt.Errorf("data integrity error: parent guardian with id %s not found", id)
+		}
+
+		// Petakan domain.Parent ke response.GuardianInfoResponse
+		return &response.GuardianInfoResponse{
+			ID:           parent.ID,
+			FullName:     parent.FullName,
+			PhoneNumber:  parent.PhoneNumber,
+			Email:        parent.Email,
+			Type:         "parent",
+			Relationship: "PARENT", // Kita tidak tahu FATHER/MOTHER, jadi 'PARENT'
+		}, nil
+
+	case "guardian":
+		guardian, err := s.guardianRepo.FindByID(id)
+		if err != nil {
+			return nil, err
+		}
+		if guardian == nil {
+			return nil, fmt.Errorf("data integrity error: guardian with id %s not found", id)
+		}
+
+		// Petakan domain.Guardian ke response.GuardianInfoResponse
+		return &response.GuardianInfoResponse{
+			ID:           guardian.ID,
+			FullName:     guardian.FullName,
+			PhoneNumber:  guardian.PhoneNumber,
+			Email:        guardian.Email,
+			Type:         "guardian",
+			Relationship: guardian.RelationshipToStudent, // cth: 'UNCLE', 'AUNT'
+		}, nil
+	}
+
+	return nil, fmt.Errorf("unknown guardian_type: %s", tipe)
 }
