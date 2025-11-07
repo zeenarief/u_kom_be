@@ -25,6 +25,7 @@ type Server struct {
 	RoleHandler       *handler.RoleHandler
 	PermissionHandler *handler.PermissionHandler
 	StudentHandler    *handler.StudentHandler
+	ParentHandler     *handler.ParentHandler
 	AuthService       service.AuthService
 }
 
@@ -52,6 +53,7 @@ func NewServer() *Server {
 	roleRepo := repository.NewRoleRepository(db)
 	permissionRepo := repository.NewPermissionRepository(db)
 	studentRepo := repository.NewStudentRepository(db)
+	parentRepo := repository.NewParentRepository(db)
 
 	// Initialize utils
 	encryptionUtil, err := utils.NewEncryptionUtil(cfg.EncryptionKey)
@@ -61,12 +63,14 @@ func NewServer() *Server {
 
 	// Initialize converters
 	studentConverter := converter.NewStudentConverter(encryptionUtil)
+	parentConverter := converter.NewParentConverter(encryptionUtil)
 
 	// Initialize services
 	userService := service.NewUserService(userRepo, roleRepo, permissionRepo)
 	roleService := service.NewRoleService(roleRepo, permissionRepo)
 	permissionService := service.NewPermissionService(permissionRepo)
 	studentService := service.NewStudentService(studentRepo, encryptionUtil, studentConverter)
+	parentService := service.NewParentService(parentRepo, encryptionUtil, parentConverter)
 	authService := service.NewAuthService(
 		userRepo,
 		cfg.JWTSecret,
@@ -81,6 +85,7 @@ func NewServer() *Server {
 	roleHandler := handler.NewRoleHandler(roleService)
 	permissionHandler := handler.NewPermissionHandler(permissionService)
 	studentHandler := handler.NewStudentHandler(studentService)
+	parentHandler := handler.NewParentHandler(parentService)
 
 	// Setup router with middleware
 	router := setupRouter(cfg, authService)
@@ -93,6 +98,7 @@ func NewServer() *Server {
 		RoleHandler:       roleHandler,
 		PermissionHandler: permissionHandler,
 		StudentHandler:    studentHandler,
+		ParentHandler:     parentHandler,
 		AuthService:       authService,
 	}
 }
@@ -124,6 +130,7 @@ func (s *Server) Start() error {
 		s.RoleHandler,
 		s.PermissionHandler,
 		s.StudentHandler,
+		s.ParentHandler,
 	)
 
 	// Start server
