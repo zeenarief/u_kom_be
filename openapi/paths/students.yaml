@@ -1,0 +1,181 @@
+paths:
+  # === /students ===
+  /students:
+    get:
+      tags: [Student]
+      summary: "Get All Students (List)"
+      description: "Mengambil daftar semua siswa dalam format ringkas (ListResponse). Memerlukan permission 'students.read'."
+      responses:
+        '200':
+          description: "Daftar siswa berhasil diambil."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseStudentList'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    post:
+      tags: [Student]
+      summary: "Create New Student"
+      description: "Membuat data siswa baru. Memerlukan permission 'students.create'."
+      requestBody:
+        description: "Data siswa baru"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/student.yaml#/schemas/StudentCreateRequest'
+      responses:
+        '201':
+          description: "Siswa berhasil dibuat. Mengembalikan data detail siswa."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseStudentDetail'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+  # === /students/{id} ===
+  /students/{id}:
+    parameters:
+      # Referensi yang benar ke parameter 'id'
+      - $ref: '../components/parameters.yaml#/parameters/StudentId'
+
+    get:
+      tags: [Student]
+      summary: "Get Student by ID (Detail)"
+      description: "Mengambil data detail lengkap seorang siswa, termasuk relasi orang tua (M:N) dan wali (1:1 Polymorphic). Memerlukan permission 'students.read'."
+      responses:
+        '200':
+          description: "Data detail siswa berhasil diambil."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseStudentDetail'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    put:
+      tags: [Student]
+      summary: "Update Student"
+      description: "Memperbarui data siswa. Hanya field yang dikirim yang akan diupdate. Memerlukan permission 'students.update'."
+      requestBody:
+        description: "Data siswa yang ingin diupdate"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/student.yaml#/schemas/StudentUpdateRequest'
+      responses:
+        '200':
+          description: "Siswa berhasil diupdate. Mengembalikan data detail terbaru."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseStudentDetail'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    delete:
+      tags: [Student]
+      summary: "Delete Student"
+      description: "Menghapus data siswa. Memerlukan permission 'students.delete'."
+      responses:
+        '200':
+          description: "Siswa berhasil dihapus."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+  # === /students/{id}/sync-parents ===
+  /students/{id}/sync-parents:
+    parameters:
+      # --- INI ADALAH PERBAIKANNYA ---
+      - $ref: '../components/parameters.yaml#/parameters/StudentId'
+    post:
+      tags: [Student]
+      summary: "Sync Student Parents (M:N)"
+      description: "Menyelaraskan (sync) relasi Many-to-Many orang tua siswa. Ini akan MENGHAPUS semua relasi lama dan menggantinya dengan yang baru. Memerlukan permission 'students.manage_parents'."
+      requestBody:
+        description: "Array data relasi orang tua"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/student.yaml#/schemas/StudentSyncParentsRequest'
+      responses:
+        '200':
+          description: "Relasi orang tua berhasil disinkronkan."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+  # === /students/{id}/set-guardian ===
+  /students/{id}/set-guardian:
+    parameters:
+      # --- INI ADALAH PERBAIKANNYA ---
+      - $ref: '../components/parameters.yaml#/parameters/StudentId'
+    put:
+      tags: [Student]
+      summary: "Set/Update Student Guardian (Polymorphic)"
+      description: "Menetapkan atau mengubah satu wali utama (kontak darurat) siswa. Wali ini bisa dari tabel 'parents' atau 'guardians'. Memerlukan permission 'students.manage_guardian'."
+      requestBody:
+        description: "Data wali yang ingin ditetapkan"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/student.yaml#/schemas/StudentSetGuardianRequest'
+      responses:
+        '200':
+          description: "Wali siswa berhasil ditetapkan."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+  # === /students/{id}/remove-guardian ===
+  /students/{id}/remove-guardian:
+    parameters:
+      # --- INI ADALAH PERBAIKANNYA ---
+      - $ref: '../components/parameters.yaml#/parameters/StudentId'
+    delete:
+      tags: [Student]
+      summary: "Remove Student Guardian"
+      description: "Menghapus penetapan wali utama dari siswa (mengatur 'guardian_id' dan 'guardian_type' ke NULL). Memerlukan permission 'students.manage_guardian'."
+      responses:
+        '200':
+          description: "Wali siswa berhasil dihapus."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }

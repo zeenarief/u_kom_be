@@ -1,0 +1,31 @@
+# Definisi respons error umum untuk di-reuse
+Unauthorized:
+  description: "Unauthorized (Token tidak valid atau tidak ada)"
+  content:
+    application/json:
+      schema:
+        $ref: './schemas/common.yaml#/schemas/ErrorWrapper'
+Forbidden:
+  description: "Forbidden (Tidak memiliki permission yang cukup)"
+  content:
+    application/json:
+      schema:
+        $ref: './schemas/common.yaml#/schemas/ErrorWrapper'
+NotFound:
+  description: "Not Found (Resource tidak ditemukan)"
+  content:
+    application/json:
+      schema:
+        $ref: './schemas/common.yaml#/schemas/ErrorWrapper'
+BadRequest:
+  description: "Bad Request (Validasi gagal atau input salah)"
+  content:
+    application/json:
+      schema:
+        $ref: './schemas/common.yaml#/schemas/ErrorWrapper'
+InternalError:
+  description: "Internal Server Error"
+  content:
+    application/json:
+      schema:
+        $ref: './schemas/common.yaml#/schemas/ErrorWrapper'

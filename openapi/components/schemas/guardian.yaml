@@ -1,0 +1,194 @@
+schemas:
+  # --- Request DTOs ---
+  GuardianCreateRequest:
+    type: object
+    required:
+      - full_name
+      - phone_number
+    properties:
+      full_name:
+        type: string
+        example: "Paman Budi"
+      nik:
+        type: string
+        description: "NIK Wali (Akan dienkripsi)"
+        example: "3303xxxxxxxxxx"
+      gender:
+        type: string
+        enum: [male, female]
+      phone_number:
+        type: string
+        example: "0815xxxxxxxx"
+      email:
+        type: string
+        format: email
+        example: "paman.budi@example.com"
+      address:
+        type: string
+        example: "Jl. Sejahtera No. 20"
+      rt:
+        type: string
+        maxLength: 3
+        example: "003"
+      rw:
+        type: string
+        maxLength: 3
+        example: "004"
+      sub_district:
+        type: string
+        example: "Palmerah"
+      district:
+        type: string
+        example: "Jakarta Barat"
+      city:
+        type: string
+        example: "DKI Jakarta"
+      province:
+        type: string
+        example: "DKI Jakarta"
+      postal_code:
+        type: string
+        maxLength: 5
+        example: "11480"
+      relationship_to_student:
+        type: string
+        example: "UNCLE"
+        description: "Cth: 'UNCLE', 'AUNT', 'GRANDFATHER'"
+
+  GuardianUpdateRequest:
+    type: object
+    description: "Hanya kirim field yang ingin di-update."
+    properties:
+      full_name:
+        type: string
+        example: "Paman Budi"
+      nik:
+        type: string
+        description: "NIK Wali (Akan dienkripsi)"
+        example: "3303xxxxxxxxxx"
+      gender:
+        type: string
+        enum: [male, female]
+      phone_number:
+        type: string
+        example: "0815xxxxxxxx"
+      email:
+        type: string
+        format: email
+        example: "paman.budi@example.com"
+      address:
+        type: string
+        example: "Jl. Sejahtera No. 20"
+      rt:
+        type: string
+        maxLength: 3
+        example: "003"
+      rw:
+        type: string
+        maxLength: 3
+        example: "004"
+      sub_district:
+        type: string
+        example: "Palmerah"
+      district:
+        type: string
+        example: "Jakarta Barat"
+      city:
+        type: string
+        example: "DKI Jakarta"
+      province:
+        type: string
+        example: "DKI Jakarta"
+      postal_code:
+        type: string
+        maxLength: 5
+        example: "11480"
+      relationship_to_student:
+        type: string
+        example: "UNCLE"
+        description: "Cth: 'UNCLE', 'AUNT', 'GRANDFATHER'"
+
+  # --- Response DTOs ---
+  GuardianListResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-guardian-paman"
+      full_name:
+        type: string
+        example: "Paman Budi"
+      phone_number:
+        type: string
+        example: "0815xxxxxxxx"
+      email:
+        type: string
+        format: email
+        nullable: true
+        example: "paman.budi@example.com"
+      relationship_to_student:
+        type: string
+        example: "UNCLE"
+
+  GuardianDetailResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-guardian-paman"
+      full_name:
+        type: string
+        example: "Paman Budi"
+      nik:
+        type: string
+        description: "Sudah didekripsi"
+        example: "3303xxxxxxxxxx"
+      gender:
+        type: string
+        enum: [male, female]
+      phone_number:
+        type: string
+        example: "0815xxxxxxxx"
+      email:
+        type: string
+        format: email
+        nullable: true
+        example: "paman.budi@example.com"
+      address:
+        type: string
+        example: "Jl. Sejahtera No. 20"
+      rt:
+        type: string
+        maxLength: 3
+        example: "003"
+      rw:
+        type: string
+        maxLength: 3
+        example: "004"
+      sub_district:
+        type: string
+        example: "Palmerah"
+      district:
+        type: string
+        example: "Jakarta Barat"
+      city:
+        type: string
+        example: "DKI Jakarta"
+      province:
+        type: string
+        example: "DKI Jakarta"
+      postal_code:
+        type: string
+        maxLength: 5
+        example: "11480"
+      relationship_to_student:
+        type: string
+        example: "UNCLE"
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time

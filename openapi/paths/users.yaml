@@ -1,0 +1,194 @@
+paths:
+  # === /users ===
+  /users:
+    get:
+      tags: [User]
+      summary: "Get All Users"
+      description: "Mengambil daftar semua pengguna (format list). Memerlukan permission 'users.read'."
+      responses:
+        '200':
+          description: "Daftar pengguna berhasil diambil."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseUserList'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    post:
+      tags: [User]
+      summary: "Create User (Admin)"
+      description: "Membuat pengguna baru (oleh Admin), bisa menentukan RoleIDs. Memerlukan permission 'users.create'."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/user.yaml#/schemas/UserCreateRequest'
+      responses:
+        '201':
+          description: "Pengguna berhasil dibuat. Mengembalikan data detail."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseUserRegister'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+
+  # === /users/{id} ===
+  /users/{id}:
+    parameters:
+      # Referensi yang benar ke parameter 'id'
+      - $ref: '../components/parameters.yaml#/parameters/UserId'
+
+    get:
+      tags: [User]
+      summary: "Get User by ID"
+      description: "Mengambil data detail pengguna, termasuk roles dan permissions. Memerlukan permission 'users.read'."
+      responses:
+        '200':
+          description: "Detail pengguna berhasil diambil."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseUserDetail'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+
+    put:
+      tags: [User]
+      summary: "Update User"
+      description: "Memperbarui nama atau email pengguna. Memerlukan permission 'users.update' (logika service akan mengecek 'users.update.others')."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/user.yaml#/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: "Pengguna berhasil diupdate. Mengembalikan data list."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseUserList'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+
+    delete:
+      tags: [User]
+      summary: "Delete User"
+      description: "Menghapus pengguna. Memerlukan permission 'users.delete'."
+      responses:
+        '200':
+          description: "Pengguna berhasil dihapus."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+
+  # === /users/{id}/sync-roles ===
+  /users/{id}/sync-roles:
+    parameters:
+      # --- INI ADALAH PERBAIKANNYA ---
+      - $ref: '../components/parameters.yaml#/parameters/UserId'
+    post:
+      tags: [User]
+      summary: "Sync User Roles"
+      description: "Menyelaraskan role (berdasarkan nama) untuk pengguna. Memerlukan permission 'users.manage_roles'."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/user.yaml#/schemas/SyncRolesRequest'
+      responses:
+        '200':
+          description: "Role berhasil disinkronkan."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+
+  # === /users/{id}/sync-permissions ===
+  /users/{id}/sync-permissions:
+    parameters:
+      # --- INI ADALAH PERBAIKANNYA ---
+      - $ref: '../components/parameters.yaml#/parameters/UserId'
+    post:
+      tags: [User]
+      summary: "Sync User Permissions"
+      description: "Menyelaraskan permission (berdasarkan nama) langsung ke pengguna. Memerlukan permission 'users.manage_permissions'."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/user.yaml#/schemas/SyncPermissionsRequest'
+      responses:
+        '200':
+          description: "Permission berhasil disinkronkan."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+
+  # === /users/{id}/change-password ===
+  /users/{id}/change-password:
+    parameters:
+      # --- INI ADALAH PERBAIKANNYA ---
+      - $ref: '../components/parameters.yaml#/parameters/UserId'
+    post:
+      tags: [User]
+      summary: "Change User Password"
+      description: "Mengubah password pengguna (bisa diri sendiri atau orang lain jika punya izin). Memerlukan permission 'profile.update'."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/user.yaml#/schemas/ChangePasswordRequest'
+      responses:
+        '200':
+          description: "Password berhasil diubah."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+
+  # === /profile ===
+  /profile:
+    get:
+      tags: [User]
+      summary: "Get My Profile"
+      description: "Mengambil data profil pengguna yang sedang login. Memerlukan permission 'profile.read'."
+      responses:
+        '200':
+          description: "Profil berhasil diambil."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseUserDetail'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }

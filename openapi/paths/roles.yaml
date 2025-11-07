@@ -1,0 +1,123 @@
+paths:
+  # === /roles ===
+  /roles:
+    get:
+      tags: [Role]
+      summary: "Get All Roles"
+      description: "Mengambil daftar semua role (format list). Memerlukan permission 'roles.manage'."
+      responses:
+        '200':
+          description: "Daftar role berhasil diambil."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseRoleList'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    post:
+      tags: [Role]
+      summary: "Create Role"
+      description: "Membuat role baru. Memerlukan permission 'roles.manage'."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/role.yaml#/schemas/RoleCreateRequest'
+      responses:
+        '201':
+          description: "Role berhasil dibuat. Mengembalikan data detail."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseRoleDetail'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+
+  # === /roles/{id} ===
+  /roles/{id}:
+    parameters:
+      # Referensi yang benar ke parameter 'id'
+      - $ref: '../components/parameters.yaml#/parameters/RoleId'
+
+    get:
+      tags: [Role]
+      summary: "Get Role by ID"
+      description: "Mengambil data detail role, termasuk permissions. Memerlukan permission 'roles.manage'."
+      responses:
+        '200':
+          description: "Detail role berhasil diambil."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseRoleDetail'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+
+    put:
+      tags: [Role]
+      summary: "Update Role"
+      description: "Memperbarui data role. Memerlukan permission 'roles.manage'."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/role.yaml#/schemas/RoleUpdateRequest'
+      responses:
+        '200':
+          description: "Role berhasil diupdate. Mengembalikan data detail."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseRoleDetail'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+
+    delete:
+      tags: [Role]
+      summary: "Delete Role"
+      description: "Menghapus role. Memerlukan permission 'roles.manage'."
+      responses:
+        '200':
+          description: "Role berhasil dihapus."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+
+  # === /roles/{id}/sync-permissions ===
+  /roles/{id}/sync-permissions:
+    parameters:
+      # --- INI ADALAH PERBAIKANNYA ---
+      - $ref: '../components/parameters.yaml#/parameters/RoleId'
+    post:
+      tags: [Role]
+      summary: "Sync Role Permissions"
+      description: "Menyelaraskan permission (berdasarkan nama) untuk role. Memerlukan permission 'roles.manage'."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/role.yaml#/schemas/AssignPermissionsRequest'
+      responses:
+        '200':
+          description: "Permission berhasil disinkronkan."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }

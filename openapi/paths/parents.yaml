@@ -1,0 +1,105 @@
+paths:
+  # === /parents ===
+  /parents:
+    get:
+      tags: [Parent]
+      summary: "Get All Parents (List)"
+      description: "Mengambil daftar semua orang tua dalam format ringkas (ListResponse). Memerlukan permission 'parents.read'."
+      responses:
+        '200':
+          description: "Daftar orang tua berhasil diambil."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseParentList'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    post:
+      tags: [Parent]
+      summary: "Create New Parent"
+      description: "Membuat data orang tua baru. Memerlukan permission 'parents.create'."
+      requestBody:
+        description: "Data orang tua baru"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/parent.yaml#/schemas/ParentCreateRequest'
+      responses:
+        '201':
+          description: "Orang tua berhasil dibuat. Mengembalikan data detail."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseParentDetail'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+  # === /parents/{id} ===
+  /parents/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+        description: "ID Orang Tua (UUID)"
+
+    get:
+      tags: [Parent]
+      summary: "Get Parent by ID (Detail)"
+      description: "Mengambil data detail lengkap seorang orang tua. Memerlukan permission 'parents.read'."
+      responses:
+        '200':
+          description: "Data detail orang tua berhasil diambil."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseParentDetail'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    put:
+      tags: [Parent]
+      summary: "Update Parent"
+      description: "Memperbarui data orang tua. Hanya field yang dikirim yang akan diupdate. Memerlukan permission 'parents.update'."
+      requestBody:
+        description: "Data orang tua yang ingin diupdate"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/parent.yaml#/schemas/ParentUpdateRequest'
+      responses:
+        '200':
+          description: "Orang tua berhasil diupdate. Mengembalikan data detail terbaru."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseParentDetail'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    delete:
+      tags: [Parent]
+      summary: "Delete Parent"
+      description: "Menghapus data orang tua. Memerlukan permission 'parents.delete'."
+      responses:
+        '200':
+          description: "Orang tua berhasil dihapus."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }

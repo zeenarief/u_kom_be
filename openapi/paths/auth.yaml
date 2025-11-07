@@ -1,0 +1,95 @@
+paths:
+  # === /auth/register ===
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: "Register User (Public)"
+      description: "Registrasi pengguna baru. Endpoint ini publik dan tidak memerlukan token. RoleIDs diabaikan."
+      security: [] # Meng-override keamanan global, endpoint ini publik
+      requestBody:
+        description: "Data pengguna baru"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/user.yaml#/schemas/UserCreateRequest'
+      responses:
+        '201':
+          description: "Registrasi berhasil. Mengembalikan data pengguna yang baru dibuat."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseUserRegister'
+        '400':
+          $ref: '../components/responses.yaml#/BadRequest'
+        '500':
+          $ref: '../components/responses.yaml#/InternalError'
+
+  # === /auth/login ===
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: "Login"
+      description: "Login dengan 'login' (username atau email) dan password. Endpoint ini publik."
+      security: [] # Endpoint ini publik
+      requestBody:
+        description: "Kredensial login pengguna"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/auth.yaml#/schemas/LoginRequest'
+      responses:
+        '200':
+          description: "Login berhasil. Mengembalikan access token, refresh token, dan data pengguna."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseAuth'
+        '401': # 'Invalid credentials' adalah 401
+          $ref: '../components/responses.yaml#/Unauthorized'
+        '500':
+          $ref: '../components/responses.yaml#/InternalError'
+
+  # === /auth/refresh ===
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: "Refresh Access Token"
+      description: "Mendapatkan Access Token baru menggunakan Refresh Token. Endpoint ini publik."
+      security: [] # Endpoint ini publik
+      requestBody:
+        description: "Refresh token yang valid"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/auth.yaml#/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: "Token berhasil di-refresh. Mengembalikan token set baru."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseAuth'
+        '401': # Refresh token tidak valid atau kedaluwarsa
+          $ref: '../components/responses.yaml#/Unauthorized'
+
+  # === /auth/logout ===
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: "Logout"
+      description: "Meng-invalidate token yang sedang aktif. Memerlukan token (keamanan global)."
+      # Tidak ada requestBody
+      responses:
+        '200':
+          description: "Logout berhasil."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '401':
+          $ref: '../components/responses.yaml#/Unauthorized'
+        '500':
+          $ref: '../components/responses.yaml#/InternalError'

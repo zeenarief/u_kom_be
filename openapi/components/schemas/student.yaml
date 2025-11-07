@@ -1,0 +1,301 @@
+schemas:
+  # --- Request DTOs ---
+  StudentCreateRequest:
+    type: object
+    required:
+      - full_name
+    properties:
+      full_name:
+        type: string
+        example: "Siswa Budi"
+      no_kk:
+        type: string
+        description: "Nomor KK (Akan dienkripsi)"
+        example: "3301xxxxxxxxxx"
+      nik:
+        type: string
+        description: "NIK Siswa (Akan dienkripsi)"
+        example: "3301xxxxxxxxxx"
+      nisn:
+        type: string
+        example: "0012345678"
+      nim:
+        type: string
+        example: "2025001"
+      gender:
+        type: string
+        enum: [male, female]
+      place_of_birth:
+        type: string
+        example: "Jakarta"
+      date_of_birth:
+        type: string
+        format: date
+        example: "2010-05-15"
+      address:
+        type: string
+        example: "Jl. Pendidikan No. 1"
+      rt:
+        type: string
+        maxLength: 3
+        example: "001"
+      rw:
+        type: string
+        maxLength: 3
+        example: "002"
+      sub_district:
+        type: string
+        example: "Kebon Jeruk"
+      district:
+        type: string
+        example: "Jakarta Barat"
+      city:
+        type: string
+        example: "DKI Jakarta"
+      province:
+        type: string
+        example: "DKI Jakarta"
+      postal_code:
+        type: string
+        maxLength: 5
+        example: "11530"
+
+  StudentUpdateRequest:
+    type: object
+    description: "Hanya kirim field yang ingin di-update."
+    properties:
+      full_name:
+        type: string
+        example: "Siswa Budi Pratama"
+      no_kk:
+        type: string
+        description: "Nomor KK (Akan dienkripsi)"
+        example: "3301xxxxxxxxxx"
+      nik:
+        type: string
+        description: "NIK Siswa (Akan dienkripsi)"
+        example: "3301xxxxxxxxxx"
+      nisn:
+        type: string
+        example: "0012345678"
+      nim:
+        type: string
+        example: "2025001"
+      gender:
+        type: string
+        enum: [male, female]
+      place_of_birth:
+        type: string
+        example: "Jakarta"
+      date_of_birth:
+        type: string
+        format: date
+        example: "2010-05-15"
+      address:
+        type: string
+        example: "Jl. Pendidikan No. 1A"
+      rt:
+        type: string
+        maxLength: 3
+        example: "001"
+      rw:
+        type: string
+        maxLength: 3
+        example: "002"
+      sub_district:
+        type: string
+        example: "Kebon Jeruk"
+      district:
+        type: string
+        example: "Jakarta Barat"
+      city:
+        type: string
+        example: "DKI Jakarta"
+      province:
+        type: string
+        example: "DKI Jakarta"
+      postal_code:
+        type: string
+        maxLength: 5
+        example: "11530"
+
+  StudentSyncParentsRequest:
+    type: object
+    required:
+      - parents
+    properties:
+      parents:
+        type: array
+        items:
+          $ref: '#/schemas/ParentRelationshipRequestDTO'
+        minItems: 0
+        description: "Kirim array kosong [] untuk menghapus semua relasi."
+
+  ParentRelationshipRequestDTO:
+    type: object
+    required:
+      - parent_id
+      - relationship_type
+    properties:
+      parent_id:
+        type: string
+        format: uuid
+        description: "ID dari tabel 'parents'"
+        example: "uuid-parent-ayah"
+      relationship_type:
+        type: string
+        example: "FATHER"
+        description: "Cth: 'FATHER', 'MOTHER', 'STEP-FATHER'"
+
+  StudentSetGuardianRequest:
+    type: object
+    required:
+      - guardian_id
+      - guardian_type
+    properties:
+      guardian_id:
+        type: string
+        format: uuid
+        description: "ID dari tabel 'parents' ATAU 'guardians'"
+        example: "uuid-parent-ibu"
+      guardian_type:
+        type: string
+        enum: [parent, guardian]
+        description: "Tipe tabel asal guardian_id"
+        example: "parent"
+
+  # --- Response DTOs ---
+  StudentListResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-student-123"
+      full_name:
+        type: string
+        example: "Siswa Budi"
+      nisn:
+        type: string
+        example: "0012345678"
+      nim:
+        type: string
+        example: "2025001"
+      gender:
+        type: string
+        enum: [male, female]
+      city:
+        type: string
+        example: "DKI Jakarta"
+
+  StudentDetailResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-student-123"
+      full_name:
+        type: string
+        example: "Siswa Budi"
+      no_kk:
+        type: string
+        description: "Sudah didekripsi"
+        example: "3301xxxxxxxxxx"
+      nik:
+        type: string
+        description: "Sudah didekripsi"
+        example: "3301xxxxxxxxxx"
+      nisn:
+        type: string
+        example: "0012345678"
+      nim:
+        type: string
+        example: "2025001"
+      gender:
+        type: string
+        enum: [male, female]
+      place_of_birth:
+        type: string
+        example: "Jakarta"
+      date_of_birth:
+        type: string
+        format: date
+        example: "2010-05-15"
+      address:
+        type: string
+        example: "Jl. Pendidikan No. 1"
+      rt:
+        type: string
+        maxLength: 3
+        example: "001"
+      rw:
+        type: string
+        maxLength: 3
+        example: "002"
+      sub_district:
+        type: string
+        example: "Kebon Jeruk"
+      district:
+        type: string
+        example: "Jakarta Barat"
+      city:
+        type: string
+        example: "DKI Jakarta"
+      province:
+        type: string
+        example: "DKI Jakarta"
+      postal_code:
+        type: string
+        maxLength: 5
+        example: "11530"
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+      parents:
+        type: array
+        items:
+          $ref: '#/schemas/ParentRelationshipResponse'
+        nullable: true
+      guardian:
+        $ref: '#/schemas/GuardianInfoResponse'
+        nullable: true
+
+  ParentRelationshipResponse:
+    type: object
+    properties:
+      relationship_type:
+        type: string
+        example: "FATHER"
+      parent_info:
+        $ref: './parent.yaml#/schemas/ParentListResponse'
+
+  GuardianInfoResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-parent-ibu"
+      full_name:
+        type: string
+        example: "Ibu Siti"
+      phone_number:
+        type: string
+        example: "0812xxxxxxxx"
+      email:
+        type: string
+        format: email
+        nullable: true
+        example: "ibu.siti@example.com"
+      type:
+        type: string
+        enum: [parent, guardian]
+        example: "parent"
+      relationship:
+        type: string
+        description: "Cth: 'PARENT', 'UNCLE', 'AUNT'"
+        example: "PARENT"

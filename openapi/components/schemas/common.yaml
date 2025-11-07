@@ -1,0 +1,191 @@
+# Skema wrapper respons (dari base_response.go)
+schemas:
+  # Wrapper Sukses (generik)
+  SuccessWrapper:
+    type: object
+    properties:
+      status: { type: string, example: "success" }
+      message: { type: string }
+      data: { } # 'data' akan di-override di skema spesifik
+
+  # Wrapper Error (generik)
+  ErrorWrapper:
+    type: object
+    properties:
+      status: { type: string, example: "error" }
+      message: { type: string }
+      error:
+        # Error bisa berupa salah satu dari ini:
+        oneOf:
+          - $ref: '#/schemas/SimpleError'
+          - $ref: '#/schemas/ValidationError'
+      timestamp: { type: string, format: date-time }
+
+  # Skema Error Detail
+  SimpleError:
+    type: object
+    properties:
+      message: { type: string }
+
+  ErrorDetail:
+    type: object
+    properties:
+      code: { type: string }
+      field: { type: string }
+      message: { type: string }
+
+  ValidationError:
+    type: object
+    properties:
+      errors:
+        type: array
+        items:
+          $ref: '#/schemas/ErrorDetail'
+
+  # === Wrapper Sukses Spesifik (Penting!) ===
+  # Ini adalah cara terbaik untuk mendokumentasikan 'data: ...'
+
+  SuccessResponseEmpty: # Untuk PUT, DELETE, POST (tanpa data)
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data: { type: 'object', nullable: true, example: null }
+
+  # Wrapper untuk Auth
+  SuccessResponseAuth:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            $ref: './auth.yaml#/schemas/AuthResponse'
+
+  # Wrapper untuk User (Register)
+  SuccessResponseUserRegister:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            $ref: './user.yaml#/schemas/UserWithRoleResponse' # Register mengembalikan ini
+
+  # Wrapper untuk User (Detail)
+  SuccessResponseUserDetail:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            $ref: './user.yaml#/schemas/UserWithRolesResponseAndPermissions'
+
+  # Wrapper untuk User (List)
+  SuccessResponseUserList:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            type: array
+            items:
+              $ref: './user.yaml#/schemas/UserWithRoleResponse'
+
+  # Wrapper untuk Role (Detail)
+  SuccessResponseRoleDetail:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            $ref: './role.yaml#/schemas/RoleDetailResponse'
+
+  # Wrapper untuk Role (List)
+  SuccessResponseRoleList:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            type: array
+            items:
+              $ref: './role.yaml#/schemas/RoleListResponse'
+
+  # Wrapper untuk Permission (Detail)
+  SuccessResponsePermissionDetail:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            $ref: './permission.yaml#/schemas/PermissionResponse'
+
+  # Wrapper untuk Permission (List)
+  SuccessResponsePermissionList:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            type: array
+            items:
+              $ref: './permission.yaml#/schemas/PermissionResponse'
+
+  # Wrapper untuk Student (Detail)
+  SuccessResponseStudentDetail:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            $ref: './student.yaml#/schemas/StudentDetailResponse'
+
+  # Wrapper untuk Student (List)
+  SuccessResponseStudentList:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            type: array
+            items:
+              $ref: './student.yaml#/schemas/StudentListResponse'
+
+  # Wrapper untuk Parent (Detail)
+  SuccessResponseParentDetail:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            $ref: './parent.yaml#/schemas/ParentDetailResponse'
+
+  # Wrapper untuk Parent (List)
+  SuccessResponseParentList:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            type: array
+            items:
+              $ref: './parent.yaml#/schemas/ParentListResponse'
+
+  # Wrapper untuk Guardian (Detail)
+  SuccessResponseGuardianDetail:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            $ref: './guardian.yaml#/schemas/GuardianDetailResponse'
+
+  # Wrapper untuk Guardian (List)
+  SuccessResponseGuardianList:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            type: array
+            items:
+              $ref: './guardian.yaml#/schemas/GuardianListResponse'

@@ -1,0 +1,46 @@
+schemas:
+  PermissionCreateRequest:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        minLength: 3
+        example: "students.create"
+      description:
+        type: string
+        example: "Izin untuk membuat siswa baru"
+
+  PermissionUpdateRequest:
+    type: object
+    properties:
+      name:
+        type: string
+        minLength: 3
+        example: "students.create"
+      description:
+        type: string
+        example: "Izin untuk membuat data siswa baru"
+
+  # --- Response DTO ---
+  PermissionResponse: # List dan Detail sama
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-perm-123"
+      name:
+        type: string
+        example: "students.create"
+      description:
+        type: string
+        nullable: true
+        example: "Izin untuk membuat siswa baru"
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time

@@ -1,0 +1,7 @@
+# Definisi skema keamanan JWT (Bearer Token)
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+    description: "Otentikasi JWT. Masukkan 'Bearer {token}'"

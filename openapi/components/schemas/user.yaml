@@ -1,0 +1,146 @@
+# DTOs untuk /users dan /auth/register
+schemas:
+  UserCreateRequest:
+    type: object
+    required:
+      - username
+      - name
+      - email
+      - password
+    properties:
+      username:
+        type: string
+        minLength: 3
+        example: "budi.santoso"
+      name:
+        type: string
+        example: "Budi Santoso"
+      email:
+        type: string
+        format: email
+        example: "budi.santoso@example.com"
+      password:
+        type: string
+        format: password
+        minLength: 6
+        example: "password123"
+      role_ids:
+        type: array
+        items:
+          type: string
+          format: uuid
+        description: "Array of Role IDs. Kosongkan saat register publik."
+        example: ["uuid-role-admin", "uuid-role-guru"]
+
+  UserUpdateRequest:
+    type: object
+    properties:
+      name:
+        type: string
+        example: "Budi Santoso"
+      email:
+        type: string
+        format: email
+        example: "budi.baru@example.com"
+
+  ChangePasswordRequest: # Skema dari inline struct di handler
+    type: object
+    required:
+      - current_password
+      - new_password
+    properties:
+      current_password:
+        type: string
+        format: password
+        example: "password1ama"
+      new_password:
+        type: string
+        format: password
+        minLength: 6
+        example: "passwordB4ru!"
+
+  SyncRolesRequest: # Skema dari inline struct di handler
+    type: object
+    required:
+      - roles
+    properties:
+      roles:
+        type: array
+        items:
+          type: string
+        description: "Array of Role *NAMES*"
+        example: ["admin", "guru"]
+
+  SyncPermissionsRequest: # Skema dari inline struct di handler
+    type: object
+    required:
+      - permissions
+    properties:
+      permissions:
+        type: array
+        items:
+          type: string
+        description: "Array of Permission *NAMES*"
+        example: ["users.read", "users.create"]
+
+  # --- Response DTOs ---
+  UserWithRoleResponse: # Digunakan untuk List dan AuthResponse
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-user-123"
+      username:
+        type: string
+        example: "budi.santoso"
+      name:
+        type: string
+        example: "Budi Santoso"
+      email:
+        type: string
+        format: email
+        example: "budi.santoso@example.com"
+      roles:
+        type: array
+        items:
+          $ref: './role.yaml#/schemas/RoleListResponse'
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+
+  UserWithRolesResponseAndPermissions: # Digunakan untuk Detail
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-user-123"
+      username:
+        type: string
+        example: "budi.santoso"
+      name:
+        type: string
+        example: "Budi Santoso"
+      email:
+        type: string
+        format: email
+        example: "budi.santoso@example.com"
+      roles:
+        type: array
+        items:
+          $ref: './role.yaml#/schemas/RoleListResponse'
+      permissions:
+        type: array
+        items:
+          type: string
+        example: ["users.read", "profile.read"]
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time

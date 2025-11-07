@@ -1,0 +1,100 @@
+schemas:
+  RoleCreateRequest:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        minLength: 3
+        example: "Guru"
+      description:
+        type: string
+        example: "Peran untuk pengajar"
+      is_default:
+        type: boolean
+        default: false
+      permissions:
+        type: array
+        items:
+          type: string
+        description: "Array of permission *NAMES*"
+        example: ["students.read", "profile.read"]
+
+  RoleUpdateRequest:
+    type: object
+    properties:
+      name:
+        type: string
+        minLength: 3
+        example: "Guru Senior"
+      description:
+        type: string
+        example: "Peran untuk pengajar senior"
+      is_default:
+        type: boolean
+        nullable: true
+        description: "Gunakan pointer *bool, bisa null"
+        example: false
+      permissions:
+        type: array
+        items:
+          type: string
+        description: "Array of permission *NAMES*"
+        example: ["students.read", "students.update"]
+
+  AssignPermissionsRequest: # dari role_request.go
+    type: object
+    required:
+      - permissions
+    properties:
+      permissions:
+        type: array
+        items:
+          type: string
+        description: "Array of permission *NAMES*"
+        example: ["students.read", "students.update"]
+
+  # --- Response DTOs ---
+  RoleDetailResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-role-guru"
+      name:
+        type: string
+        example: "Guru"
+      description:
+        type: string
+        nullable: true
+        example: "Peran untuk pengajar"
+      is_default:
+        type: boolean
+        example: false
+      permissions:
+        type: array
+        items:
+          $ref: './permission.yaml#/schemas/PermissionResponse'
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+
+  RoleListResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-role-guru"
+      name:
+        type: string
+        example: "Guru"
+      description:
+        type: string
+        nullable: true
+        example: "Peran untuk pengajar"

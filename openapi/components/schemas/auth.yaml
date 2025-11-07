@@ -1,0 +1,44 @@
+# DTOs untuk /auth
+schemas:
+  LoginRequest:
+    type: object
+    required:
+      - login
+      - password
+    properties:
+      login:
+        type: string
+        example: "admin_username"
+        description: "Bisa berupa username atau email"
+      password:
+        type: string
+        format: password
+        example: "password123"
+
+  RefreshTokenRequest:
+    type: object
+    required:
+      - refresh_token
+    properties:
+      refresh_token:
+        type: string
+        example: "eyJhbGciOiJI..._aRefresh_Token_..."
+
+  AuthResponse:
+    type: object
+    properties:
+      access_token:
+        type: string
+        example: "eyJhbGciOiJI..._anAccess_Token_..."
+      refresh_token:
+        type: string
+        example: "eyJhbGciOiJI..._aRefresh_Token_..."
+      token_type:
+        type: string
+        example: "Bearer"
+      expires_in:
+        type: integer
+        format: int64
+        example: 3600
+      user:
+        $ref: './user.yaml#/schemas/UserWithRoleResponse'

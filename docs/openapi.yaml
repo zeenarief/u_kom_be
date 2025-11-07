@@ -1,0 +1,389 @@
+openapi: 3.0.0
+info:
+  title: "API Sistem Informasi Sekolah"
+  version: "1.0.0"
+  description: "Dokumentasi API untuk mengelola data inti sekolah, termasuk Siswa, Orang Tua, dan Wali."
+
+servers:
+  - url: "/api/v1"
+    description: "API Versi 1"
+
+# 1. Mendefinisikan Skema Keamanan (JWT)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Otentikasi JWT. Masukkan 'Bearer {token}'"
+
+  # 2. Mendefinisikan semua Schema DTO (Request & Response) kita
+  schemas:
+    # --- DTOs Request ---
+    StudentCreateRequest:
+      type: object
+      required: [full_name]
+      properties:
+        full_name: { type: string, example: "Budi Santoso" }
+        no_kk: { type: string, example: "3301...1001", description: "Nomor KK (akan dienkripsi)" }
+        nik: { type: string, example: "3301...2002", description: "NIK Siswa (akan dienkripsi)" }
+        nisn: { type: string, example: "0012345678" }
+        nim: { type: string, example: "2024001" }
+        gender: { type: string, enum: [male, female] }
+        place_of_birth: { type: string, example: "Jakarta" }
+        date_of_birth: { type: string, format: date, example: "2010-05-15" }
+        address: { type: string, example: "Jl. Merdeka No. 10" }
+        # ... (rt, rw, sub_district, dll.)
+
+    StudentUpdateRequest:
+      type: object
+      description: "Hanya kirim field yang ingin di-update."
+      properties:
+        full_name: { type: string, example: "Budi Santoso" }
+        no_kk: { type: string, example: "3301...1001" }
+        nik: { type: string, example: "3301...2002" }
+        # ... (field lainnya opsional)
+
+    StudentSyncParentsRequest:
+      type: object
+      required: [parents]
+      properties:
+        parents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParentRelationshipRequestDTO'
+          minItems: 0
+          description: "Array relasi orang tua. Kirim array kosong untuk menghapus semua."
+
+    ParentRelationshipRequestDTO:
+      type: object
+      required: [parent_id, relationship_type]
+      properties:
+        parent_id: { type: string, format: uuid, description: "ID dari tabel 'parents'" }
+        relationship_type: { type: string, example: "FATHER", description: "Cth: 'FATHER', 'MOTHER', 'STEP-FATHER'" }
+
+    StudentSetGuardianRequest:
+      type: object
+      required: [guardian_id, guardian_type]
+      properties:
+        guardian_id: { type: string, format: uuid, description: "ID dari tabel 'parents' ATAU 'guardians'" }
+        guardian_type: { type: string, enum: [parent, guardian], description: "Tipe tabel asal guardian_id" }
+
+    # --- DTOs Response ---
+    StudentListResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        full_name: { type: string }
+        nisn: { type: string }
+        nim: { type: string }
+        gender: { type: string }
+        city: { type: string }
+
+    StudentDetailResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        full_name: { type: string }
+        no_kk: { type: string, description: "Data No. KK (sudah didekripsi)" }
+        nik: { type: string, description: "Data NIK (sudah didekripsi)" }
+        nisn: { type: string }
+        nim: { type: string }
+        gender: { type: string }
+        # ... (semua field detail student: address, rt, rw, dll.)
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        parents:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParentRelationshipResponse'
+        guardian:
+          $ref: '#/components/schemas/GuardianInfoResponse'
+          nullable: true
+
+    ParentRelationshipResponse:
+      type: object
+      properties:
+        relationship_type: { type: string }
+        parent_info:
+          $ref: '#/components/schemas/ParentListResponse' # Kita gunakan ListResponse ringkas
+
+    ParentListResponse: # Skema ini direferensikan oleh ParentRelationshipResponse
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        full_name: { type: string }
+        gender: { type: string }
+        life_status: { type: string }
+        phone_number: { type: string }
+        email: { type: string, format: email }
+        occupation: { type: string }
+
+    GuardianInfoResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        full_name: { type: string }
+        phone_number: { type: string }
+        email: { type: string, format: email }
+        type: { type: string, enum: [parent, guardian], description: "Tabel asal wali" }
+        relationship: { type: string, description: "Cth: 'FATHER', 'MOTHER', 'UNCLE'" }
+
+    # --- Skema Wrapper Response (Sesuai base_handler.go) ---
+    SuccessResponseListStudent:
+      type: object
+      properties:
+        status: { type: string, example: "success" }
+        message: { type: string }
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/StudentListResponse'
+
+    SuccessResponseDetailStudent:
+      type: object
+      properties:
+        status: { type: string, example: "success" }
+        message: { type: string }
+        data:
+          $ref: '#/components/schemas/StudentDetailResponse'
+
+    SuccessResponseEmpty: # Untuk POST, PUT, DELETE tanpa data kembalian
+      type: object
+      properties:
+        status: { type: string, example: "success" }
+        message: { type: string }
+        data: { type: 'object', nullable: true, example: null }
+
+    ErrorResponse:
+      type: object
+      properties:
+        status: { type: string, example: "error" }
+        message: { type: string }
+        data: { type: object, nullable: true }
+
+# 3. Menerapkan Keamanan JWT secara Global
+security:
+  - bearerAuth: [] # Semua endpoint wajib pakai JWT
+
+# 4. Grup Endpoint
+tags:
+  - name: "Student"
+    description: "Mengelola data siswa dan relasi keluarganya (orang tua dan wali)."
+
+# 5. Definisi PATH (Endpoint)
+paths:
+  # --- Path /students ---
+  /students:
+    get:
+      tags: [Student]
+      summary: "Get All Students (List)"
+      description: "Mengambil daftar semua siswa dalam format ringkas (ListResponse). Memerlukan permission 'students.read'."
+      responses:
+        '200':
+          description: "Daftar siswa berhasil diambil."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponseListStudent'
+        '401':
+          description: "Unauthorized (Token tidak valid)"
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } }
+        '403':
+          description: "Forbidden (Permission 'students.read' ditolak)"
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } }
+
+    post:
+      tags: [Student]
+      summary: "Create New Student"
+      description: "Membuat data siswa baru. Memerlukan permission 'students.create'."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentCreateRequest'
+      responses:
+        '201':
+          description: "Siswa berhasil dibuat. Mengembalikan data detail siswa."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponseDetailStudent'
+        '400':
+          description: "Bad Request (Validasi gagal, cth: NISN duplikat)"
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } }
+        '401':
+          description: "Unauthorized"
+        '403':
+          description: "Forbidden (Permission 'students.create' ditolak)"
+
+  # --- Path /students/{id} ---
+  /students/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+        description: "ID Siswa (UUID)"
+
+    get:
+      tags: [Student]
+      summary: "Get Student by ID (Detail)"
+      description: "Mengambil data detail lengkap seorang siswa, termasuk relasi orang tua dan wali. Memerlukan permission 'students.read'."
+      responses:
+        '200':
+          description: "Data detail siswa berhasil diambil."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponseDetailStudent'
+        '401':
+          description: "Unauthorized"
+        '403':
+          description: "Forbidden (Permission 'students.read' ditolak)"
+        '404':
+          description: "Not Found (Siswa tidak ditemukan)"
+          content:
+            application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } }
+
+    put:
+      tags: [Student]
+      summary: "Update Student"
+      description: "Memperbarui data siswa. Hanya field yang dikirim yang akan diupdate. Memerlukan permission 'students.update'."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentUpdateRequest'
+      responses:
+        '200':
+          description: "Siswa berhasil diupdate. Mengembalikan data detail terbaru."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponseDetailStudent'
+        '400':
+          description: "Bad Request (Validasi gagal)"
+        '401':
+          description: "Unauthorized"
+        '403':
+          description: "Forbidden (Permission 'students.update' ditolak)"
+        '404':
+          description: "Not Found"
+
+    delete:
+      tags: [Student]
+      summary: "Delete Student"
+      description: "Menghapus data siswa. Memerlukan permission 'students.delete'."
+      responses:
+        '200':
+          description: "Siswa berhasil dihapus."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponseEmpty'
+        '401':
+          description: "Unauthorized"
+        '403':
+          description: "Forbidden (Permission 'students.delete' ditolak)"
+        '404':
+          description: "Not Found"
+
+  # --- Path /students/{id}/sync-parents ---
+  /students/{id}/sync-parents:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+        description: "ID Siswa (UUID)"
+    post:
+      tags: [Student]
+      summary: "Sync Student Parents (M:N)"
+      description: "Menyelaraskan (sync) relasi Many-to-Many orang tua siswa. Ini akan MENGHAPUS semua relasi lama dan menggantinya dengan yang baru. Memerlukan permission 'students.manage_parents'."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentSyncParentsRequest'
+      responses:
+        '200':
+          description: "Relasi orang tua berhasil disinkronkan."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponseEmpty'
+        '400':
+          description: "Bad Request (Cth: parent_id tidak ditemukan, atau duplikat)"
+        '401':
+          description: "Unauthorized"
+        '403':
+          description: "Forbidden (Permission 'students.manage_parents' ditolak)"
+        '404':
+          description: "Not Found (Siswa tidak ditemukan)"
+
+  # --- Path /students/{id}/set-guardian ---
+  /students/{id}/set-guardian:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+        description: "ID Siswa (UUID)"
+    put:
+      tags: [Student]
+      summary: "Set/Update Student Guardian (Polymorphic)"
+      description: "Menetapkan atau mengubah satu wali utama (kontak darurat) siswa. Wali ini bisa dari tabel 'parents' atau 'guardians'. Memerlukan permission 'students.manage_guardian'."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentSetGuardianRequest'
+      responses:
+        '200':
+          description: "Wali siswa berhasil ditetapkan."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponseEmpty'
+        '400':
+          description: "Bad Request (Cth: guardian_id tidak ditemukan, guardian_type salah)"
+        '401':
+          description: "Unauthorized"
+        '403':
+          description: "Forbidden (Permission 'students.manage_guardian' ditolak)"
+        '404':
+          description: "Not Found (Siswa tidak ditemukan)"
+
+  # --- Path /students/{id}/remove-guardian ---
+  /students/{id}/remove-guardian:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+        description: "ID Siswa (UUID)"
+    delete:
+      tags: [Student]
+      summary: "Remove Student Guardian"
+      description: "Menghapus penetapan wali utama dari siswa (mengatur 'guardian_id' dan 'guardian_type' ke NULL). Memerlukan permission 'students.manage_guardian'."
+      responses:
+        '200':
+          description: "Wali siswa berhasil dihapus."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponseEmpty'
+        '401':
+          description: "Unauthorized"
+        '403':
+          description: "Forbidden (Permission 'students.manage_guardian' ditolak)"
+        '404':
+          description: "Not Found (Siswa tidak ditemukan)"

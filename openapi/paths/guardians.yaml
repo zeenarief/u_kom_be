@@ -1,0 +1,105 @@
+paths:
+  # === /guardians ===
+  /guardians:
+    get:
+      tags: [Guardian]
+      summary: "Get All Guardians (List)"
+      description: "Mengambil daftar semua wali (pihak lain) dalam format ringkas. Memerlukan permission 'guardians.read'."
+      responses:
+        '200':
+          description: "Daftar wali berhasil diambil."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseGuardianList'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    post:
+      tags: [Guardian]
+      summary: "Create New Guardian"
+      description: "Membuat data wali (pihak lain) baru. Memerlukan permission 'guardians.create'."
+      requestBody:
+        description: "Data wali baru"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/guardian.yaml#/schemas/GuardianCreateRequest'
+      responses:
+        '201':
+          description: "Wali berhasil dibuat. Mengembalikan data detail."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseGuardianDetail'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+  # === /guardians/{id} ===
+  /guardians/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+        description: "ID Wali (UUID)"
+
+    get:
+      tags: [Guardian]
+      summary: "Get Guardian by ID (Detail)"
+      description: "Mengambil data detail lengkap seorang wali. Memerlukan permission 'guardians.read'."
+      responses:
+        '200':
+          description: "Data detail wali berhasil diambil."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseGuardianDetail'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    put:
+      tags: [Guardian]
+      summary: "Update Guardian"
+      description: "Memperbarui data wali. Hanya field yang dikirim yang akan diupdate. Memerlukan permission 'guardians.update'."
+      requestBody:
+        description: "Data wali yang ingin diupdate"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/guardian.yaml#/schemas/GuardianUpdateRequest'
+      responses:
+        '200':
+          description: "Wali berhasil diupdate. Mengembalikan data detail terbaru."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseGuardianDetail'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    delete:
+      tags: [Guardian]
+      summary: "Delete Guardian"
+      description: "Menghapus data wali. Memerlukan permission 'guardians.delete'."
+      responses:
+        '200':
+          description: "Wali berhasil dihapus."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }

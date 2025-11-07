@@ -1,0 +1,99 @@
+paths:
+  # === /permissions ===
+  /permissions:
+    get:
+      tags: [Permission]
+      summary: "Get All Permissions"
+      description: "Mengambil daftar semua permission. Memerlukan permission 'roles.manage'."
+      responses:
+        '200':
+          description: "Daftar permission berhasil diambil."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponsePermissionList'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    post:
+      tags: [Permission]
+      summary: "Create Permission"
+      description: "Membuat permission baru. Memerlukan permission 'roles.manage'."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/permission.yaml#/schemas/PermissionCreateRequest'
+      responses:
+        '201':
+          description: "Permission berhasil dibuat. Mengembalikan data detail."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponsePermissionDetail'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+
+  # === /permissions/{id} ===
+  /permissions/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+        description: "ID Permission (UUID)"
+
+    get:
+      tags: [Permission]
+      summary: "Get Permission by ID"
+      description: "Mengambil data detail permission. Memerlukan permission 'roles.manage'."
+      responses:
+        '200':
+          description: "Detail permission berhasil diambil."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponsePermissionDetail'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+
+    put:
+      tags: [Permission]
+      summary: "Update Permission"
+      description: "Memperbarui data permission. Memerlukan permission 'roles.manage'."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/permission.yaml#/schemas/PermissionUpdateRequest'
+      responses:
+        '200':
+          description: "Permission berhasil diupdate. Mengembalikan data detail."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponsePermissionDetail'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+
+    delete:
+      tags: [Permission]
+      summary: "Delete Permission"
+      description: "Menghapus permission. Memerlukan permission 'roles.manage'."
+      responses:
+        '200':
+          description: "Permission berhasil dihapus."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }

@@ -1,0 +1,178 @@
+openapi: 3.0.0
+info:
+  title: "API Sistem Informasi Sekolah"
+  version: "1.0.0"
+  description: "Dokumentasi API lengkap untuk mengelola data inti sekolah."
+
+servers:
+  - url: "/api/v1"
+    description: "API Versi 1"
+
+# 1. Definisi Tags
+tags:
+  - name: "Auth"
+    description: "Otentikasi, Registrasi, dan Manajemen Token"
+  - name: "User"
+    description: "Mengelola akun pengguna (CRUD, Roles, Permissions)"
+  - name: "Role"
+    description: "Mengelola Role (Jabatan) dan izin terkait"
+  - name: "Permission"
+    description: "Mengelola Permission (Izin) sistem"
+  - name: "Student"
+    description: "Mengelola data siswa dan relasi keluarganya"
+  - name: "Parent"
+    description: "Mengelola data orang tua siswa"
+  - name: "Guardian"
+    description: "Mengelola data wali (pihak lain) siswa"
+
+# 2. Keamanan Global
+security:
+  - bearerAuth: []
+
+# 3. Definisi Paths (Ini sudah diperbaiki dari sebelumnya)
+paths:
+  # === Auth Paths ===
+  /auth/register:
+    $ref: './paths/auth.yaml#/paths/~1auth~1register' # ~1 adalah escape untuk '/'
+  /auth/login:
+    $ref: './paths/auth.yaml#/paths/~1auth~1login'
+  /auth/refresh:
+    $ref: './paths/auth.yaml#/paths/~1auth~1refresh'
+  /auth/logout:
+    $ref: './paths/auth.yaml#/paths/~1auth~1logout'
+
+  # === User Paths ===
+  /users:
+    $ref: './paths/users.yaml#/paths/~1users'
+  /users/{id}:
+    $ref: './paths/users.yaml#/paths/~1users~1{id}'
+  /users/{id}/sync-roles:
+    $ref: './paths/users.yaml#/paths/~1users~1{id}~1sync-roles'
+  /users/{id}/sync-permissions:
+    $ref: './paths/users.yaml#/paths/~1users~1{id}~1sync-permissions'
+  /users/{id}/change-password:
+    $ref: './paths/users.yaml#/paths/~1users~1{id}~1change-password'
+  /profile:
+    $ref: './paths/users.yaml#/paths/~1profile'
+
+  # === Role Paths ===
+  /roles:
+    $ref: './paths/roles.yaml#/paths/~1roles'
+  /roles/{id}:
+    $ref: './paths/roles.yaml#/paths/~1roles~1{id}'
+  /roles/{id}/sync-permissions:
+    $ref: './paths/roles.yaml#/paths/~1roles~1{id}~1sync-permissions'
+
+  # === Permission Paths ===
+  /permissions:
+    $ref: './paths/permissions.yaml#/paths/~1permissions'
+  /permissions/{id}:
+    $ref: './paths/permissions.yaml#/paths/~1permissions~1{id}'
+
+  # === Student Paths ===
+  /students:
+    $ref: './paths/students.yaml#/paths/~1students'
+  /students/{id}:
+    $ref: './paths/students.yaml#/paths/~1students~1{id}'
+  /students/{id}/sync-parents:
+    $ref: './paths/students.yaml#/paths/~1students~1{id}~1sync-parents'
+  /students/{id}/set-guardian:
+    $ref: './paths/students.yaml#/paths/~1students~1{id}~1set-guardian'
+  /students/{id}/remove-guardian:
+    $ref: './paths/students.yaml#/paths/~1students~1{id}~1remove-guardian'
+
+  # === Parent Paths ===
+  /parents:
+    $ref: './paths/parents.yaml#/paths/~1parents'
+  /parents/{id}:
+    $ref: './paths/parents.yaml#/paths/~1parents~1{id}'
+
+  # === Guardian Paths ===
+  /guardians:
+    $ref: './paths/guardians.yaml#/paths/~1guardians'
+  /guardians/{id}:
+    $ref: './paths/guardians.yaml#/paths/~1guardians~1{id}'
+
+
+# 4. Definisi Components (BAGIAN YANG DIPERBAIKI)
+components:
+  securitySchemes:
+    $ref: './components/securitySchemes.yaml'
+  responses:
+    $ref: './components/responses.yaml'
+  parameters:
+    $ref: './components/parameters.yaml'
+
+  # --- INI ADALAH PERBAIKANNYA ---
+  # Kita daftarkan SEMUA skema di sini
+  schemas:
+    # Dari common.yaml
+    SuccessWrapper: { $ref: './components/schemas/common.yaml#/schemas/SuccessWrapper' }
+    ErrorWrapper: { $ref: './components/schemas/common.yaml#/schemas/ErrorWrapper' }
+    SimpleError: { $ref: './components/schemas/common.yaml#/schemas/SimpleError' }
+    ErrorDetail: { $ref: './components/schemas/common.yaml#/schemas/ErrorDetail' }
+    ValidationError: { $ref: './components/schemas/common.yaml#/schemas/ValidationError' }
+    SuccessResponseEmpty: { $ref: './components/schemas/common.yaml#/schemas/SuccessResponseEmpty' }
+    SuccessResponseAuth: { $ref: './components/schemas/common.yaml#/schemas/SuccessResponseAuth' }
+    SuccessResponseUserRegister: { $ref: './components/schemas/common.yaml#/schemas/SuccessResponseUserRegister' }
+    SuccessResponseUserDetail: { $ref: './components/schemas/common.yaml#/schemas/SuccessResponseUserDetail' }
+    SuccessResponseUserList: { $ref: './components/schemas/common.yaml#/schemas/SuccessResponseUserList' }
+    SuccessResponseRoleDetail: { $ref: './components/schemas/common.yaml#/schemas/SuccessResponseRoleDetail' }
+    SuccessResponseRoleList: { $ref: './components/schemas/common.yaml#/schemas/SuccessResponseRoleList' }
+    SuccessResponsePermissionDetail: { $ref: 'components/schemas/common.yaml#/schemas/SuccessResponsePermissionDetail' }
+    SuccessResponsePermissionList: { $ref: 'components/schemas/common.yaml#/schemas/SuccessResponsePermissionList' }
+    SuccessResponseStudentDetail: { $ref: 'components/schemas/common.yaml#/schemas/SuccessResponseStudentDetail' }
+    SuccessResponseStudentList: { $ref: 'components/schemas/common.yaml#/schemas/SuccessResponseStudentList' }
+    SuccessResponseParentDetail: { $ref: 'components/schemas/common.yaml#/schemas/SuccessResponseParentDetail' }
+    SuccessResponseParentList: { $ref: 'components/schemas/common.yaml#/schemas/SuccessResponseParentList' }
+    SuccessResponseGuardianDetail: { $ref: 'components/schemas/common.yaml#/schemas/SuccessResponseGuardianDetail' }
+    SuccessResponseGuardianList: { $ref: 'components/schemas/common.yaml#/schemas/SuccessResponseGuardianList' }
+
+    # Dari auth.yaml
+    LoginRequest: { $ref: './components/schemas/auth.yaml#/schemas/LoginRequest' }
+    RefreshTokenRequest: { $ref: './components/schemas/auth.yaml#/schemas/RefreshTokenRequest' }
+    AuthResponse: { $ref: './components/schemas/auth.yaml#/schemas/AuthResponse' }
+
+    # Dari user.yaml
+    UserCreateRequest: { $ref: './components/schemas/user.yaml#/schemas/UserCreateRequest' }
+    UserUpdateRequest: { $ref: './components/schemas/user.yaml#/schemas/UserUpdateRequest' }
+    ChangePasswordRequest: { $ref: './components/schemas/user.yaml#/schemas/ChangePasswordRequest' }
+    SyncRolesRequest: { $ref: './components/schemas/user.yaml#/schemas/SyncRolesRequest' }
+    SyncPermissionsRequest: { $ref: './components/schemas/user.yaml#/schemas/SyncPermissionsRequest' }
+    UserWithRoleResponse: { $ref: './components/schemas/user.yaml#/schemas/UserWithRoleResponse' }
+    UserWithRolesResponseAndPermissions: { $ref: './components/schemas/user.yaml#/schemas/UserWithRolesResponseAndPermissions' }
+
+    # Dari role.yaml
+    RoleCreateRequest: { $ref: './components/schemas/role.yaml#/schemas/RoleCreateRequest' }
+    RoleUpdateRequest: { $ref: './components/schemas/role.yaml#/schemas/RoleUpdateRequest' }
+    AssignPermissionsRequest: { $ref: './components/schemas/role.yaml#/schemas/AssignPermissionsRequest' }
+    RoleDetailResponse: { $ref: './components/schemas/role.yaml#/schemas/RoleDetailResponse' }
+    RoleListResponse: { $ref: './components/schemas/role.yaml#/schemas/RoleListResponse' }
+
+    # Dari permission.yaml
+    PermissionCreateRequest: { $ref: './components/schemas/permission.yaml#/schemas/PermissionCreateRequest' }
+    PermissionUpdateRequest: { $ref: './components/schemas/permission.yaml#/schemas/PermissionUpdateRequest' }
+    PermissionResponse: { $ref: './components/schemas/permission.yaml#/schemas/PermissionResponse' }
+
+    # Dari student.yaml
+    StudentCreateRequest: { $ref: './components/schemas/student.yaml#/schemas/StudentCreateRequest' }
+    StudentUpdateRequest: { $ref: './components/schemas/student.yaml#/schemas/StudentUpdateRequest' }
+    StudentSyncParentsRequest: { $ref: './components/schemas/student.yaml#/schemas/StudentSyncParentsRequest' }
+    ParentRelationshipRequestDTO: { $ref: './components/schemas/student.yaml#/schemas/ParentRelationshipRequestDTO' }
+    StudentSetGuardianRequest: { $ref: './components/schemas/student.yaml#/schemas/StudentSetGuardianRequest' }
+    StudentListResponse: { $ref: './components/schemas/student.yaml#/schemas/StudentListResponse' }
+    StudentDetailResponse: { $ref: './components/schemas/student.yaml#/schemas/StudentDetailResponse' }
+    ParentRelationshipResponse: { $ref: './components/schemas/student.yaml#/schemas/ParentRelationshipResponse' }
+    GuardianInfoResponse: { $ref: './components/schemas/student.yaml#/schemas/GuardianInfoResponse' }
+
+    # Dari parent.yaml
+    ParentCreateRequest: { $ref: './components/schemas/parent.yaml#/schemas/ParentCreateRequest' }
+    ParentUpdateRequest: { $ref: './components/schemas/parent.yaml#/schemas/ParentUpdateRequest' }
+    ParentListResponse: { $ref: './components/schemas/parent.yaml#/schemas/ParentListResponse' }
+    ParentDetailResponse: { $ref: './components/schemas/parent.yaml#/schemas/ParentDetailResponse' }
+
+    # Dari guardian.yaml
+    GuardianCreateRequest: { $ref: './components/schemas/guardian.yaml#/schemas/GuardianCreateRequest' }
+    GuardianUpdateRequest: { $ref: './components/schemas/guardian.yaml#/schemas/GuardianUpdateRequest' }
+    GuardianListResponse: { $ref: './components/schemas/guardian.yaml#/schemas/GuardianListResponse' }
+    GuardianDetailResponse: { $ref: './components/schemas/guardian.yaml#/schemas/GuardianDetailResponse' }

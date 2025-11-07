@@ -1,0 +1,255 @@
+schemas:
+  # --- Request DTOs ---
+  ParentCreateRequest:
+    type: object
+    required:
+      - full_name
+    properties:
+      full_name:
+        type: string
+        example: "Agus Setiawan"
+      nik:
+        type: string
+        description: "NIK Orang Tua (Akan dienkripsi)"
+        example: "3302xxxxxxxxxx"
+      gender:
+        type: string
+        enum: [male, female]
+      place_of_birth:
+        type: string
+        example: "Bandung"
+      date_of_birth:
+        type: string
+        format: date
+        example: "1980-01-20"
+      life_status:
+        type: string
+        enum: [alive, deceased]
+        default: "alive"
+      marital_status:
+        type: string
+        enum: [married, divorced, widowed]
+      phone_number:
+        type: string
+        example: "0812xxxxxxxx"
+      email:
+        type: string
+        format: email
+        example: "agus.setiawan@example.com"
+      education_level:
+        type: string
+        example: "S1"
+      occupation:
+        type: string
+        example: "Wiraswasta"
+      income_range:
+        type: string
+        example: "5-10jt"
+      address:
+        type: string
+        example: "Jl. Merdeka No. 10"
+      rt:
+        type: string
+        maxLength: 3
+        example: "001"
+      rw:
+        type: string
+        maxLength: 3
+        example: "002"
+      sub_district:
+        type: string
+        example: "Kebon Jeruk"
+      district:
+        type: string
+        example: "Jakarta Barat"
+      city:
+        type: string
+        example: "DKI Jakarta"
+      province:
+        type: string
+        example: "DKI Jakarta"
+      postal_code:
+        type: string
+        maxLength: 5
+        example: "11530"
+
+  ParentUpdateRequest:
+    type: object
+    description: "Hanya kirim field yang ingin di-update."
+    properties:
+      full_name:
+        type: string
+        example: "Agus Setiawan"
+      nik:
+        type: string
+        description: "NIK Orang Tua (Akan dienkripsi)"
+        example: "3302xxxxxxxxxx"
+      gender:
+        type: string
+        enum: [male, female]
+      place_of_birth:
+        type: string
+        example: "Bandung"
+      date_of_birth:
+        type: string
+        format: date
+        example: "1980-01-20"
+      life_status:
+        type: string
+        enum: [alive, deceased]
+      marital_status:
+        type: string
+        enum: [married, divorced, widowed]
+      phone_number:
+        type: string
+        example: "0812xxxxxxxx"
+      email:
+        type: string
+        format: email
+        example: "agus.setiawan@example.com"
+      education_level:
+        type: string
+        example: "S1"
+      occupation:
+        type: string
+        example: "Wiraswasta"
+      income_range:
+        type: string
+        example: "5-10jt"
+      address:
+        type: string
+        example: "Jl. Merdeka No. 10"
+      rt:
+        type: string
+        maxLength: 3
+        example: "001"
+      rw:
+        type: string
+        maxLength: 3
+        example: "002"
+      sub_district:
+        type: string
+        example: "Kebon Jeruk"
+      district:
+        type: string
+        example: "Jakarta Barat"
+      city:
+        type: string
+        example: "DKI Jakarta"
+      province:
+        type: string
+        example: "DKI Jakarta"
+      postal_code:
+        type: string
+        maxLength: 5
+        example: "11530"
+
+  # --- Response DTOs ---
+  ParentListResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-parent-ayah"
+      full_name:
+        type: string
+        example: "Agus Setiawan"
+      gender:
+        type: string
+        enum: [male, female]
+      life_status:
+        type: string
+        enum: [alive, deceased]
+      phone_number:
+        type: string
+        example: "0812xxxxxxxx"
+      email:
+        type: string
+        format: email
+        nullable: true
+        example: "agus.setiawan@example.com"
+      occupation:
+        type: string
+        example: "Wiraswasta"
+
+  ParentDetailResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-parent-ayah"
+      full_name:
+        type: string
+        example: "Agus Setiawan"
+      nik:
+        type: string
+        description: "Sudah didekripsi"
+        example: "3302xxxxxxxxxx"
+      gender:
+        type: string
+        enum: [male, female]
+      place_of_birth:
+        type: string
+        example: "Bandung"
+      date_of_birth:
+        type: string
+        format: date
+        example: "1980-01-20"
+      life_status:
+        type: string
+        enum: [alive, deceased]
+      marital_status:
+        type: string
+        enum: [married, divorced, widowed]
+      phone_number:
+        type: string
+        example: "0812xxxxxxxx"
+      email:
+        type: string
+        format: email
+        nullable: true
+        example: "agus.setiawan@example.com"
+      education_level:
+        type: string
+        example: "S1"
+      occupation:
+        type: string
+        example: "Wiraswasta"
+      income_range:
+        type: string
+        example: "5-10jt"
+      address:
+        type: string
+        example: "Jl. Merdeka No. 10"
+      rt:
+        type: string
+        maxLength: 3
+        example: "001"
+      rw:
+        type: string
+        maxLength: 3
+        example: "002"
+      sub_district:
+        type: string
+        example: "Kebon Jeruk"
+      district:
+        type: string
+        example: "Jakarta Barat"
+      city:
+        type: string
+        example: "DKI Jakarta"
+      province:
+        type: string
+        example: "DKI Jakarta"
+      postal_code:
+        type: string
+        maxLength: 5
+        example: "11530"
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
