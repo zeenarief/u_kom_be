@@ -1,1 +1,1 @@
-ALTER TABLE guardians DROP FOREIGN KEY fk_guardians_user_id, DROP COLUMN user_id;
+ALTER TABLE parents DROP FOREIGN KEY fk_parents_user_id, DROP COLUMN user_id;
