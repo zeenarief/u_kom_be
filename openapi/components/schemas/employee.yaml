@@ -1,0 +1,184 @@
+schemas:
+  # --- Request DTOs ---
+  EmployeeCreateRequest:
+    type: object
+    required:
+      - full_name
+      - job_title
+    properties:
+      full_name:
+        type: string
+        example: "Pegawai Guru"
+      nip:
+        type: string
+        nullable: true
+        example: "199001012020011001"
+      job_title:
+        type: string
+        example: "Guru Matematika"
+      nik:
+        type: string
+        nullable: true
+        description: "NIK Pegawai (akan dienkripsi)"
+        example: "3303xxxxxxxxxx"
+      gender:
+        type: string
+        enum: [male, female]
+      phone_number:
+        type: string
+        nullable: true
+        example: "08123456789"
+      address:
+        type: string
+        nullable: true
+        example: "Jl. Merdeka No. 45"
+      date_of_birth:
+        type: string
+        format: date
+        nullable: true
+        example: "1990-01-01"
+      join_date:
+        type: string
+        format: date
+        nullable: true
+        example: "2020-01-01"
+      employment_status:
+        type: string
+        example: "Full-time"
+
+  EmployeeUpdateRequest:
+    type: object
+    description: "Send only the fields you want to update."
+    properties:
+      full_name:
+        type: string
+        example: "Pegawai Guru"
+      nip:
+        type: string
+        nullable: true
+        example: "199001012020011001"
+      job_title:
+        type: string
+        example: "Guru Matematika"
+      nik:
+        type: string
+        nullable: true
+        description: "NIK Pegawai (akan dienkripsi)"
+        example: "3303xxxxxxxxxx"
+      gender:
+        type: string
+        enum: [male, female]
+      phone_number:
+        type: string
+        nullable: true
+        example: "08123456789"
+      address:
+        type: string
+        nullable: true
+        example: "Jl. Merdeka No. 45"
+      date_of_birth:
+        type: string
+        format: date
+        nullable: true
+        example: "1990-01-01"
+      join_date:
+        type: string
+        format: date
+        nullable: true
+        example: "2020-01-01"
+      employment_status:
+        type: string
+        example: "Full-time"
+
+  # --- Response DTOs ---
+  EmployeeListResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-employee-1"
+      full_name:
+        type: string
+        example: "Pegawai Guru"
+      nip:
+        type: string
+        nullable: true
+        example: "199001012020011001"
+      job_title:
+        type: string
+        example: "Guru Matematika"
+      phone_number:
+        type: string
+        nullable: true
+        example: "08123456789"
+      employment_status:
+        type: string
+        nullable: true
+        example: "Full-time"
+      user_id:
+        type: string
+        format: uuid
+        nullable: true
+        example: "uuid-user-1"
+
+  EmployeeDetailResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-employee-1"
+      user_id:
+        type: string
+        format: uuid
+        nullable: true
+        example: "uuid-user-1"
+      full_name:
+        type: string
+        example: "Pegawai Guru"
+      nip:
+        type: string
+        nullable: true
+        example: "199001012020011001"
+      job_title:
+        type: string
+        example: "Guru Matematika"
+      nik:
+        type: string
+        nullable: true
+        description: "NIK Pegawai (sudah didekripsi)"
+        example: "3303xxxxxxxxxx"
+      gender:
+        type: string
+        enum: [male, female]
+      phone_number:
+        type: string
+        nullable: true
+        example: "08123456789"
+      address:
+        type: string
+        nullable: true
+        example: "Jl. Merdeka No. 45"
+      date_of_birth:
+        type: string
+        format: date
+        nullable: true
+        example: "1990-01-01"
+      join_date:
+        type: string
+        format: date
+        nullable: true
+        example: "2020-01-01"
+      employment_status:
+        type: string
+        nullable: true
+        example: "Full-time"
+      created_at:
+        type: string
+        format: date-time
+        example: "2025-11-06T02:26:05Z"
+      updated_at:
+        type: string
+        format: date-time
+        example: "2025-11-06T02:26:05Z"

@@ -4,35 +4,55 @@ parameters:
     name: id
     in: path
     required: true
-    schema: { type: string, format: uuid }
+    schema:
+      type: string
+      format: uuid
     description: "ID Pengguna (UUID)"
   RoleId:
     name: id
     in: path
     required: true
-    schema: { type: string, format: uuid }
+    schema:
+      type: string
+      format: uuid
     description: "ID Role (UUID)"
   PermissionId:
     name: id
     in: path
     required: true
-    schema: { type: string, format: uuid }
+    schema:
+      type: string
+      format: uuid
     description: "ID Permission (UUID)"
   StudentId:
     name: id
     in: path
     required: true
-    schema: { type: string, format: uuid }
+    schema:
+      type: string
+      format: uuid
     description: "ID Siswa (UUID)"
   ParentId:
     name: id
     in: path
     required: true
-    schema: { type: string, format: uuid }
+    schema:
+      type: string
+      format: uuid
     description: "ID Orang Tua (UUID)"
   GuardianId:
     name: id
     in: path
     required: true
-    schema: { type: string, format: uuid }
+    schema:
+      type: string
+      format: uuid
     description: "ID Wali (UUID)"
+  EmployeeId:
+    name: id
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+    description: "ID Pegawai (UUID)"

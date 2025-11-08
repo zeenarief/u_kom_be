@@ -103,3 +103,47 @@ paths:
         '403': { $ref: '../components/responses.yaml#/Forbidden' }
         '404': { $ref: '../components/responses.yaml#/NotFound' }
         '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+  /guardians/{id}/link-user:
+    parameters:
+      - $ref: '../components/parameters.yaml#/parameters/GuardianId'
+    post:
+      tags: [ Guardian ]
+      summary: "Link Guardian to User Account"
+      description: "Menautkan profil wali ke akun user. Memerlukan permission 'guardians.manage_account'."
+      requestBody:
+        description: "ID User yang akan ditautkan"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/common.yaml#/schemas/LinkUserRequest'
+      responses:
+        '200':
+          description: "Wali berhasil ditautkan."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+
+  /guardians/{id}/unlink-user:
+    parameters:
+      - $ref: '../components/parameters.yaml#/parameters/GuardianId'
+    delete:
+      tags: [ Guardian ]
+      summary: "Unlink Guardian from User Account"
+      description: "Menghapus tautan wali dari akun user. Memerlukan permission 'guardians.manage_account'."
+      responses:
+        '200':
+          description: "Tautan wali berhasil dihapus."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }

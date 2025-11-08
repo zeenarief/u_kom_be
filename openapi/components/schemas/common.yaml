@@ -42,8 +42,18 @@ schemas:
         items:
           $ref: '#/schemas/ErrorDetail'
 
+  LinkUserRequest:
+    type: object
+    required:
+      - user_id
+    properties:
+      user_id:
+        type: string
+        format: uuid
+        description: "ID dari tabel 'users' yang akan ditautkan"
+        example: "uuid-user-untuk-ditautkan"
+
   # === Wrapper Sukses Spesifik (Penting!) ===
-  # Ini adalah cara terbaik untuk mendokumentasikan 'data: ...'
 
   SuccessResponseEmpty: # Untuk PUT, DELETE, POST (tanpa data)
     allOf:
@@ -189,3 +199,25 @@ schemas:
             type: array
             items:
               $ref: './guardian.yaml#/schemas/GuardianListResponse'
+
+  # Wrapper untuk Employee (Detail)
+  SuccessResponseEmployeeDetail:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            $ref: './employee.yaml#/schemas/EmployeeDetailResponse'
+
+    # Wrapper untuk Employee (List) - TAMBAHAN BARU
+  SuccessResponseEmployeeList:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            type: array
+            items:
+              $ref: './employee.yaml#/schemas/EmployeeListResponse'
+
+

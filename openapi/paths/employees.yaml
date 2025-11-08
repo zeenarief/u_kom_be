@@ -1,87 +1,83 @@
 paths:
-  # === /parents ===
-  /parents:
+  # === /employees ===
+  /employees:
     get:
-      tags: [Parent]
-      summary: "Get All Parents (List)"
-      description: "Mengambil daftar semua orang tua dalam format ringkas (ListResponse). Memerlukan permission 'parents.read'."
+      tags: [Employee]
+      summary: "Get All Employees (List)"
+      description: "Mengambil daftar semua pegawai (ringkas). Memerlukan permission 'employees.read'."
       responses:
         '200':
-          description: "Daftar orang tua berhasil diambil."
+          description: "Daftar pegawai berhasil diambil."
           content:
             application/json:
               schema:
-                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseParentList'
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmployeeList'
         '401': { $ref: '../components/responses.yaml#/Unauthorized' }
         '403': { $ref: '../components/responses.yaml#/Forbidden' }
         '500': { $ref: '../components/responses.yaml#/InternalError' }
 
     post:
-      tags: [Parent]
-      summary: "Create New Parent"
-      description: "Membuat data orang tua baru. Memerlukan permission 'parents.create'."
+      tags: [Employee]
+      summary: "Create New Employee"
+      description: "Membuat data pegawai baru. Memerlukan permission 'employees.create'."
       requestBody:
-        description: "Data orang tua baru"
+        description: "Data pegawai baru"
         required: true
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/parent.yaml#/schemas/ParentCreateRequest'
+              $ref: '../components/schemas/employee.yaml#/schemas/EmployeeCreateRequest'
       responses:
         '201':
-          description: "Orang tua berhasil dibuat. Mengembalikan data detail."
+          description: "Pegawai berhasil dibuat. Mengembalikan data detail."
           content:
             application/json:
               schema:
-                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseParentDetail'
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmployeeDetail'
         '400': { $ref: '../components/responses.yaml#/BadRequest' }
         '401': { $ref: '../components/responses.yaml#/Unauthorized' }
         '403': { $ref: '../components/responses.yaml#/Forbidden' }
         '500': { $ref: '../components/responses.yaml#/InternalError' }
 
-  # === /parents/{id} ===
-  /parents/{id}:
+  # === /employees/{id} ===
+  /employees/{id}:
     parameters:
-      - name: id
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
-        description: "ID Orang Tua (UUID)"
+      - $ref: '../components/parameters.yaml#/parameters/EmployeeId'
 
     get:
-      tags: [Parent]
-      summary: "Get Parent by ID (Detail)"
-      description: "Mengambil data detail lengkap seorang orang tua. Memerlukan permission 'parents.read'."
+      tags: [Employee]
+      summary: "Get Employee by ID (Detail)"
+      description: "Mengambil data detail lengkap seorang pegawai. Memerlukan permission 'employees.read'."
       responses:
         '200':
-          description: "Data detail orang tua berhasil diambil."
+          description: "Data detail pegawai berhasil diambil."
           content:
             application/json:
               schema:
-                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseParentDetail'
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmployeeDetail'
         '401': { $ref: '../components/responses.yaml#/Unauthorized' }
         '403': { $ref: '../components/responses.yaml#/Forbidden' }
         '404': { $ref: '../components/responses.yaml#/NotFound' }
         '500': { $ref: '../components/responses.yaml#/InternalError' }
 
     put:
-      tags: [Parent]
-      summary: "Update Parent"
-      description: "Memperbarui data orang tua. Hanya field yang dikirim yang akan diupdate. Memerlukan permission 'parents.update'."
+      tags: [Employee]
+      summary: "Update Employee"
+      description: "Memperbarui data pegawai. Memerlukan permission 'employees.update'."
       requestBody:
-        description: "Data orang tua yang ingin diupdate"
+        description: "Data pegawai yang ingin diupdate"
         required: true
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/parent.yaml#/schemas/ParentUpdateRequest'
+              $ref: '../components/schemas/employee.yaml#/schemas/EmployeeUpdateRequest'
       responses:
         '200':
-          description: "Orang tua berhasil diupdate. Mengembalikan data detail terbaru."
+          description: "Pegawai berhasil diupdate. Mengembalikan data detail terbaru."
           content:
             application/json:
               schema:
-                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseParentDetail'
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmployeeDetail'
         '400': { $ref: '../components/responses.yaml#/BadRequest' }
         '401': { $ref: '../components/responses.yaml#/Unauthorized' }
         '403': { $ref: '../components/responses.yaml#/Forbidden' }
@@ -89,12 +85,12 @@ paths:
         '500': { $ref: '../components/responses.yaml#/InternalError' }
 
     delete:
-      tags: [Parent]
-      summary: "Delete Parent"
-      description: "Menghapus data orang tua. Memerlukan permission 'parents.delete'."
+      tags: [Employee]
+      summary: "Delete Employee"
+      description: "Menghapus data pegawai. Memerlukan permission 'employees.delete'."
       responses:
         '200':
-          description: "Orang tua berhasil dihapus."
+          description: "Pegawai berhasil dihapus."
           content:
             application/json:
               schema:
@@ -104,13 +100,14 @@ paths:
         '404': { $ref: '../components/responses.yaml#/NotFound' }
         '500': { $ref: '../components/responses.yaml#/InternalError' }
 
-  /parents/{id}/link-user:
+  # === /employees/{id}/link-user ===
+  /employees/{id}/link-user:
     parameters:
-      - $ref: '../components/parameters.yaml#/parameters/ParentId'
+      - $ref: '../components/parameters.yaml#/parameters/EmployeeId'
     post:
-      tags: [ Parent ]
-      summary: "Link Parent to User Account"
-      description: "Menautkan profil orang tua ke akun user. Memerlukan permission 'parents.manage_account'."
+      tags: [Employee]
+      summary: "Link Employee to User Account"
+      description: "Menautkan profil pegawai ke akun user. Memerlukan permission 'employees.manage_account'."
       requestBody:
         description: "ID User yang akan ditautkan"
         required: true
@@ -120,7 +117,7 @@ paths:
               $ref: '../components/schemas/common.yaml#/schemas/LinkUserRequest'
       responses:
         '200':
-          description: "Orang tua berhasil ditautkan."
+          description: "Pegawai berhasil ditautkan."
           content:
             application/json:
               schema:
@@ -130,16 +127,17 @@ paths:
         '403': { $ref: '../components/responses.yaml#/Forbidden' }
         '404': { $ref: '../components/responses.yaml#/NotFound' }
 
-  /parents/{id}/unlink-user:
+  # === /employees/{id}/unlink-user ===
+  /employees/{id}/unlink-user:
     parameters:
-      - $ref: '../components/parameters.yaml#/parameters/ParentId'
+      - $ref: '../components/parameters.yaml#/parameters/EmployeeId'
     delete:
-      tags: [ Parent ]
-      summary: "Unlink Parent from User Account"
-      description: "Menghapus tautan orang tua dari akun user. Memerlukan permission 'parents.manage_account'."
+      tags: [Employee]
+      summary: "Unlink Employee from User Account"
+      description: "Menghapus tautan pegawai dari akun user (set 'user_id' ke NULL). Memerlukan permission 'employees.manage_account'."
       responses:
         '200':
-          description: "Tautan orang tua berhasil dihapus."
+          description: "Tautan pegawai berhasil dihapus."
           content:
             application/json:
               schema:

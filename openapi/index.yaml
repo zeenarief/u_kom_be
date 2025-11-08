@@ -24,6 +24,8 @@ tags:
     description: "Mengelola data orang tua siswa"
   - name: "Guardian"
     description: "Mengelola data wali (pihak lain) siswa"
+  - name: "Employee"
+    description: "Mengelola data pegawai (Guru, Staf, dll)"
 
 # 2. Keamanan Global
 security:
@@ -80,18 +82,40 @@ paths:
     $ref: './paths/students.yaml#/paths/~1students~1{id}~1set-guardian'
   /students/{id}/remove-guardian:
     $ref: './paths/students.yaml#/paths/~1students~1{id}~1remove-guardian'
+  /students/{id}/link-user:
+    $ref: './paths/students.yaml#/paths/~1students~1{id}~1link-user'
+  /students/{id}/unlink-user:
+    $ref: './paths/students.yaml#/paths/~1students~1{id}~1unlink-user'
 
   # === Parent Paths ===
   /parents:
     $ref: './paths/parents.yaml#/paths/~1parents'
   /parents/{id}:
     $ref: './paths/parents.yaml#/paths/~1parents~1{id}'
+  /parents/{id}/link-user:
+    $ref: './paths/parents.yaml#/paths/~1parents~1{id}~1link-user'
+  /parents/{id}/unlink-user:
+    $ref: './paths/parents.yaml#/paths/~1parents~1{id}~1unlink-user'
 
   # === Guardian Paths ===
   /guardians:
     $ref: './paths/guardians.yaml#/paths/~1guardians'
   /guardians/{id}:
     $ref: './paths/guardians.yaml#/paths/~1guardians~1{id}'
+  /guardians/{id}/link-user:
+    $ref: './paths/guardians.yaml#/paths/~1guardians~1{id}~1link-user'
+  /guardians/{id}/unlink-user:
+    $ref: './paths/guardians.yaml#/paths/~1guardians~1{id}~1unlink-user'
+
+  # === Employee Paths ===
+  /employees:
+    $ref: './paths/employees.yaml#/paths/~1employees'
+  /employees/{id}:
+    $ref: './paths/employees.yaml#/paths/~1employees~1{id}'
+  /employees/{id}/link-user:
+    $ref: './paths/employees.yaml#/paths/~1employees~1{id}~1link-user'
+  /employees/{id}/unlink-user:
+    $ref: './paths/employees.yaml#/paths/~1employees~1{id}~1unlink-user'
 
 
 # 4. Definisi Components (BAGIAN YANG DIPERBAIKI)
@@ -103,8 +127,6 @@ components:
   parameters:
     $ref: './components/parameters.yaml'
 
-  # --- INI ADALAH PERBAIKANNYA ---
-  # Kita daftarkan SEMUA skema di sini
   schemas:
     # Dari common.yaml
     SuccessWrapper: { $ref: './components/schemas/common.yaml#/schemas/SuccessWrapper' }
@@ -127,6 +149,8 @@ components:
     SuccessResponseParentList: { $ref: 'components/schemas/common.yaml#/schemas/SuccessResponseParentList' }
     SuccessResponseGuardianDetail: { $ref: 'components/schemas/common.yaml#/schemas/SuccessResponseGuardianDetail' }
     SuccessResponseGuardianList: { $ref: 'components/schemas/common.yaml#/schemas/SuccessResponseGuardianList' }
+    SuccessResponseEmployeeDetail: { $ref: 'components/schemas/common.yaml#/schemas/SuccessResponseEmployeeDetail' }
+    SuccessResponseEmployeeList: { $ref: 'components/schemas/common.yaml#/schemas/SuccessResponseEmployeeList' }
 
     # Dari auth.yaml
     LoginRequest: { $ref: './components/schemas/auth.yaml#/schemas/LoginRequest' }
@@ -176,3 +200,9 @@ components:
     GuardianUpdateRequest: { $ref: './components/schemas/guardian.yaml#/schemas/GuardianUpdateRequest' }
     GuardianListResponse: { $ref: './components/schemas/guardian.yaml#/schemas/GuardianListResponse' }
     GuardianDetailResponse: { $ref: './components/schemas/guardian.yaml#/schemas/GuardianDetailResponse' }
+
+    # Dari employee.yaml
+    EmployeeCreateRequest: { $ref: './components/schemas/employee.yaml#/schemas/EmployeeCreateRequest' }
+    EmployeeUpdateRequest: { $ref: './components/schemas/employee.yaml#/schemas/EmployeeUpdateRequest' }
+    EmployeeListResponse: { $ref: './components/schemas/employee.yaml#/schemas/EmployeeListResponse' }
+    EmployeeDetailResponse: { $ref: './components/schemas/employee.yaml#/schemas/EmployeeDetailResponse' }
