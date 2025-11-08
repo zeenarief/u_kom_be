@@ -9,6 +9,7 @@ import (
 	"belajar-golang/internal/utils"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type StudentService interface {
@@ -20,12 +21,15 @@ type StudentService interface {
 	SyncParents(studentID string, req request.StudentSyncParentsRequest) error
 	SetGuardian(studentID string, req request.StudentSetGuardianRequest) error
 	RemoveGuardian(studentID string) error // Helper untuk menghapus wali
+	LinkUser(studentID string, userID string) error
+	UnlinkUser(studentID string) error
 }
 
 type studentService struct {
 	studentRepo    repository.StudentRepository
 	parentRepo     repository.ParentRepository
 	guardianRepo   repository.GuardianRepository
+	userRepo       repository.UserRepository
 	encryptionUtil utils.EncryptionUtil                // <-- Untuk ENKRIPSI
 	converter      converter.StudentConverterInterface // <-- Untuk DEKRIPSI/Response
 }
@@ -34,6 +38,7 @@ func NewStudentService(
 	studentRepo repository.StudentRepository,
 	parentRepo repository.ParentRepository,
 	guardianRepo repository.GuardianRepository,
+	userRepo repository.UserRepository,
 	encryptionUtil utils.EncryptionUtil,
 	converter converter.StudentConverterInterface,
 ) StudentService {
@@ -41,6 +46,7 @@ func NewStudentService(
 		studentRepo:    studentRepo,
 		parentRepo:     parentRepo,
 		guardianRepo:   guardianRepo,
+		userRepo:       userRepo,
 		encryptionUtil: encryptionUtil,
 		converter:      converter,
 	}
@@ -423,4 +429,57 @@ func (s *studentService) fetchGuardianInfo(guardianID *string, guardianType *str
 	}
 
 	return nil, fmt.Errorf("unknown guardian_type: %s", tipe)
+}
+
+// LinkUser menautkan profil Student ke akun User
+func (s *studentService) LinkUser(studentID string, userID string) error {
+	// 1. Cek apakah Student ada
+	student, err := s.studentRepo.FindByID(studentID)
+	if err != nil {
+		return err
+	}
+	if student == nil {
+		return errors.New("student not found")
+	}
+
+	// 2. Cek apakah User ada
+	user, err := s.userRepo.FindByID(userID)
+	if err != nil {
+		return err
+	}
+	if user == nil {
+		return errors.New("user not found")
+	}
+
+	// 3. Cek apakah User tsb sudah ditautkan ke Student LAIN
+	// (Kita tidak punya FindByUserID di studentRepo, jadi kita tambahkan
+	// atau kita cek di service user)
+	// Untuk konsistensi, mari kita asumsikan kita perlu menambahkannya:
+	// existingStudent, _ := s.studentRepo.FindByUserID(userID)
+	// ... (Jika Anda ingin validasi ini, kita harus menambahkannya ke repo)
+	// Untuk saat ini, kita andalkan constraint UNIQUE di database
+
+	// 4. Tautkan akun
+	if err := s.studentRepo.SetUserID(studentID, &userID); err != nil {
+		if strings.Contains(err.Error(), "Duplicate entry") {
+			return errors.New("this user account is already linked to another student")
+		}
+		return err
+	}
+	return nil
+}
+
+// UnlinkUser menghapus tautan Student dari akun User
+func (s *studentService) UnlinkUser(studentID string) error {
+	// 1. Cek apakah Student ada
+	student, err := s.studentRepo.FindByID(studentID)
+	if err != nil {
+		return err
+	}
+	if student == nil {
+		return errors.New("student not found")
+	}
+
+	// 2. Hapus tautan (set user_id ke NULL)
+	return s.studentRepo.SetUserID(studentID, nil)
 }

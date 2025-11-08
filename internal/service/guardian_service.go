@@ -9,6 +9,7 @@ import (
 	"belajar-golang/internal/utils"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type GuardianService interface {
@@ -17,21 +18,26 @@ type GuardianService interface {
 	GetAllGuardians() ([]response.GuardianListResponse, error)
 	UpdateGuardian(id string, req request.GuardianUpdateRequest) (*response.GuardianDetailResponse, error)
 	DeleteGuardian(id string) error
+	LinkUser(guardianID string, userID string) error
+	UnlinkUser(guardianID string) error
 }
 
 type guardianService struct {
 	guardianRepo   repository.GuardianRepository
+	userRepo       repository.UserRepository
 	encryptionUtil utils.EncryptionUtil
 	converter      converter.GuardianConverterInterface
 }
 
 func NewGuardianService(
 	guardianRepo repository.GuardianRepository,
+	userRepo repository.UserRepository,
 	encryptionUtil utils.EncryptionUtil,
 	converter converter.GuardianConverterInterface,
 ) GuardianService {
 	return &guardianService{
 		guardianRepo:   guardianRepo,
+		userRepo:       userRepo,
 		encryptionUtil: encryptionUtil,
 		converter:      converter,
 	}
@@ -215,4 +221,49 @@ func (s *guardianService) DeleteGuardian(id string) error {
 	}
 
 	return s.guardianRepo.Delete(id)
+}
+
+// LinkUser menautkan profil Guardian ke akun User
+func (s *guardianService) LinkUser(guardianID string, userID string) error {
+	// 1. Cek apakah Guardian ada
+	guardian, err := s.guardianRepo.FindByID(guardianID)
+	if err != nil {
+		return err
+	}
+	if guardian == nil {
+		return errors.New("guardian not found")
+	}
+
+	// 2. Cek apakah User ada
+	user, err := s.userRepo.FindByID(userID)
+	if err != nil {
+		return err
+	}
+	if user == nil {
+		return errors.New("user not found")
+	}
+
+	// 3. Tautkan akun (Kita andalkan UNIQUE constraint di DB untuk error duplikat)
+	if err := s.guardianRepo.SetUserID(guardianID, &userID); err != nil {
+		if strings.Contains(err.Error(), "Duplicate entry") {
+			return errors.New("this user account is already linked to another guardian")
+		}
+		return err
+	}
+	return nil
+}
+
+// UnlinkUser menghapus tautan Guardian dari akun User
+func (s *guardianService) UnlinkUser(guardianID string) error {
+	// 1. Cek apakah Guardian ada
+	guardian, err := s.guardianRepo.FindByID(guardianID)
+	if err != nil {
+		return err
+	}
+	if guardian == nil {
+		return errors.New("guardian not found")
+	}
+
+	// 2. Hapus tautan (set user_id ke NULL)
+	return s.guardianRepo.SetUserID(guardianID, nil)
 }

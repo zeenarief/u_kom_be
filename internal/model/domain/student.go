@@ -33,6 +33,9 @@ type Student struct {
 
 	GuardianID   *string `gorm:"type:char(36);index:idx_student_guardian" json:"guardian_id"`
 	GuardianType *string `gorm:"type:varchar(20);index:idx_student_guardian" json:"guardian_type"`
+
+	UserID *string `gorm:"type:char(36);uniqueIndex" json:"user_id"`
+	User   User    `gorm:"foreignKey:UserID;references:ID"`
 }
 
 // Hook BeforeCreate untuk generate UUID

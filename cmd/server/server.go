@@ -27,6 +27,7 @@ type Server struct {
 	StudentHandler    *handler.StudentHandler
 	ParentHandler     *handler.ParentHandler
 	GuardianHandler   *handler.GuardianHandler
+	EmployeeHandler   *handler.EmployeeHandler
 	AuthService       service.AuthService
 }
 
@@ -56,6 +57,7 @@ func NewServer() *Server {
 	studentRepo := repository.NewStudentRepository(db)
 	parentRepo := repository.NewParentRepository(db)
 	guardianRepo := repository.NewGuardianRepository(db)
+	employeeRepo := repository.NewEmployeeRepository(db)
 
 	// Initialize utils
 	encryptionUtil, err := utils.NewEncryptionUtil(cfg.EncryptionKey)
@@ -67,13 +69,30 @@ func NewServer() *Server {
 	parentConverter := converter.NewParentConverter(encryptionUtil)
 	guardianConverter := converter.NewGuardianConverter(encryptionUtil)
 	studentConverter := converter.NewStudentConverter(encryptionUtil, parentConverter)
+	employeeConverter := converter.NewEmployeeConverter(encryptionUtil)
 
 	// Initialize services
 	userService := service.NewUserService(userRepo, roleRepo, permissionRepo)
 	roleService := service.NewRoleService(roleRepo, permissionRepo)
 	permissionService := service.NewPermissionService(permissionRepo)
-	parentService := service.NewParentService(parentRepo, encryptionUtil, parentConverter)
-	guardianService := service.NewGuardianService(guardianRepo, encryptionUtil, guardianConverter)
+	parentService := service.NewParentService(
+		parentRepo,
+		userRepo,
+		encryptionUtil,
+		parentConverter,
+	)
+	guardianService := service.NewGuardianService(
+		guardianRepo,
+		userRepo,
+		encryptionUtil,
+		guardianConverter,
+	)
+	employeeService := service.NewEmployeeService(
+		employeeRepo,
+		userRepo,
+		encryptionUtil,
+		employeeConverter,
+	)
 	authService := service.NewAuthService(
 		userRepo,
 		cfg.JWTSecret,
@@ -85,6 +104,7 @@ func NewServer() *Server {
 		studentRepo,
 		parentRepo,
 		guardianRepo,
+		userRepo,
 		encryptionUtil,
 		studentConverter,
 	)
@@ -97,6 +117,7 @@ func NewServer() *Server {
 	studentHandler := handler.NewStudentHandler(studentService)
 	parentHandler := handler.NewParentHandler(parentService)
 	guardianHandler := handler.NewGuardianHandler(guardianService)
+	employeeHandler := handler.NewEmployeeHandler(employeeService)
 
 	// Setup router with middleware
 	router := setupRouter(cfg, authService)
@@ -111,6 +132,7 @@ func NewServer() *Server {
 		StudentHandler:    studentHandler,
 		ParentHandler:     parentHandler,
 		GuardianHandler:   guardianHandler,
+		EmployeeHandler:   employeeHandler,
 		AuthService:       authService,
 	}
 }
@@ -144,6 +166,7 @@ func (s *Server) Start() error {
 		s.StudentHandler,
 		s.ParentHandler,
 		s.GuardianHandler,
+		s.EmployeeHandler,
 	)
 
 	// Start server

@@ -15,6 +15,7 @@ type ParentRepository interface {
 	FindAll() ([]domain.Parent, error)
 	Update(parent *domain.Parent) error
 	Delete(id string) error
+	SetUserID(parentID string, userID *string) error
 }
 
 type parentRepository struct {
@@ -78,4 +79,10 @@ func (r *parentRepository) Update(parent *domain.Parent) error {
 
 func (r *parentRepository) Delete(id string) error {
 	return r.db.Delete(&domain.Parent{}, "id = ?", id).Error
+}
+
+// SetUserID meng-update kolom user_id untuk parent
+func (r *parentRepository) SetUserID(parentID string, userID *string) error {
+	// GORM akan otomatis meng-set ke NULL jika userID adalah nil
+	return r.db.Model(&domain.Parent{}).Where("id = ?", parentID).Update("user_id", userID).Error
 }

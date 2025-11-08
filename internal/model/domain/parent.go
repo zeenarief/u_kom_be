@@ -34,6 +34,9 @@ type Parent struct {
 
 	// Relasi ke tabel pivot StudentParent
 	Students []StudentParent `gorm:"foreignKey:ParentID" json:"students,omitempty"`
+
+	UserID *string `gorm:"type:char(36);uniqueIndex" json:"user_id"`
+	User   User    `gorm:"foreignKey:UserID;references:ID"`
 }
 
 // Hook BeforeCreate untuk generate UUID, sama seperti Student/Role

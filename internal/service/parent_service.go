@@ -9,6 +9,7 @@ import (
 	"belajar-golang/internal/utils"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type ParentService interface {
@@ -17,21 +18,26 @@ type ParentService interface {
 	GetAllParents() ([]response.ParentListResponse, error)
 	UpdateParent(id string, req request.ParentUpdateRequest) (*response.ParentDetailResponse, error)
 	DeleteParent(id string) error
+	LinkUser(parentID string, userID string) error
+	UnlinkUser(parentID string) error
 }
 
 type parentService struct {
 	parentRepo     repository.ParentRepository
+	userRepo       repository.UserRepository
 	encryptionUtil utils.EncryptionUtil
 	converter      converter.ParentConverterInterface
 }
 
 func NewParentService(
 	parentRepo repository.ParentRepository,
+	userRepo repository.UserRepository,
 	encryptionUtil utils.EncryptionUtil,
 	converter converter.ParentConverterInterface,
 ) ParentService {
 	return &parentService{
 		parentRepo:     parentRepo,
+		userRepo:       userRepo,
 		encryptionUtil: encryptionUtil,
 		converter:      converter,
 	}
@@ -244,4 +250,49 @@ func (s *parentService) DeleteParent(id string) error {
 	}
 
 	return s.parentRepo.Delete(id)
+}
+
+// LinkUser menautkan profil Parent ke akun User
+func (s *parentService) LinkUser(parentID string, userID string) error {
+	// 1. Cek apakah Parent ada
+	parent, err := s.parentRepo.FindByID(parentID)
+	if err != nil {
+		return err
+	}
+	if parent == nil {
+		return errors.New("parent not found")
+	}
+
+	// 2. Cek apakah User ada
+	user, err := s.userRepo.FindByID(userID)
+	if err != nil {
+		return err
+	}
+	if user == nil {
+		return errors.New("user not found")
+	}
+
+	// 3. Tautkan akun (Kita andalkan UNIQUE constraint di DB untuk error duplikat)
+	if err := s.parentRepo.SetUserID(parentID, &userID); err != nil {
+		if strings.Contains(err.Error(), "Duplicate entry") {
+			return errors.New("this user account is already linked to another parent")
+		}
+		return err
+	}
+	return nil
+}
+
+// UnlinkUser menghapus tautan Parent dari akun User
+func (s *parentService) UnlinkUser(parentID string) error {
+	// 1. Cek apakah Parent ada
+	parent, err := s.parentRepo.FindByID(parentID)
+	if err != nil {
+		return err
+	}
+	if parent == nil {
+		return errors.New("parent not found")
+	}
+
+	// 2. Hapus tautan (set user_id ke NULL)
+	return s.parentRepo.SetUserID(parentID, nil)
 }

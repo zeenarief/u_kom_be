@@ -25,6 +25,9 @@ type Guardian struct {
 	RelationshipToStudent string    `gorm:"type:varchar(50)" json:"relationship_to_student"`
 	CreatedAt             time.Time `json:"created_at"`
 	UpdatedAt             time.Time `json:"updated_at"`
+
+	UserID *string `gorm:"type:char(36);uniqueIndex" json:"user_id"`
+	User   User    `gorm:"foreignKey:UserID;references:ID"`
 }
 
 // Hook BeforeCreate untuk generate UUID, sama seperti model lainnya

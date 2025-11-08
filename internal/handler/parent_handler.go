@@ -101,3 +101,47 @@ func (h *ParentHandler) DeleteParent(c *gin.Context) {
 
 	SuccessResponse(c, "Parent deleted successfully", nil)
 }
+
+// LinkUser menangani POST /parents/:id/link-user
+func (h *ParentHandler) LinkUser(c *gin.Context) {
+	parentID := c.Param("id")
+
+	var req struct {
+		UserID string `json:"user_id" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		BadRequestError(c, "Invalid request payload (missing 'user_id')", err.Error())
+		return
+	}
+
+	err := h.parentService.LinkUser(parentID, req.UserID)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			NotFoundError(c, err.Error())
+		} else if strings.Contains(err.Error(), "already linked") {
+			BadRequestError(c, "Link failed", err.Error())
+		} else {
+			InternalServerError(c, err.Error())
+		}
+		return
+	}
+
+	SuccessResponse(c, "Parent linked to user successfully", nil)
+}
+
+// UnlinkUser menangani DELETE /parents/:id/unlink-user
+func (h *ParentHandler) UnlinkUser(c *gin.Context) {
+	parentID := c.Param("id")
+
+	err := h.parentService.UnlinkUser(parentID)
+	if err != nil {
+		if err.Error() == "parent not found" {
+			NotFoundError(c, "Parent not found")
+		} else {
+			InternalServerError(c, err.Error())
+		}
+		return
+	}
+
+	SuccessResponse(c, "Parent unlinked from user successfully", nil)
+}

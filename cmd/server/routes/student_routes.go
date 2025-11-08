@@ -50,5 +50,13 @@ func RegisterStudentRoutes(
 		students.DELETE("/:id/remove-guardian",
 			middleware.PermissionMiddleware("students.manage_guardian", authService),
 			studentHandler.RemoveGuardian)
+
+		students.POST("/:id/link-user",
+			middleware.PermissionMiddleware("students.manage_account", authService),
+			studentHandler.LinkUser)
+
+		students.DELETE("/:id/unlink-user",
+			middleware.PermissionMiddleware("students.manage_account", authService),
+			studentHandler.UnlinkUser)
 	}
 }

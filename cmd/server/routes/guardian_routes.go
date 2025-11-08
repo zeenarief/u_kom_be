@@ -36,5 +36,13 @@ func RegisterGuardianRoutes(
 		guardians.DELETE("/:id",
 			middleware.PermissionMiddleware("guardians.delete", authService),
 			guardianHandler.DeleteGuardian)
+
+		guardians.POST("/:id/link-user",
+			middleware.PermissionMiddleware("guardians.manage_account", authService),
+			guardianHandler.LinkUser)
+
+		guardians.DELETE("/:id/unlink-user",
+			middleware.PermissionMiddleware("guardians.manage_account", authService),
+			guardianHandler.UnlinkUser)
 	}
 }

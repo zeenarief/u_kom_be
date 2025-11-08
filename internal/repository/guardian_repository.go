@@ -15,6 +15,7 @@ type GuardianRepository interface {
 	FindAll() ([]domain.Guardian, error)
 	Update(guardian *domain.Guardian) error
 	Delete(id string) error
+	SetUserID(guardianID string, userID *string) error
 }
 
 type guardianRepository struct {
@@ -77,4 +78,10 @@ func (r *guardianRepository) Update(guardian *domain.Guardian) error {
 
 func (r *guardianRepository) Delete(id string) error {
 	return r.db.Delete(&domain.Guardian{}, "id = ?", id).Error
+}
+
+// SetUserID meng-update kolom user_id untuk guardian
+func (r *guardianRepository) SetUserID(guardianID string, userID *string) error {
+	// GORM akan otomatis meng-set ke NULL jika userID adalah nil
+	return r.db.Model(&domain.Guardian{}).Where("id = ?", guardianID).Update("user_id", userID).Error
 }

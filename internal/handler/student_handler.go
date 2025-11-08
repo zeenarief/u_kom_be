@@ -176,3 +176,47 @@ func (h *StudentHandler) RemoveGuardian(c *gin.Context) {
 
 	SuccessResponse(c, "Student guardian removed successfully", nil)
 }
+
+// LinkUser menangani POST /students/:id/link-user
+func (h *StudentHandler) LinkUser(c *gin.Context) {
+	studentID := c.Param("id")
+
+	var req struct {
+		UserID string `json:"user_id" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		BadRequestError(c, "Invalid request payload (missing 'user_id')", err.Error())
+		return
+	}
+
+	err := h.studentService.LinkUser(studentID, req.UserID)
+	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			NotFoundError(c, err.Error())
+		} else if strings.Contains(err.Error(), "already linked") {
+			BadRequestError(c, "Link failed", err.Error())
+		} else {
+			InternalServerError(c, err.Error())
+		}
+		return
+	}
+
+	SuccessResponse(c, "Student linked to user successfully", nil)
+}
+
+// UnlinkUser menangani DELETE /students/:id/unlink-user
+func (h *StudentHandler) UnlinkUser(c *gin.Context) {
+	studentID := c.Param("id")
+
+	err := h.studentService.UnlinkUser(studentID)
+	if err != nil {
+		if err.Error() == "student not found" {
+			NotFoundError(c, "Student not found")
+		} else {
+			InternalServerError(c, err.Error())
+		}
+		return
+	}
+
+	SuccessResponse(c, "Student unlinked from user successfully", nil)
+}

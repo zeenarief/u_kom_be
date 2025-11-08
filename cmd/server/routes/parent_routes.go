@@ -36,5 +36,13 @@ func RegisterParentRoutes(
 		parents.DELETE("/:id",
 			middleware.PermissionMiddleware("parents.delete", authService),
 			parentHandler.DeleteParent)
+
+		parents.POST("/:id/link-user",
+			middleware.PermissionMiddleware("parents.manage_account", authService),
+			parentHandler.LinkUser)
+
+		parents.DELETE("/:id/unlink-user",
+			middleware.PermissionMiddleware("parents.manage_account", authService),
+			parentHandler.UnlinkUser)
 	}
 }

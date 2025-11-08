@@ -1,0 +1,1 @@
+ALTER TABLE students DROP FOREIGN KEY fk_students_user_id, DROP COLUMN user_id;

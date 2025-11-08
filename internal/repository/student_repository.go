@@ -18,6 +18,7 @@ type StudentRepository interface {
 	FindByIDWithParents(id string) (*domain.Student, error)
 	SyncParents(studentID string, parents []domain.StudentParent) error
 	SetGuardian(studentID string, guardianID *string, guardianType *string) error
+	SetUserID(studentID string, userID *string) error
 }
 
 type studentRepository struct {
@@ -137,4 +138,10 @@ func (r *studentRepository) SetGuardian(studentID string, guardianID *string, gu
 		"guardian_id":   guardianID,
 		"guardian_type": guardianType,
 	}).Error
+}
+
+// SetUserID meng-update kolom user_id untuk student
+func (r *studentRepository) SetUserID(studentID string, userID *string) error {
+	// GORM akan otomatis meng-set ke NULL jika userID adalah nil
+	return r.db.Model(&domain.Student{}).Where("id = ?", studentID).Update("user_id", userID).Error
 }
