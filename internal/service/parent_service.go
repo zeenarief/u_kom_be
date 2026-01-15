@@ -111,11 +111,26 @@ func (s *parentService) CreateParent(req request.ParentCreateRequest) (*response
 	}
 
 	// 6. Konversi ke Response Detail
-	return s.converter.ToParentDetailResponse(createdParent), nil
+	resp := s.converter.ToParentDetailResponse(createdParent)
+
+	// Cek apakah parent punya user_id (terhubung ke akun)
+	if parent.User.ID != "" {
+		resp.User = &response.UserLinkedResponse{
+			ID:       parent.User.ID,
+			Username: parent.User.Username,
+			Name:     parent.User.Name,
+			Email:    parent.User.Email,
+		}
+	} else {
+		resp.User = nil
+	}
+
+	return resp, nil
 }
 
 // GetParentByID mengambil satu data orang tua
 func (s *parentService) GetParentByID(id string) (*response.ParentDetailResponse, error) {
+	// 1. Repo sudah Preload User
 	parent, err := s.parentRepo.FindByID(id)
 	if err != nil {
 		return nil, err
@@ -123,8 +138,24 @@ func (s *parentService) GetParentByID(id string) (*response.ParentDetailResponse
 	if parent == nil {
 		return nil, errors.New("parent not found")
 	}
-	// Panggil konverter untuk response detail (dengan dekripsi NIK)
-	return s.converter.ToParentDetailResponse(parent), nil
+
+	// 2. Konversi Parent dasar
+	resp := s.converter.ToParentDetailResponse(parent)
+
+	// 3. PERBAIKAN: Mapping Data User (Manual)
+	// Cek apakah parent punya user_id (terhubung ke akun)
+	if parent.User.ID != "" {
+		resp.User = &response.UserLinkedResponse{
+			ID:       parent.User.ID,
+			Username: parent.User.Username,
+			Name:     parent.User.Name,
+			Email:    parent.User.Email,
+		}
+	} else {
+		resp.User = nil
+	}
+
+	return resp, nil
 }
 
 // GetAllParents mengambil semua data orang tua (ringkas)
@@ -236,7 +267,21 @@ func (s *parentService) UpdateParent(id string, req request.ParentUpdateRequest)
 		return nil, err
 	}
 
-	return s.converter.ToParentDetailResponse(updatedParent), nil
+	resp := s.converter.ToParentDetailResponse(updatedParent)
+
+	// Cek apakah parent punya user_id (terhubung ke akun)
+	if parent.User.ID != "" {
+		resp.User = &response.UserLinkedResponse{
+			ID:       parent.User.ID,
+			Username: parent.User.Username,
+			Name:     parent.User.Name,
+			Email:    parent.User.Email,
+		}
+	} else {
+		resp.User = nil
+	}
+
+	return resp, nil
 }
 
 // DeleteParent menghapus data orang tua

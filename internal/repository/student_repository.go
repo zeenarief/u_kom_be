@@ -88,6 +88,7 @@ func (r *studentRepository) Delete(id string) error {
 func (r *studentRepository) FindByIDWithParents(id string) (*domain.Student, error) {
 	var student domain.Student
 	err := r.db.
+		Preload("User").
 		Preload("Parents").        // 1. Ambil data dari pivot table (student_parent)
 		Preload("Parents.Parent"). // 2. Untuk setiap data pivot, ambil data dari tabel parents
 		First(&student, "id = ?", id).Error

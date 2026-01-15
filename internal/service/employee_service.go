@@ -98,7 +98,21 @@ func (s *employeeService) CreateEmployee(req request.EmployeeCreateRequest) (*re
 	}
 
 	// 6. Konversi ke Response Detail
-	return s.converter.ToEmployeeDetailResponse(createdEmployee), nil
+	resp := s.converter.ToEmployeeDetailResponse(createdEmployee)
+
+	// === LOGIC MAPPING USER ===
+	if employee.User.ID != "" {
+		resp.User = &response.UserLinkedResponse{
+			ID:       employee.User.ID,
+			Username: employee.User.Username,
+			Name:     employee.User.Name,
+			Email:    employee.User.Email,
+		}
+	} else {
+		resp.User = nil
+	}
+
+	return resp, nil
 }
 
 // GetEmployeeByID mengambil satu data pegawai
@@ -111,7 +125,21 @@ func (s *employeeService) GetEmployeeByID(id string) (*response.EmployeeDetailRe
 		return nil, errors.New("employee not found")
 	}
 	// Panggil konverter (akan mendekripsi NIK)
-	return s.converter.ToEmployeeDetailResponse(employee), nil
+	resp := s.converter.ToEmployeeDetailResponse(employee)
+
+	// === LOGIC MAPPING USER ===
+	if employee.User.ID != "" {
+		resp.User = &response.UserLinkedResponse{
+			ID:       employee.User.ID,
+			Username: employee.User.Username,
+			Name:     employee.User.Name,
+			Email:    employee.User.Email,
+		}
+	} else {
+		resp.User = nil
+	}
+
+	return resp, nil
 }
 
 // GetAllEmployees mengambil semua data pegawai (ringkas)
@@ -199,7 +227,21 @@ func (s *employeeService) UpdateEmployee(id string, req request.EmployeeUpdateRe
 		return nil, err
 	}
 
-	return s.converter.ToEmployeeDetailResponse(updatedEmployee), nil
+	resp := s.converter.ToEmployeeDetailResponse(updatedEmployee)
+
+	// === LOGIC MAPPING USER ===
+	if employee.User.ID != "" {
+		resp.User = &response.UserLinkedResponse{
+			ID:       employee.User.ID,
+			Username: employee.User.Username,
+			Name:     employee.User.Name,
+			Email:    employee.User.Email,
+		}
+	} else {
+		resp.User = nil
+	}
+
+	return resp, nil
 }
 
 // DeleteEmployee menghapus data pegawai

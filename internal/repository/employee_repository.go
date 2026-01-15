@@ -33,8 +33,8 @@ func (r *employeeRepository) Create(employee *domain.Employee) error {
 
 func (r *employeeRepository) FindByID(id string) (*domain.Employee, error) {
 	var employee domain.Employee
-	// FindByID tidak melakukan Preload User secara default
-	err := r.db.First(&employee, "id = ?", id).Error
+	// FindByID melakukan Preload User
+	err := r.db.Preload("User").First(&employee, "id = ?", id).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil // Data tidak ditemukan
 	}

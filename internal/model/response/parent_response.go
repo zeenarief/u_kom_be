@@ -39,4 +39,6 @@ type ParentDetailResponse struct {
 	PostalCode     string    `json:"postal_code"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
+
+	User *UserLinkedResponse `json:"user"`
 }

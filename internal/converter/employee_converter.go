@@ -41,7 +41,6 @@ func (c *employeeConverter) ToEmployeeDetailResponse(employee *domain.Employee) 
 
 	return &response.EmployeeDetailResponse{
 		ID:               employee.ID,
-		UserID:           employee.UserID,
 		FullName:         employee.FullName,
 		NIP:              employee.NIP,
 		JobTitle:         employee.JobTitle,
@@ -66,7 +65,6 @@ func (c *employeeConverter) ToEmployeeListResponse(employee *domain.Employee) *r
 		JobTitle:         employee.JobTitle,
 		PhoneNumber:      employee.PhoneNumber,
 		EmploymentStatus: employee.EmploymentStatus,
-		UserID:           employee.UserID,
 	}
 }
 

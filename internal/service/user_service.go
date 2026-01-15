@@ -145,17 +145,16 @@ func (s *userService) UpdateUser(id string, req request.UserUpdateRequest, curre
 		return nil, errors.New("user not found")
 	}
 
-	// Validasi: user hanya bisa mengupdate dirinya sendiri kecuali memiliki permission users.update.others
+	// 1. Validasi Basic: User update diri sendiri atau punya akses update others
 	if id != currentUserID && !s.hasPermission(currentUserPermissions, "users.update.others") {
 		return nil, errors.New("unauthorized: you can only update your own profile")
 	}
 
-	// Update fields if provided
+	// 2. Update Basic Fields
 	if req.Name != "" {
 		user.Name = req.Name
 	}
 	if req.Email != "" && req.Email != user.Email {
-		// Check if new email already exists
 		existingUser, _ := s.userRepo.FindByEmail(req.Email)
 		if existingUser != nil && existingUser.ID != id {
 			return nil, errors.New("email already exists")
@@ -163,12 +162,28 @@ func (s *userService) UpdateUser(id string, req request.UserUpdateRequest, curre
 		user.Email = req.Email
 	}
 
+	// === 3. Update Roles ===
+	// Cek apakah request mengirim role_ids (array tidak nil)
+	if req.RoleIDs != nil {
+		// SECURITY CHECK: Hanya user dengan permission 'users.manage_roles' yang boleh ganti role
+		if !s.hasPermission(currentUserPermissions, "users.manage_roles") {
+			return nil, errors.New("unauthorized: insufficient permissions to change roles")
+		}
+
+		// Lakukan Sync Role (Menggunakan ID, bukan Name)
+		// Kita gunakan s.userRepo.SyncRoles karena menerima []string ID
+		if err := s.userRepo.SyncRoles(id, req.RoleIDs); err != nil {
+			return nil, fmt.Errorf("failed to update roles: %v", err)
+		}
+	}
+
+	// Simpan perubahan data user basic
 	err = s.userRepo.Update(user)
 	if err != nil {
 		return nil, err
 	}
 
-	// Reload user dengan roles dan permissions
+	// Reload user dengan roles dan permissions terbaru untuk response
 	updatedUser, err := s.userRepo.GetUserWithRolesAndPermissions(user.ID)
 	if err != nil {
 		return nil, err

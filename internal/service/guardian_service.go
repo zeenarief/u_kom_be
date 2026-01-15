@@ -100,7 +100,21 @@ func (s *guardianService) CreateGuardian(req request.GuardianCreateRequest) (*re
 	}
 
 	// 6. Konversi ke Response Detail
-	return s.converter.ToGuardianDetailResponse(createdGuardian), nil
+	resp := s.converter.ToGuardianDetailResponse(createdGuardian)
+
+	// MAPPING USER
+	if guardian.User.ID != "" {
+		resp.User = &response.UserLinkedResponse{
+			ID:       guardian.User.ID,
+			Username: guardian.User.Username,
+			Name:     guardian.User.Name,
+			Email:    guardian.User.Email,
+		}
+	} else {
+		resp.User = nil
+	}
+
+	return resp, nil
 }
 
 // GetGuardianByID mengambil satu data wali
@@ -113,7 +127,21 @@ func (s *guardianService) GetGuardianByID(id string) (*response.GuardianDetailRe
 		return nil, errors.New("guardian not found")
 	}
 	// Panggil konverter untuk response detail (dengan dekripsi NIK)
-	return s.converter.ToGuardianDetailResponse(guardian), nil
+	resp := s.converter.ToGuardianDetailResponse(guardian)
+
+	// MAPPING USER
+	if guardian.User.ID != "" {
+		resp.User = &response.UserLinkedResponse{
+			ID:       guardian.User.ID,
+			Username: guardian.User.Username,
+			Name:     guardian.User.Name,
+			Email:    guardian.User.Email,
+		}
+	} else {
+		resp.User = nil
+	}
+
+	return resp, nil
 }
 
 // GetAllGuardians mengambil semua data wali (ringkas)
@@ -207,7 +235,21 @@ func (s *guardianService) UpdateGuardian(id string, req request.GuardianUpdateRe
 		return nil, err
 	}
 
-	return s.converter.ToGuardianDetailResponse(updatedGuardian), nil
+	resp := s.converter.ToGuardianDetailResponse(updatedGuardian)
+
+	// MAPPING USER
+	if guardian.User.ID != "" {
+		resp.User = &response.UserLinkedResponse{
+			ID:       guardian.User.ID,
+			Username: guardian.User.Username,
+			Name:     guardian.User.Name,
+			Email:    guardian.User.Email,
+		}
+	} else {
+		resp.User = nil
+	}
+
+	return resp, nil
 }
 
 // DeleteGuardian menghapus data wali

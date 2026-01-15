@@ -31,4 +31,6 @@ type GuardianDetailResponse struct {
 	RelationshipToStudent string    `json:"relationship_to_student"`
 	CreatedAt             time.Time `json:"created_at"`
 	UpdatedAt             time.Time `json:"updated_at"`
+
+	User *UserLinkedResponse `json:"user"`
 }

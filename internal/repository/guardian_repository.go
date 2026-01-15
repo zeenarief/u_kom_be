@@ -32,7 +32,7 @@ func (r *guardianRepository) Create(guardian *domain.Guardian) error {
 
 func (r *guardianRepository) FindByID(id string) (*domain.Guardian, error) {
 	var guardian domain.Guardian
-	err := r.db.First(&guardian, "id = ?", id).Error
+	err := r.db.Preload("User").First(&guardian, "id = ?", id).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil // Data tidak ditemukan
 	}

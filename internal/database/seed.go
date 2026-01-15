@@ -37,6 +37,7 @@ func SeedData(db *gorm.DB) error {
 func seedPermissions(db *gorm.DB) error {
 	// SESUAIKAN dengan permissions di SQL seed
 	permissions := []domain.Permission{
+		// ===== Users =====
 		{Name: "users.read", Description: "Read all users"},
 		{Name: "users.create", Description: "Create new users"},
 		{Name: "users.update", Description: "Update users"},
@@ -45,11 +46,46 @@ func seedPermissions(db *gorm.DB) error {
 		{Name: "users.delete", Description: "Delete users"},
 		{Name: "users.manage_roles", Description: "Manage user roles"},
 		{Name: "users.manage_permissions", Description: "Manage user permissions"},
+
+		// ===== Roles & Permissions =====
 		{Name: "roles.manage", Description: "Manage roles"},
 		{Name: "permissions.manage", Description: "Manage permissions"},
+
+		// ===== Profile & Auth =====
 		{Name: "profile.read", Description: "Read own profile"},
 		{Name: "profile.update", Description: "Update own profile"},
 		{Name: "auth.logout", Description: "Logout from system"},
+
+		// ===== Students =====
+		{Name: "students.create", Description: "Create new student"},
+		{Name: "students.read", Description: "Read students data"},
+		{Name: "students.update", Description: "Update student data"},
+		{Name: "students.delete", Description: "Delete student"},
+
+		{Name: "students.manage_parents", Description: "Manage student parents relationship"},
+		{Name: "students.manage_guardian", Description: "Set or remove student guardian"},
+		{Name: "students.manage_account", Description: "Link or unlink student user account"},
+
+		// ===== Parents =====
+		{Name: "parents.create", Description: "Create new parent"},
+		{Name: "parents.read", Description: "Read parents data"},
+		{Name: "parents.update", Description: "Update parent data"},
+		{Name: "parents.delete", Description: "Delete parent"},
+		{Name: "parents.manage_account", Description: "Link or unlink parent user account"},
+
+		// ===== Guardians =====
+		{Name: "guardians.create", Description: "Create new guardian"},
+		{Name: "guardians.read", Description: "Read guardians data"},
+		{Name: "guardians.update", Description: "Update guardian data"},
+		{Name: "guardians.delete", Description: "Delete guardian"},
+		{Name: "guardians.manage_account", Description: "Link or unlink guardian user account"},
+
+		// ===== Employees =====
+		{Name: "employees.create", Description: "Create new employee"},
+		{Name: "employees.read", Description: "Read employees data"},
+		{Name: "employees.update", Description: "Update employee data"},
+		{Name: "employees.delete", Description: "Delete employee"},
+		{Name: "employees.manage_account", Description: "Link or unlink employee user account"},
 	}
 
 	for _, permission := range permissions {

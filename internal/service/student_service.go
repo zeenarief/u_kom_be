@@ -139,6 +139,18 @@ func (s *studentService) GetStudentByID(id string) (*response.StudentDetailRespo
 	// - Relasi M:N Parents (yang sudah di-preload)
 	responseDTO := s.converter.ToStudentDetailResponse(student)
 
+	// Cek apakah student ini punya user_id (terhubung ke akun)
+	if student.User.ID != "" {
+		responseDTO.User = &response.UserLinkedResponse{
+			ID:       student.User.ID,
+			Username: student.User.Username,
+			Name:     student.User.Name,
+			Email:    student.User.Email,
+		}
+	} else {
+		responseDTO.User = nil
+	}
+
 	// 3. (LOGIKA BARU) Ambil data Wali Polimorfik secara manual
 	// Kita lakukan di service, bukan di converter, karena butuh I/O (repo)
 	if student.GuardianID != nil && student.GuardianType != nil {

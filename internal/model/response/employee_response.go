@@ -17,7 +17,7 @@ type EmployeeListResponse struct {
 // EmployeeDetailResponse adalah DTO untuk tampilan detail (lengkap)
 type EmployeeDetailResponse struct {
 	ID               string     `json:"id"`
-	UserID           *string    `json:"user_id,omitempty"` // ID akun user yang terhubung
+	User             *UserLinkedResponse `json:"user"` // ID akun user yang terhubung
 	FullName         string     `json:"full_name"`
 	NIP              *string    `json:"nip,omitempty"`
 	JobTitle         string     `json:"job_title"`

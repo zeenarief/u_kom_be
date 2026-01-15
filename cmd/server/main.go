@@ -38,7 +38,7 @@ func main() {
 		return
 	}
 
-	// Create and start server
+	// Create and start a server
 	server := NewServer()
 
 	// Start the server

@@ -11,7 +11,7 @@ type Employee struct {
 	ID               string     `gorm:"primaryKey;type:char(36)" json:"id"`
 	UserID           *string    `gorm:"type:char(36);uniqueIndex" json:"user_id"` // Pointer untuk NULL
 	FullName         string     `gorm:"type:varchar(100);not null" json:"full_name"`
-	NIP              *string    `gorm:"type:varchar(50);uniqueIndex" json:"nip"` // Pointer untuk NULL
+	NIP              *string    `gorm:"type:varchar(50);uniqueIndex;column:nip" json:"nip"` // Pointer untuk NULL
 	JobTitle         string     `gorm:"type:varchar(100);not null" json:"job_title"`
 	NIK              string     `gorm:"type:text" json:"nik,omitempty"` // Akan dienkripsi
 	Gender           string     `gorm:"type:varchar(10)" json:"gender"`

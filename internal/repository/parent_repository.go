@@ -33,7 +33,7 @@ func (r *parentRepository) Create(parent *domain.Parent) error {
 func (r *parentRepository) FindByID(id string) (*domain.Parent, error) {
 	var parent domain.Parent
 	// Belum ada relasi, jadi tidak perlu .Preload()
-	err := r.db.First(&parent, "id = ?", id).Error
+	err := r.db.Preload("User").First(&parent, "id = ?", id).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil // Data tidak ditemukan
 	}

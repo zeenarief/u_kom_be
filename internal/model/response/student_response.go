@@ -58,4 +58,6 @@ type StudentDetailResponse struct {
 
 	// Guardian adalah relasi polimorfik 1:1. Pointer digunakan agar bisa 'null' jika tidak di-set
 	Guardian *GuardianInfoResponse `json:"guardian,omitempty"`
+
+	User *UserLinkedResponse `json:"user"`
 }
