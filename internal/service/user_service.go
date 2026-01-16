@@ -62,6 +62,11 @@ func (s *userService) CreateUser(req request.UserCreateRequest) (*response.UserW
 		return nil, errors.New("username already exists")
 	}
 
+	// Validasi Password Kuat
+	if err := utils.ValidatePasswordComplexity(req.Password); err != nil {
+		return nil, err // Akan melempar error ke handler
+	}
+
 	// Hash password
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
@@ -175,6 +180,24 @@ func (s *userService) UpdateUser(id string, req request.UserUpdateRequest, curre
 		if err := s.userRepo.SyncRoles(id, req.RoleIDs); err != nil {
 			return nil, fmt.Errorf("failed to update roles: %v", err)
 		}
+	}
+
+	// === 4. Update Password (Reset by Admin) ===
+	if req.Password != "" {
+		// Cek Permission: Apakah user boleh mengganti password orang lain?
+		// Jika update diri sendiri -> Boleh (tapi biasanya lewat endpoint change-password biar aman butuh password lama)
+		// Jika update orang lain -> Harus punya permission 'users.change_password.others'
+
+		if id != currentUserID && !s.hasPermission(currentUserPermissions, "users.change_password.others") {
+			return nil, errors.New("unauthorized: insufficient permissions to reset password")
+		}
+
+		// Hash password baru
+		hashedPassword, err := utils.HashPassword(req.Password)
+		if err != nil {
+			return nil, err
+		}
+		user.Password = hashedPassword
 	}
 
 	// Simpan perubahan data user basic

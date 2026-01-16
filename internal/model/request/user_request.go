@@ -12,4 +12,7 @@ type UserUpdateRequest struct {
 	Name  string `json:"name,omitempty"`
 	Email string `json:"email,omitempty" binding:"omitempty,email"`
 	RoleIDs []string `json:"role_ids,omitempty"`
+
+	Password string   `json:"password,omitempty" binding:"omitempty,min=6"`
+
 }
