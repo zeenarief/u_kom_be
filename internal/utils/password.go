@@ -23,7 +23,7 @@ func ValidatePasswordComplexity(pass string) error {
 		hasUpper   = false
 		hasLower   = false
 		hasNumber  = false
-		// hasSpecial = false // Opsional, kadang bikin user kesal
+		// hasSpecial = false
 	)
 
 	if len(pass) >= 8 { // Naikkan jadi 8 karakter

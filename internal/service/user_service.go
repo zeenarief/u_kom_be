@@ -192,6 +192,11 @@ func (s *userService) UpdateUser(id string, req request.UserUpdateRequest, curre
 			return nil, errors.New("unauthorized: insufficient permissions to reset password")
 		}
 
+		// Validasi Password Kuat
+		if err := utils.ValidatePasswordComplexity(req.Password); err != nil {
+			return nil, err // Akan melempar error ke handler
+		}
+
 		// Hash password baru
 		hashedPassword, err := utils.HashPassword(req.Password)
 		if err != nil {

@@ -28,6 +28,7 @@ type Server struct {
 	ParentHandler     *handler.ParentHandler
 	GuardianHandler   *handler.GuardianHandler
 	EmployeeHandler   *handler.EmployeeHandler
+	DashboardHandler  *handler.DashboardHandler
 	AuthService       service.AuthService
 }
 
@@ -58,6 +59,7 @@ func NewServer() *Server {
 	parentRepo := repository.NewParentRepository(db)
 	guardianRepo := repository.NewGuardianRepository(db)
 	employeeRepo := repository.NewEmployeeRepository(db)
+	dashboardRepo := repository.NewDashboardRepository(db)
 
 	// Initialize utils
 	encryptionUtil, err := utils.NewEncryptionUtil(cfg.EncryptionKey)
@@ -108,6 +110,7 @@ func NewServer() *Server {
 		encryptionUtil,
 		studentConverter,
 	)
+	dashboardService := service.NewDashboardService(dashboardRepo)
 
 	// Initialize handlers
 	userHandler := handler.NewUserHandler(userService)
@@ -118,6 +121,7 @@ func NewServer() *Server {
 	parentHandler := handler.NewParentHandler(parentService)
 	guardianHandler := handler.NewGuardianHandler(guardianService)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
+	dashboardHandler := handler.NewDashboardHandler(dashboardService)
 
 	// Setup router with middleware
 	router := setupRouter(cfg, authService)
@@ -133,6 +137,7 @@ func NewServer() *Server {
 		ParentHandler:     parentHandler,
 		GuardianHandler:   guardianHandler,
 		EmployeeHandler:   employeeHandler,
+		DashboardHandler:  dashboardHandler,
 		AuthService:       authService,
 	}
 }
@@ -167,6 +172,7 @@ func (s *Server) Start() error {
 		s.ParentHandler,
 		s.GuardianHandler,
 		s.EmployeeHandler,
+		s.DashboardHandler,
 	)
 
 	// Start server
