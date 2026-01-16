@@ -43,7 +43,7 @@ func NewAuthService(userRepo repository.UserRepository, jwtSecret, refreshSecret
 }
 
 func (s *authService) Register(req request.UserCreateRequest) (*response.UserWithRoleResponse, error) {
-	// Check if email already exists
+	// 1. Validasi Duplikat Email
 	existingUser, err := s.userRepo.FindByEmailWithRelations(req.Email)
 	if err != nil {
 		return nil, fmt.Errorf("error checking email: %v", err)
@@ -52,7 +52,7 @@ func (s *authService) Register(req request.UserCreateRequest) (*response.UserWit
 		return nil, errors.New("email already exists")
 	}
 
-	// Check if username already exists
+	// 2. Validasi Duplikat Username
 	existingUser, err = s.userRepo.FindByUsernameWithRelations(req.Username)
 	if err != nil {
 		return nil, fmt.Errorf("error checking username: %v", err)
@@ -61,51 +61,56 @@ func (s *authService) Register(req request.UserCreateRequest) (*response.UserWit
 		return nil, errors.New("username already exists")
 	}
 
-	// Hash password
+	// 3. Validasi Kekuatan Password
+	// Kita gunakan utils yang sudah dibuat sebelumnya
+	if err := utils.ValidatePasswordComplexity(req.Password); err != nil {
+		return nil, err
+	}
+
+	// 4. Hash Password
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert request to domain model
+	// 5. Convert request to domain model
 	user := &domain.User{
-		ID:       uuid.New().String(),
+		// Gunakan utils.GenerateUUID() agar konsisten, atau kosongkan biar GORM Hook yang handle
+		ID:       utils.GenerateUUID(),
 		Username: req.Username,
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: hashedPassword,
 	}
 
-	// Save to database
+	// 6. Save to database
 	err = s.userRepo.Create(user)
 	if err != nil {
 		return nil, err
 	}
 
-	// Assign default user role
+	// 7. Assign Default Role (PENTING untuk Public Register)
 	defaultRole, err := s.userRepo.GetDefaultRole()
 	if err != nil {
 		return nil, err
 	}
-
 	if defaultRole == nil {
-		return nil, errors.New("default role not found")
+		// Fallback error jika belum di-seed
+		return nil, errors.New("registration failed: default role not configured")
 	}
 
-	// Assign default user role
 	err = s.userRepo.AssignRole(user.ID, defaultRole.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	// Reload user dengan roles dan permissions
+	// 8. Reload user untuk response
 	createdUser, err := s.userRepo.GetUserWithRolesAndPermissions(user.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	return converter.ToUserWithRoleResponse(createdUser), nil
-
 }
 
 func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, error) {
