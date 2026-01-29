@@ -1,16 +1,16 @@
 package main
 
 import (
-	"belajar-golang/cmd/server/routes"
-	"belajar-golang/internal/config"
-	"belajar-golang/internal/converter"
-	"belajar-golang/internal/database"
-	"belajar-golang/internal/handler"
-	"belajar-golang/internal/middleware"
-	"belajar-golang/internal/repository"
-	"belajar-golang/internal/service"
-	"belajar-golang/internal/utils"
 	"log"
+	"u_kom_be/cmd/server/routes"
+	"u_kom_be/internal/config"
+	"u_kom_be/internal/converter"
+	"u_kom_be/internal/database"
+	"u_kom_be/internal/handler"
+	"u_kom_be/internal/middleware"
+	"u_kom_be/internal/repository"
+	"u_kom_be/internal/service"
+	"u_kom_be/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"

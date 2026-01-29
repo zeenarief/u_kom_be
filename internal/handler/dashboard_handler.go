@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"belajar-golang/internal/service"
 	"github.com/gin-gonic/gin"
+	"u_kom_be/internal/service"
 )
 
 type DashboardHandler struct {

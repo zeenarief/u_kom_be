@@ -1,10 +1,10 @@
 package converter
 
 import (
-	"belajar-golang/internal/model/domain"
-	"belajar-golang/internal/model/response"
-	"belajar-golang/internal/utils"
 	"log"
+	"u_kom_be/internal/model/domain"
+	"u_kom_be/internal/model/response"
+	"u_kom_be/internal/utils"
 )
 
 // StudentConverterInterface mendefinisikan kontrak untuk konverter

@@ -1,9 +1,9 @@
 package database
 
 import (
-	"belajar-golang/internal/model/domain"
 	"fmt"
 	"log"
+	"u_kom_be/internal/model/domain"
 
 	"gorm.io/gorm"
 )

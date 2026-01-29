@@ -1,10 +1,10 @@
 package database
 
 import (
-	"belajar-golang/internal/config"
-	"belajar-golang/internal/model/domain"
 	"fmt"
 	"log"
+	"u_kom_be/internal/config"
+	"u_kom_be/internal/model/domain"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/mysql"

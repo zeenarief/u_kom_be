@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"belajar-golang/internal/config"
 	"net/http"
 	"sync"
 	"time"
+	"u_kom_be/internal/config"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"

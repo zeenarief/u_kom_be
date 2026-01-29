@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"belajar-golang/internal/handler"
-	"belajar-golang/internal/model/domain"
-	"belajar-golang/internal/service"
+	"u_kom_be/internal/handler"
+	"u_kom_be/internal/model/domain"
+	"u_kom_be/internal/service"
 
 	"github.com/gin-gonic/gin"
 )

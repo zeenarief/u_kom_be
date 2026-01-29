@@ -1,11 +1,11 @@
 package handler
 
 import (
-	"belajar-golang/internal/model/domain"
-	"belajar-golang/internal/model/request"
-	"belajar-golang/internal/service"
 	"net/http"
 	"strings"
+	"u_kom_be/internal/model/domain"
+	"u_kom_be/internal/model/request"
+	"u_kom_be/internal/service"
 
 	"github.com/gin-gonic/gin"
 )

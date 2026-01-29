@@ -1,9 +1,9 @@
 package service
 
 import (
-	"belajar-golang/internal/model/domain"
-	"belajar-golang/internal/model/response"
-	"belajar-golang/internal/repository"
+	"u_kom_be/internal/model/domain"
+	"u_kom_be/internal/model/response"
+	"u_kom_be/internal/repository"
 )
 
 type DashboardService interface {

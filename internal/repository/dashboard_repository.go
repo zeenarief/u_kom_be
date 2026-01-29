@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"belajar-golang/internal/model/domain"
 	"gorm.io/gorm"
+	"u_kom_be/internal/model/domain"
 )
 
 type DashboardRepository interface {

@@ -1,12 +1,12 @@
 package service
 
 import (
-	"belajar-golang/internal/model/domain"
-	"belajar-golang/internal/model/request"
-	"belajar-golang/internal/model/response"
-	"belajar-golang/internal/repository"
 	"errors"
 	"fmt"
+	"u_kom_be/internal/model/domain"
+	"u_kom_be/internal/model/request"
+	"u_kom_be/internal/model/response"
+	"u_kom_be/internal/repository"
 )
 
 type RoleService interface {

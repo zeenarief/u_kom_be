@@ -1,11 +1,11 @@
 package main
 
 import (
-	"belajar-golang/internal/config"
-	"belajar-golang/internal/database"
 	"flag"
 	"log"
 	"os"
+	"u_kom_be/internal/config"
+	"u_kom_be/internal/database"
 
 	"github.com/joho/godotenv"
 )

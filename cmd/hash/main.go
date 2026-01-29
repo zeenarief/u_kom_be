@@ -1,9 +1,9 @@
 package main
 
 import (
-	"belajar-golang/internal/utils"
 	"fmt"
 	"log"
+	"u_kom_be/internal/utils"
 )
 
 func main() {

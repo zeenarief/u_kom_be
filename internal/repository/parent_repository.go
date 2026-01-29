@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"belajar-golang/internal/model/domain"
 	"errors"
+	"u_kom_be/internal/model/domain"
 
 	"gorm.io/gorm"
 )

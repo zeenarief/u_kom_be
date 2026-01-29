@@ -1,18 +1,18 @@
 package service
 
 import (
-	"belajar-golang/internal/converter"
-	"belajar-golang/internal/model/domain"
-	"belajar-golang/internal/model/request"
-	"belajar-golang/internal/model/response"
-	"belajar-golang/internal/repository"
-	"belajar-golang/internal/utils"
 	"errors"
 	"fmt"
 	"time"
+	"u_kom_be/internal/converter"
+	"u_kom_be/internal/model/domain"
+	"u_kom_be/internal/model/request"
+	"u_kom_be/internal/model/response"
+	"u_kom_be/internal/repository"
+	"u_kom_be/internal/utils"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/google/uuid"
+	_ "github.com/google/uuid"
 )
 
 type AuthService interface {

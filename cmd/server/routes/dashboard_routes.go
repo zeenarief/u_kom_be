@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"belajar-golang/internal/handler"
-	"belajar-golang/internal/middleware"
-	"belajar-golang/internal/service"
 	"github.com/gin-gonic/gin"
+	"u_kom_be/internal/handler"
+	"u_kom_be/internal/middleware"
+	"u_kom_be/internal/service"
 )
 
 func RegisterDashboardRoutes(router *gin.RouterGroup, handler *handler.DashboardHandler, authService service.AuthService) {

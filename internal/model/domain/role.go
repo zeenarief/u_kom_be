@@ -1,8 +1,8 @@
 package domain
 
 import (
-	"belajar-golang/internal/utils"
 	"time"
+	"u_kom_be/internal/utils"
 
 	"gorm.io/gorm"
 )

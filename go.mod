@@ -1,4 +1,4 @@
-module belajar-golang
+module u_kom_be
 
 go 1.25.0
 

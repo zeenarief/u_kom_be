@@ -1,8 +1,8 @@
 package converter
 
 import (
-	"belajar-golang/internal/model/domain"
-	"belajar-golang/internal/model/response"
+	"u_kom_be/internal/model/domain"
+	"u_kom_be/internal/model/response"
 )
 
 func ToUserWithRoleResponse(user *domain.User) *response.UserWithRoleResponse {

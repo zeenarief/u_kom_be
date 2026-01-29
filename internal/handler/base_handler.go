@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"belajar-golang/internal/model/response"
 	"net/http"
+	"u_kom_be/internal/model/response"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"belajar-golang/internal/handler"
-	"belajar-golang/internal/service"
 	"time"
+	"u_kom_be/internal/handler"
+	"u_kom_be/internal/service"
 
 	"github.com/gin-gonic/gin"
 )

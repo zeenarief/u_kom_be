@@ -1,9 +1,9 @@
 package database
 
 import (
-	"belajar-golang/internal/config"
 	"fmt"
 	"log"
+	"u_kom_be/internal/config"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

@@ -1,15 +1,15 @@
 package service
 
 import (
-	"belajar-golang/internal/converter"
-	"belajar-golang/internal/model/domain"
-	"belajar-golang/internal/model/request"
-	"belajar-golang/internal/model/response"
-	"belajar-golang/internal/repository"
-	"belajar-golang/internal/utils"
 	"errors"
 	"fmt"
 	"strings"
+	"u_kom_be/internal/converter"
+	"u_kom_be/internal/model/domain"
+	"u_kom_be/internal/model/request"
+	"u_kom_be/internal/model/response"
+	"u_kom_be/internal/repository"
+	"u_kom_be/internal/utils"
 )
 
 type GuardianService interface {
