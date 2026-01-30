@@ -1,8 +1,9 @@
 package repository
 
 import (
-	"gorm.io/gorm"
 	"u_kom_be/internal/model/domain"
+
+	"gorm.io/gorm"
 )
 
 type DashboardRepository interface {
