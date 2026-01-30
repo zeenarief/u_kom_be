@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"strings"
@@ -10,6 +11,8 @@ import (
 	"u_kom_be/internal/model/response"
 	"u_kom_be/internal/repository"
 	"u_kom_be/internal/utils"
+
+	"github.com/xuri/excelize/v2"
 )
 
 type StudentService interface {
@@ -23,6 +26,7 @@ type StudentService interface {
 	RemoveGuardian(studentID string) error // Helper untuk menghapus wali
 	LinkUser(studentID string, userID string) error
 	UnlinkUser(studentID string) error
+	ExportStudentsToExcel() (*bytes.Buffer, error)
 }
 
 type studentService struct {
@@ -494,4 +498,64 @@ func (s *studentService) UnlinkUser(studentID string) error {
 
 	// 2. Hapus tautan (set user_id ke NULL)
 	return s.studentRepo.SetUserID(studentID, nil)
+}
+
+func (s *studentService) ExportStudentsToExcel() (*bytes.Buffer, error) {
+	// 1. Ambil semua data siswa
+	students, err := s.studentRepo.FindAll()
+	if err != nil {
+		return nil, err
+	}
+
+	// 2. Buat File Excel Baru
+	f := excelize.NewFile()
+	sheetName := "Data Siswa"
+	index, _ := f.NewSheet(sheetName)
+	f.SetActiveSheet(index)
+	// Hapus sheet default "Sheet1" jika tidak dipakai
+	f.DeleteSheet("Sheet1")
+
+	// 3. Buat Header
+	headers := []string{"No", "NISN", "NIM", "Nama Lengkap", "Gender", "Tempat Lahir", "Tanggal Lahir", "Alamat", "No HP"}
+	for i, header := range headers {
+		// Konversi koordinat (0,0 -> A1, 1,0 -> B1)
+		cell, _ := excelize.CoordinatesToCellName(i+1, 1)
+		f.SetCellValue(sheetName, cell, header)
+	}
+
+	// Style Header (Bold, Kuning) - Opsional biar cantik
+	style, _ := f.NewStyle(&excelize.Style{
+		Font: &excelize.Font{Bold: true},
+		Fill: excelize.Fill{Type: "pattern", Color: []string{"#FFFF00"}, Pattern: 1},
+	})
+	f.SetCellStyle(sheetName, "A1", "I1", style)
+
+	// 4. Isi Data
+	for i, student := range students {
+		row := i + 2 // Mulai dari baris ke-2
+
+		f.SetCellValue(sheetName, fmt.Sprintf("A%d", row), i+1)
+		f.SetCellValue(sheetName, fmt.Sprintf("B%d", row), student.NISN)
+		f.SetCellValue(sheetName, fmt.Sprintf("C%d", row), student.NIM)
+		f.SetCellValue(sheetName, fmt.Sprintf("D%d", row), student.FullName)
+		f.SetCellValue(sheetName, fmt.Sprintf("E%d", row), student.Gender)
+		f.SetCellValue(sheetName, fmt.Sprintf("F%d", row), student.PlaceOfBirth)
+		// Format Tanggal
+		dob := ""
+		if !student.DateOfBirth.IsZero() {
+			dob = student.DateOfBirth.Format("2006-01-02")
+		}
+		f.SetCellValue(sheetName, fmt.Sprintf("G%d", row), dob)
+		f.SetCellValue(sheetName, fmt.Sprintf("H%d", row), student.Address)
+		// Ambil HP dari User jika ada, atau field lain (sesuaikan struktur data Anda)
+		f.SetCellValue(sheetName, fmt.Sprintf("I%d", row), "-")
+	}
+
+	// 5. Simpan ke Buffer (Memory)
+	buffer, err := f.WriteToBuffer()
+	if err != nil {
+		return nil, err
+	}
+
+	return buffer, nil
 }

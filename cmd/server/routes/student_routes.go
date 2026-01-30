@@ -58,5 +58,9 @@ func RegisterStudentRoutes(
 		students.DELETE("/:id/unlink-user",
 			middleware.PermissionMiddleware("students.manage_account", authService),
 			studentHandler.UnlinkUser)
+		// Route Export (Tambahkan Permission check jika perlu)
+		students.GET("/export/excel",
+			middleware.PermissionMiddleware("students.read", authService),
+			studentHandler.ExportExcel)
 	}
 }

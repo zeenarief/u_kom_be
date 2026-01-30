@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"fmt"
 	"strings"
+	"time"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/service"
 
@@ -219,4 +221,27 @@ func (h *StudentHandler) UnlinkUser(c *gin.Context) {
 	}
 
 	SuccessResponse(c, "Student unlinked from user successfully", nil)
+}
+
+func (h *StudentHandler) ExportExcel(c *gin.Context) {
+	buffer, err := h.studentService.ExportStudentsToExcel()
+	if err != nil {
+		InternalServerError(c, "Failed to generate excel file")
+		return
+	}
+
+	// Nama file dinamis dengan timestamp
+	filename := fmt.Sprintf("data_siswa_%s.xlsx", time.Now().Format("20060102_150405"))
+
+	// Set Headers untuk Download
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Disposition", "attachment; filename="+filename)
+	c.Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	c.Header("Content-Transfer-Encoding", "binary")
+	c.Header("Expires", "0")
+	c.Header("Cache-Control", "must-revalidate")
+	c.Header("Pragma", "public")
+
+	// Kirim binary data
+	c.Data(200, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", buffer.Bytes())
 }
