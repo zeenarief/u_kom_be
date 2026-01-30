@@ -1,0 +1,118 @@
+### Konfigurasi Global
+@baseUrl = http://localhost:8080/api/v1
+@contentType = application/json
+@adminEmail = zainal@sekolah.sch.id
+@adminPassword = PasswordSangatKuat123!
+
+### ========================================================================
+### LANGKAH 0: LOGIN ADMIN
+### ========================================================================
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+> {%
+    client.global.set("authToken", response.body.data.access_token);
+%}
+
+### ========================================================================
+### LANGKAH 1: BUAT AKUN USER UNTUK SISWA
+### Kita butuh user_id yang akan di-link
+### ========================================================================
+POST {{baseUrl}}/users
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "siswa_andi",
+  "name": "Andi Pratama (Akun Login)",
+  "email": "andi@sekolah.sch.id",
+  "password": "PasswordSiswa123!"
+}
+
+> {%
+    client.global.set("userID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 2: BUAT DATA SISWA
+### Kita butuh student_id
+### ========================================================================
+POST {{baseUrl}}/students
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "full_name": "Andi Pratama (Data Akademik)",
+  "nisn": "9988776655",
+  "gender": "male",
+  "date_of_birth": "2010-01-01T00:00:00Z",
+  "address": "Jl. Pendidikan No. 1"
+}
+
+> {%
+    client.global.set("studentID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 3: LINK SISWA KE USER
+### Menghubungkan Profil Akademik dengan Akun Login
+### ========================================================================
+POST {{baseUrl}}/students/{{studentID}}/link-user
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "user_id": "{{userID}}"
+}
+
+### ========================================================================
+### LANGKAH 4: VERIFIKASI HASIL LINK
+### Cek detail siswa, harusnya sekarang ada data 'user' di dalamnya
+### ========================================================================
+GET {{baseUrl}}/students/{{studentID}}
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 5: TES VALIDASI (NEGATIVE TEST)
+### Coba link user yang SAMA ke siswa LAIN (Harusnya Gagal/Error)
+### ========================================================================
+
+# 5a. Buat Siswa Kedua
+POST {{baseUrl}}/students
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "full_name": "Siswa Peniru",
+  "nisn": "1122334455",
+  "nim": "5546",
+  "date_of_birth": "2020-01-01T00:00:00Z",
+  "gender": "male"
+}
+
+> {%
+    client.global.set("studentID2", response.body.data.id);
+%}
+
+### ========================================================================
+
+# 5b. Coba Link User 'Andi' ke 'Siswa Peniru'
+POST {{baseUrl}}/students/{{studentID2}}/link-user
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "user_id": "{{userID}}"
+}
+
+### ========================================================================
+### LANGKAH 6: UNLINK USER
+### Memutuskan hubungan akun
+### ========================================================================
+DELETE {{baseUrl}}/students/{{studentID}}/unlink-user
+Authorization: Bearer {{authToken}}

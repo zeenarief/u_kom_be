@@ -1,0 +1,108 @@
+### Konfigurasi Global
+@baseUrl = http://localhost:8080/api/v1
+@contentType = application/json
+@adminEmail = zainal@sekolah.sch.id
+@adminPassword = PasswordSangatKuat123!
+
+### ========================================================================
+### LANGKAH 0: LOGIN SEBAGAI ADMIN
+### ========================================================================
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+> {%
+    client.global.set("authToken", response.body.data.access_token);
+%}
+
+### ========================================================================
+### LANGKAH 1: LIST SEMUA USER
+### Memastikan Admin bisa melihat daftar user
+### ========================================================================
+GET {{baseUrl}}/users
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 2: BUAT USER BARU (STAFF TATA USAHA)
+### Skenario: Admin mendaftarkan akun untuk staff baru
+### ========================================================================
+POST {{baseUrl}}/users
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "username": "staff_budi",
+  "name": "Budi Staff TU",
+  "email": "budi.tu@sekolah.sch.id",
+  "password": "PasswordStaff123!"
+}
+
+> {%
+    client.global.set("newUserID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 3: GET USER DETAIL
+### Memastikan data user baru tersimpan
+### ========================================================================
+GET {{baseUrl}}/users/{{newUserID}}
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 4: UPDATE DATA USER (GANTI NAMA & PASSWORD)
+### Skenario: Ada kesalahan input nama, dan admin mereset password
+### ========================================================================
+PUT {{baseUrl}}/users/{{newUserID}}
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Budi Santoso (Kepala TU)",
+  "password": "PasswordBaruBudi123!"
+}
+
+### ========================================================================
+### LANGKAH 5: GET DAFTAR ROLE (UNTUK MENDAPATKAN ID ROLE GURU/STAFF)
+### Kita butuh ID Role untuk tes assign role. Kita ambil salah satu role yang ada.
+### ========================================================================
+# Asumsi Anda punya endpoint GET /roles. Jika tidak, Anda harus hardcode ID Role di langkah 6.
+GET {{baseUrl}}/roles
+Authorization: Bearer {{authToken}}
+
+> {%
+    // Mengambil ID Role pertama yang bukan 'user' atau 'admin' (jika ada), atau ambil index ke-0
+    // Logic sederhana: Ambil role pertama dari list
+    client.global.set("roleID", response.body.data[0].id);
+%}
+
+### ========================================================================
+### LANGKAH 6: GANTI ROLE USER (SYNC ROLES)
+### Skenario: Mengangkat user menjadi role tertentu (misal: Guru/Staff)
+### ========================================================================
+POST {{baseUrl}}/users/{{newUserID}}/sync-roles
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "roles": [
+    "{{roleID}}"
+  ]
+}
+
+### ========================================================================
+### LANGKAH 7: CEK PERMISSION/ROLE USER SETELAH UPDATE
+### Memastikan role user sudah berubah
+### ========================================================================
+GET {{baseUrl}}/users/{{newUserID}}/permissions
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 8: DELETE USER
+### Membersihkan data test
+### ========================================================================
+DELETE {{baseUrl}}/users/{{newUserID}}
+Authorization: Bearer {{authToken}}

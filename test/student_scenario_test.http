@@ -1,0 +1,133 @@
+### Konfigurasi Global
+@baseUrl = http://localhost:8080/api/v1
+@contentType = application/json
+@adminEmail = zainal@sekolah.sch.id
+@adminPassword = PasswordSangatKuat123!
+
+### ========================================================================
+### LANGKAH 0: LOGIN TERLEBIH DAHULU
+### ========================================================================
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+> {%
+    // Script ini berjalan SETELAH request selesai
+    // Mengambil access_token dari JSON response dan menyimpannya ke variabel global 'authToken'
+    client.global.set("authToken", response.body.data.access_token);
+%}
+
+### ========================================================================
+### LANGKAH 1: PERSIAPAN DATA ORANG TUA (DUMMY)
+### ========================================================================
+POST {{baseUrl}}/parents
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "full_name": "Budi Santoso (Ayah Dummy)",
+  "nik": "3301234567890001",
+  "date_of_birth": "2000-01-01T00:00:00Z",
+  "gender": "male",
+  "phone_number": "081234567890",
+  "email": "budi.ayah@mail.com",
+  "address": "Jl. Merdeka No. 45"
+}
+
+> {%
+    // Mengambil ID Parent yang baru dibuat
+    client.global.set("parentID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 2: CREATE STUDENT
+### ========================================================================
+POST {{baseUrl}}/students
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "full_name": "Ahmad Siswa Cerdas",
+  "nik": "3372051234560001",
+  "no_kk": "3372050000000001",
+  "nisn": "0012345678",
+  "nim": "2026001",
+  "gender": "male",
+  "place_of_birth": "Surakarta",
+  "date_of_birth": "2000-01-01T00:00:00Z",
+  "address": "Jl. Slamet Riyadi No. 10",
+  "rt": "01",
+  "rw": "05",
+  "sub_district": "Laweyan",
+  "district": "Laweyan",
+  "city": "Surakarta",
+  "province": "Jawa Tengah",
+  "postal_code": "57141"
+}
+
+> {%
+    // Mengambil ID Student yang baru dibuat
+    client.global.set("studentID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 3: GET STUDENT BY ID
+### ========================================================================
+GET {{baseUrl}}/students/{{studentID}}
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 4: UPDATE STUDENT
+### ========================================================================
+PUT {{baseUrl}}/students/{{studentID}}
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "full_name": "Ahmad Siswa Cerdas (Updated)",
+  "address": "Jl. Slamet Riyadi No. 99 (Pindah Rumah)"
+}
+
+### ========================================================================
+### LANGKAH 5: SYNC PARENTS
+### ========================================================================
+POST {{baseUrl}}/students/{{studentID}}/sync-parents
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "parents": [
+    {
+      "parent_id": "{{parentID}}",
+      "relationship_type": "FATHER"
+    }
+  ]
+}
+
+### ========================================================================
+### LANGKAH 6: SET GUARDIAN
+### ========================================================================
+PUT {{baseUrl}}/students/{{studentID}}/set-guardian
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "guardian_id": "{{parentID}}",
+  "guardian_type": "parent"
+}
+
+### ========================================================================
+### LANGKAH 7: CEK HASIL RELASI (GET ULANG)
+### ========================================================================
+GET {{baseUrl}}/students/{{studentID}}
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 8: DELETE STUDENT
+### ========================================================================
+DELETE {{baseUrl}}/students/{{studentID}}
+Authorization: Bearer {{authToken}}

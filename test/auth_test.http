@@ -1,0 +1,70 @@
+### Global Variables
+@baseUrl = http://localhost:8080/api/v1
+@contentType = application/json
+
+### ------------------------------------------------------------------------
+### SKENARIO 1: REGISTER USER BARU
+### Menguji apakah user bisa mendaftar akun baru.
+### Harapan: Status 201 Created
+### ------------------------------------------------------------------------
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "username": "guru_zainal",
+  "email": "zainal@sekolah.sch.id",
+  "password": "PasswordSangatKuat123!",
+  "name": "Zainal Arifin"
+}
+
+### ------------------------------------------------------------------------
+### SKENARIO 2: LOGIN BERHASIL
+### Menguji login dengan kredensial yang benar.
+### Harapan: Status 200 OK dan menerima Access Token + Refresh Token
+### ------------------------------------------------------------------------
+# @name loginRequest
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "zainal@sekolah.sch.id",
+  "password": "PasswordSangatKuat123!"
+}
+
+### Ambil Token dari Response Login (Untuk request selanjutnya)
+@authToken = {{loginRequest.response.body.data.access_token}}
+@refreshToken = {{loginRequest.response.body.data.refresh_token}}
+
+
+### ------------------------------------------------------------------------
+### SKENARIO 3: LOGIN GAGAL (Password Salah)
+### Menguji keamanan sistem jika password salah.
+### Harapan: Status 401 Unauthorized
+### ------------------------------------------------------------------------
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "zainal@sekolah.sch.id",
+  "password": "passwordngawur"
+}
+
+### ------------------------------------------------------------------------
+### SKENARIO 4: REFRESH TOKEN
+### Menguji mekanisme pembaruan token saat token lama expired.
+### Harapan: Status 200 OK dan menerima Token Baru
+### ------------------------------------------------------------------------
+POST {{baseUrl}}/auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refresh_token": "{{refreshToken}}"
+}
+
+### ------------------------------------------------------------------------
+### SKENARIO 5: LOGOUT
+### Menguji penghapusan sesi (tergantung implementasi Anda apakah blacklist token/hapus session DB).
+### Harapan: Status 200 OK
+### ------------------------------------------------------------------------
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{authToken}}
