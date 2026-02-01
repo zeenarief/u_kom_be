@@ -245,3 +245,20 @@ func (h *StudentHandler) ExportExcel(c *gin.Context) {
 	// Kirim binary data
 	c.Data(200, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", buffer.Bytes())
 }
+
+func (h *StudentHandler) ExportPDF(c *gin.Context) {
+	buffer, err := h.studentService.ExportStudentsToPdf()
+	if err != nil {
+		InternalServerError(c, "Failed to generate PDF file")
+		return
+	}
+
+	filename := fmt.Sprintf("data_siswa_%s.pdf", time.Now().Format("20060102_150405"))
+
+	// Header untuk PDF
+	c.Header("Content-Disposition", "attachment; filename="+filename)
+	c.Header("Content-Type", "application/pdf")
+	c.Header("Content-Length", fmt.Sprintf("%d", buffer.Len()))
+
+	c.Data(200, "application/pdf", buffer.Bytes())
+}

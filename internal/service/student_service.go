@@ -12,6 +12,7 @@ import (
 	"u_kom_be/internal/repository"
 	"u_kom_be/internal/utils"
 
+	"github.com/go-pdf/fpdf"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -27,6 +28,7 @@ type StudentService interface {
 	LinkUser(studentID string, userID string) error
 	UnlinkUser(studentID string) error
 	ExportStudentsToExcel() (*bytes.Buffer, error)
+	ExportStudentsToPdf() (*bytes.Buffer, error)
 }
 
 type studentService struct {
@@ -558,4 +560,67 @@ func (s *studentService) ExportStudentsToExcel() (*bytes.Buffer, error) {
 	}
 
 	return buffer, nil
+}
+
+func (s *studentService) ExportStudentsToPdf() (*bytes.Buffer, error) {
+	students, err := s.studentRepo.FindAll()
+	if err != nil {
+		return nil, err
+	}
+
+	// 1. Init PDF (Landscape, mm, A4)
+	pdf := fpdf.New("L", "mm", "A4", "")
+	pdf.AddPage()
+
+	// 2. Judul
+	pdf.SetFont("Arial", "B", 16)
+	pdf.CellFormat(0, 10, "LAPORAN DATA SISWA", "", 1, "C", false, 0, "")
+	pdf.Ln(5)
+
+	// 3. Header Tabel
+	pdf.SetFont("Arial", "B", 10)
+	pdf.SetFillColor(240, 240, 240) // Abu-abu muda
+
+	// Lebar Kolom: No, NISN, Nama, Gender, Alamat
+	widths := []float64{10, 30, 60, 20, 40, 80}
+	headers := []string{"No", "NISN", "Nama Lengkap", "JK", "Tgl Lahir", "Alamat"}
+
+	for i, header := range headers {
+		pdf.CellFormat(widths[i], 10, header, "1", 0, "C", true, 0, "")
+	}
+	pdf.Ln(-1) // Pindah baris
+
+	// 4. Isi Data
+	pdf.SetFont("Arial", "", 9)
+	pdf.SetFillColor(255, 255, 255) // Putih
+
+	for i, student := range students {
+		// Format Tanggal
+		dob := "-"
+		if !student.DateOfBirth.IsZero() {
+			dob = student.DateOfBirth.Format("02-01-2006")
+		}
+
+		// Convert Gender
+		gender := "L"
+		if student.Gender == "female" {
+			gender = "P"
+		}
+
+		pdf.CellFormat(widths[0], 8, fmt.Sprintf("%d", i+1), "1", 0, "C", false, 0, "")
+		pdf.CellFormat(widths[1], 8, student.NISN, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(widths[2], 8, student.FullName, "1", 0, "L", false, 0, "")
+		pdf.CellFormat(widths[3], 8, gender, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(widths[4], 8, dob, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(widths[5], 8, student.Address, "1", 0, "L", false, 0, "") // Alamat mungkin terpotong jika panjang, nanti bisa pakai MultiCell
+		pdf.Ln(-1)
+	}
+
+	// 5. Output ke Buffer
+	var buf bytes.Buffer
+	if err := pdf.Output(&buf); err != nil {
+		return nil, err
+	}
+
+	return &buf, nil
 }

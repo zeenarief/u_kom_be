@@ -62,5 +62,8 @@ func RegisterStudentRoutes(
 		students.GET("/export/excel",
 			middleware.PermissionMiddleware("students.read", authService),
 			studentHandler.ExportExcel)
+		students.GET("/export/pdf",
+			middleware.PermissionMiddleware("students.read", authService),
+			studentHandler.ExportPDF)
 	}
 }
