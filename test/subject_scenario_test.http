@@ -1,0 +1,110 @@
+### Konfigurasi Global
+@baseUrl = http://localhost:8080/api/v1
+@contentType = application/json
+@adminEmail = zainal@sekolah.sch.id
+@adminPassword = PasswordSangatKuat123!
+
+### ========================================================================
+### LANGKAH 0: LOGIN ADMIN
+### ========================================================================
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+> {%
+    client.global.set("authToken", response.body.data.access_token);
+%}
+
+### ========================================================================
+### LANGKAH 1: CREATE SUBJECT 1 (UMUM)
+### ========================================================================
+POST {{baseUrl}}/subjects
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "code": "MTK-W",
+  "name": "Matematika Wajib",
+  "type": "Muatan Nasional",
+  "description": "Matematika untuk semua jurusan"
+}
+
+> {%
+    client.global.set("subject1ID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 2: CREATE SUBJECT 2 (KEJURUAN)
+### ========================================================================
+POST {{baseUrl}}/subjects
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "code": "PROD-RPL-1",
+  "name": "Pemrograman Web dan Perangkat Bergerak",
+  "type": "C3. Kompetensi Keahlian",
+  "description": "Fokus pada Frontend dan Backend"
+}
+
+> {%
+    client.global.set("subject2ID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 3: TEST DUPLICATE CODE (VALIDASI)
+### Mencoba membuat mapel dengan kode 'MTK-W' lagi. Harapan: ERROR 400
+### ========================================================================
+POST {{baseUrl}}/subjects
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "code": "MTK-W",
+  "name": "Matematika (Duplicate)",
+  "type": "Muatan Nasional"
+}
+
+### ========================================================================
+### LANGKAH 4: GET ALL SUBJECTS
+### ========================================================================
+GET {{baseUrl}}/subjects
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 5: GET SUBJECT BY ID
+### ========================================================================
+GET {{baseUrl}}/subjects/{{subject1ID}}
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 6: UPDATE SUBJECT
+### Mengubah Nama dan Tipe Mapel 2
+### ========================================================================
+PUT {{baseUrl}}/subjects/{{subject2ID}}
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Pemrograman Web Lanjut (Next.js/Go)",
+  "type": "Muatan Lokal Unggulan",
+  "description": "Update kurikulum industri"
+}
+
+### ========================================================================
+### LANGKAH 7: DELETE SUBJECT
+### Menghapus Mapel 1
+### ========================================================================
+DELETE {{baseUrl}}/subjects/{{subject1ID}}
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 8: VERIFIKASI DELETE
+### Cek detail Subject 1, harusnya 404 Not Found
+### ========================================================================
+GET {{baseUrl}}/subjects/{{subject1ID}}
+Authorization: Bearer {{authToken}}
