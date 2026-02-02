@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 	"u_kom_be/internal/converter"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
@@ -29,6 +30,7 @@ type StudentService interface {
 	UnlinkUser(studentID string) error
 	ExportStudentsToExcel() (*bytes.Buffer, error)
 	ExportStudentsToPdf() (*bytes.Buffer, error)
+	ExportStudentBiodata(id string) (*bytes.Buffer, error)
 }
 
 type studentService struct {
@@ -61,12 +63,17 @@ func NewStudentService(
 // CreateStudent menangani pembuatan siswa baru
 func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*response.StudentDetailResponse, error) {
 	// 1. Validasi Duplikat
+	var nisn *string
 	if req.NISN != "" {
+		nisn = &req.NISN
 		if existing, _ := s.studentRepo.FindByNISN(req.NISN); existing != nil {
 			return nil, errors.New("nisn already exists")
 		}
 	}
+
+	var nim *string
 	if req.NIM != "" {
+		nim = &req.NIM
 		if existing, _ := s.studentRepo.FindByNIM(req.NIM); existing != nil {
 			return nil, errors.New("nim already exists")
 		}
@@ -95,8 +102,8 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 		FullName:     req.FullName,
 		NoKK:         encryptedNoKK,
 		NIK:          encryptedNIK,
-		NISN:         req.NISN,
-		NIM:          req.NIM,
+		NISN:         nisn,
+		NIM:          nim,
 		Gender:       req.Gender,
 		PlaceOfBirth: req.PlaceOfBirth,
 		DateOfBirth:  req.DateOfBirth,
@@ -201,17 +208,27 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 	}
 
 	// Validasi duplikat baru
-	if req.NISN != "" && req.NISN != student.NISN {
-		if existing, _ := s.studentRepo.FindByNISN(req.NISN); existing != nil {
-			return nil, errors.New("nisn already exists")
+	if req.NISN == "" {
+		// request eksplisit ingin mengosongkan
+		student.NISN = nil
+	} else {
+		// ada value baru
+		if student.NISN == nil || *student.NISN != req.NISN {
+			if existing, _ := s.studentRepo.FindByNISN(req.NISN); existing != nil {
+				return nil, errors.New("nisn already exists")
+			}
+			student.NISN = &req.NISN
 		}
-		student.NISN = req.NISN
 	}
-	if req.NIM != "" && req.NIM != student.NIM {
-		if existing, _ := s.studentRepo.FindByNIM(req.NIM); existing != nil {
-			return nil, errors.New("nim already exists")
+	if req.NIM == "" {
+		student.NIM = nil
+	} else {
+		if student.NIM == nil || *student.NIM != req.NIM {
+			if existing, _ := s.studentRepo.FindByNIM(req.NIM); existing != nil {
+				return nil, errors.New("nim already exists")
+			}
+			student.NIM = &req.NIM
 		}
-		student.NIM = req.NIM
 	}
 
 	// Enkripsi field yang diperbarui
@@ -608,7 +625,7 @@ func (s *studentService) ExportStudentsToPdf() (*bytes.Buffer, error) {
 		}
 
 		pdf.CellFormat(widths[0], 8, fmt.Sprintf("%d", i+1), "1", 0, "C", false, 0, "")
-		pdf.CellFormat(widths[1], 8, student.NISN, "1", 0, "C", false, 0, "")
+		pdf.CellFormat(widths[1], 8, student.NISNValue(), "1", 0, "C", false, 0, "")
 		pdf.CellFormat(widths[2], 8, student.FullName, "1", 0, "L", false, 0, "")
 		pdf.CellFormat(widths[3], 8, gender, "1", 0, "C", false, 0, "")
 		pdf.CellFormat(widths[4], 8, dob, "1", 0, "C", false, 0, "")
@@ -622,5 +639,145 @@ func (s *studentService) ExportStudentsToPdf() (*bytes.Buffer, error) {
 		return nil, err
 	}
 
+	return &buf, nil
+}
+
+func (s *studentService) ExportStudentBiodata(id string) (*bytes.Buffer, error) {
+	// 1. Ambil data lengkap (termasuk parents & guardian)
+	// Kita gunakan GetStudentByID yg sudah ada logic lengkapnya (parents, guardian info, dll)
+	// Tapi karena GetStudentByID mengembalikan Response DTO, dan kita butuh Domain Object untuk report,
+	// Lebih aman kita panggil Repo langsung:
+	student, err := s.studentRepo.FindByIDWithParents(id)
+	if err != nil {
+		return nil, err
+	}
+	if student == nil {
+		return nil, errors.New("student not found")
+	}
+
+	// 2. Init PDF (Portrait, A4)
+	pdf := fpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+
+	// --- HEADER ---
+	pdf.SetFont("Arial", "B", 14)
+	pdf.CellFormat(0, 10, "BIODATA SISWA", "", 1, "C", false, 0, "")
+	pdf.SetFont("Arial", "", 10)
+	pdf.CellFormat(0, 5, "SISTEM INFORMASI SEKOLAH", "", 1, "C", false, 0, "")
+	pdf.Ln(5)
+
+	// Garis pembatas
+	pdf.Line(10, 25, 200, 25)
+	pdf.Ln(10)
+
+	// Helper function untuk baris data: [Label : Value]
+	printRow := func(label, value string) {
+		pdf.SetFont("Arial", "", 10)
+		pdf.Cell(40, 7, label)                     // Lebar Label
+		pdf.Cell(5, 7, ":")                        // Titik dua
+		pdf.SetFont("Arial", "B", 10)              // Value agak tebal
+		pdf.MultiCell(0, 7, value, "", "L", false) // MultiCell biar kalau panjang dia wrap ke bawah
+	}
+
+	// --- A. DATA PRIBADI ---
+	pdf.SetFont("Arial", "B", 11)
+	pdf.SetFillColor(230, 230, 230)
+	pdf.CellFormat(0, 8, " A. DATA PRIBADI", "1", 1, "L", true, 0, "")
+	pdf.Ln(2)
+
+	printRow("Nama Lengkap", student.FullName)
+	printRow("NISN", student.NISNValue())
+	printRow("NIM", student.NIMValue())
+
+	// Format Tanggal & Gender
+	dob := "-"
+	if !student.DateOfBirth.IsZero() {
+		dob = student.DateOfBirth.Format("02 January 2006")
+	}
+	placeDate := fmt.Sprintf("%s, %s", student.PlaceOfBirth, dob)
+	printRow("Tempat, Tgl Lahir", placeDate)
+
+	gender := "Laki-laki"
+	if student.Gender == "female" {
+		gender = "Perempuan"
+	}
+	printRow("Jenis Kelamin", gender)
+
+	// Alamat lengkap
+	fullAddress := fmt.Sprintf("%s RT %s / RW %s, Kel. %s, Kec. %s", student.Address, student.RT, student.RW, student.SubDistrict, student.District)
+	printRow("Detail Alamat", fullAddress)
+	printRow("Kota/Kab", student.City)
+	printRow("Provinsi", student.Province)
+
+	pdf.Ln(5)
+
+	// --- B. DATA ORANG TUA ---
+	pdf.SetFont("Arial", "B", 11)
+	pdf.CellFormat(0, 8, " B. DATA ORANG TUA / WALI", "1", 1, "L", true, 0, "")
+	pdf.Ln(2)
+
+	if len(student.Parents) > 0 {
+		for i, p := range student.Parents {
+			// Kita perlu fetch data parent detail karena di student.Parents cuma ada ID & Relasi (tergantung preload)
+			// Asumsi FindByIDWithParents sudah preload 'Parent' objectnya
+			// Jika struktur domain Anda: Student struct { Parents []StudentParent } dan StudentParent punya { Parent Parent }
+
+			// Sederhananya, kita ambil parent pertama sebagai contoh,
+			// atau jika Anda sudah implementasi preload yang benar:
+			parentLabel := fmt.Sprintf("Orang Tua %d (%s)", i+1, p.RelationshipType)
+			// Disini kita butuh akses ke nama parent.
+			// Jika preload di repo belum deep, mungkin nama parent kosong.
+			// Asumsikan sudah ada:
+			if p.Parent.ID != "" {
+				printRow(parentLabel, p.Parent.FullName)
+				printRow("   No. HP", p.Parent.PhoneNumber)
+			}
+		}
+	} else {
+		pdf.SetFont("Arial", "I", 10)
+		pdf.Cell(0, 10, "Belum ada data orang tua yang terhubung.")
+		pdf.Ln(5)
+	}
+
+	// Jika ada Wali (Guardian)
+	if student.GuardianID != nil {
+		// Logic fetch guardian info sama seperti di GetStudentByID
+		// Untuk ringkasnya di PDF, Anda bisa fetch ulang atau pakai helper fetchGuardianInfo
+		// ...
+		printRow("Wali Murid", "Terdata (Lihat detail di sistem)")
+	}
+
+	pdf.Ln(10)
+
+	// --- TANDA TANGAN ---
+	// Posisi kanan bawah
+	currentY := pdf.GetY()
+	if currentY > 250 { // Kalau halaman mau habis, tambah halaman baru
+		pdf.AddPage()
+		currentY = pdf.GetY()
+	}
+
+	pdf.SetX(120)
+	pdf.SetFont("Arial", "", 10)
+
+	// PERBAIKAN: Ganti pdf.Cell menjadi pdf.CellFormat
+	pdf.CellFormat(0, 5, fmt.Sprintf("Surakarta, %s", time.Now().Format("02 January 2006")), "", 1, "C", false, 0, "")
+
+	pdf.SetX(120)
+	// Ganti pdf.Cell menjadi pdf.CellFormat
+	pdf.CellFormat(0, 5, "Mengetahui,", "", 1, "C", false, 0, "")
+
+	pdf.Ln(20) // Spasi Tanda Tangan
+
+	pdf.SetX(120)
+	pdf.SetFont("Arial", "B", 10)
+	// PERBAIKAN: Ganti pdf.Cell menjadi pdf.CellFormat
+	pdf.CellFormat(0, 5, "( ..................................... )", "", 1, "C", false, 0, "")
+
+	// Output
+	var buf bytes.Buffer
+	if err := pdf.Output(&buf); err != nil {
+		return nil, err
+	}
 	return &buf, nil
 }

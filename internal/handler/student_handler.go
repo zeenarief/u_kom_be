@@ -262,3 +262,23 @@ func (h *StudentHandler) ExportPDF(c *gin.Context) {
 
 	c.Data(200, "application/pdf", buffer.Bytes())
 }
+
+func (h *StudentHandler) ExportStudentBiodata(c *gin.Context) {
+	id := c.Param("id") // Ambil ID dari URL
+
+	buffer, err := h.studentService.ExportStudentBiodata(id)
+	if err != nil {
+		if err.Error() == "student not found" {
+			NotFoundError(c, "Student not found")
+		} else {
+			InternalServerError(c, "Failed to generate PDF")
+		}
+		return
+	}
+
+	filename := fmt.Sprintf("biodata_%s.pdf", id)
+
+	c.Header("Content-Disposition", "attachment; filename="+filename)
+	c.Header("Content-Type", "application/pdf")
+	c.Data(200, "application/pdf", buffer.Bytes())
+}

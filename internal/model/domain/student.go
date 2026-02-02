@@ -12,8 +12,8 @@ type Student struct {
 	FullName     string    `gorm:"type:varchar(100);not null" json:"full_name"`
 	NoKK         string    `gorm:"type:text" json:"no_kk,omitempty"` // akan dienkripsi
 	NIK          string    `gorm:"type:text" json:"nik,omitempty"`   // akan dienkripsi
-	NISN         string    `gorm:"type:varchar(20);uniqueIndex" json:"nisn"`
-	NIM          string    `gorm:"type:varchar(20);uniqueIndex" json:"nim"`
+	NISN         *string   `gorm:"type:varchar(20);uniqueIndex" json:"nisn"`
+	NIM          *string   `gorm:"type:varchar(20);uniqueIndex" json:"nim"`
 	Gender       string    `gorm:"type:varchar(10)" json:"gender"`
 	PlaceOfBirth string    `gorm:"type:varchar(100)" json:"place_of_birth"`
 	DateOfBirth  time.Time `gorm:"type:date" json:"date_of_birth"`
@@ -44,4 +44,18 @@ func (s *Student) BeforeCreate(tx *gorm.DB) (err error) {
 		s.ID = utils.GenerateUUID()
 	}
 	return
+}
+
+func (s *Student) NISNValue() string {
+	if s.NISN == nil {
+		return "-"
+	}
+	return *s.NISN
+}
+
+func (s *Student) NIMValue() string {
+	if s.NIM == nil {
+		return "-"
+	}
+	return *s.NIM
 }

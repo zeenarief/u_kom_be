@@ -4,12 +4,12 @@ import "time"
 
 // StudentListResponse adalah DTO untuk tampilan list (ringkas)
 type StudentListResponse struct {
-	ID       string `json:"id"`
-	FullName string `json:"full_name"`
-	NISN     string `json:"nisn"`
-	NIM      string `json:"nim"`
-	Gender   string `json:"gender"`
-	City     string `json:"city"`
+	ID       string  `json:"id"`
+	FullName string  `json:"full_name"`
+	NISN     *string `json:"nisn"`
+	NIM      *string `json:"nim"`
+	Gender   string  `json:"gender"`
+	City     string  `json:"city"`
 }
 
 // ParentRelationshipResponse adalah DTO untuk menampilkan relasi orang tua
@@ -37,8 +37,8 @@ type StudentDetailResponse struct {
 	FullName     string    `json:"full_name"`
 	NoKK         string    `json:"no_kk,omitempty"` // Akan berisi plaintext
 	NIK          string    `json:"nik,omitempty"`   // Akan berisi plaintext
-	NISN         string    `json:"nisn"`
-	NIM          string    `json:"nim"`
+	NISN         *string   `json:"nisn"`
+	NIM          *string   `json:"nim"`
 	Gender       string    `json:"gender"`
 	PlaceOfBirth string    `json:"place_of_birth"`
 	DateOfBirth  time.Time `json:"date_of_birth"`
