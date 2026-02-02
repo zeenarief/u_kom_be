@@ -18,18 +18,19 @@ import (
 
 // Server holds the application dependencies
 type Server struct {
-	Config            *config.Config
-	Router            *gin.Engine
-	UserHandler       *handler.UserHandler
-	AuthHandler       *handler.AuthHandler
-	RoleHandler       *handler.RoleHandler
-	PermissionHandler *handler.PermissionHandler
-	StudentHandler    *handler.StudentHandler
-	ParentHandler     *handler.ParentHandler
-	GuardianHandler   *handler.GuardianHandler
-	EmployeeHandler   *handler.EmployeeHandler
-	DashboardHandler  *handler.DashboardHandler
-	AuthService       service.AuthService
+	Config              *config.Config
+	Router              *gin.Engine
+	UserHandler         *handler.UserHandler
+	AuthHandler         *handler.AuthHandler
+	RoleHandler         *handler.RoleHandler
+	PermissionHandler   *handler.PermissionHandler
+	StudentHandler      *handler.StudentHandler
+	ParentHandler       *handler.ParentHandler
+	GuardianHandler     *handler.GuardianHandler
+	EmployeeHandler     *handler.EmployeeHandler
+	DashboardHandler    *handler.DashboardHandler
+	AcademicYearHandler *handler.AcademicYearHandler
+	AuthService         service.AuthService
 }
 
 // NewServer creates a new server instance with all dependencies
@@ -60,6 +61,7 @@ func NewServer() *Server {
 	guardianRepo := repository.NewGuardianRepository(db)
 	employeeRepo := repository.NewEmployeeRepository(db)
 	dashboardRepo := repository.NewDashboardRepository(db)
+	academicYearRepo := repository.NewAcademicYearRepository(db)
 
 	// Initialize utils
 	encryptionUtil, err := utils.NewEncryptionUtil(cfg.EncryptionKey)
@@ -111,6 +113,7 @@ func NewServer() *Server {
 		studentConverter,
 	)
 	dashboardService := service.NewDashboardService(dashboardRepo)
+	academicYearService := service.NewAcademicYearService(academicYearRepo, db)
 
 	// Initialize handlers
 	userHandler := handler.NewUserHandler(userService)
@@ -122,23 +125,25 @@ func NewServer() *Server {
 	guardianHandler := handler.NewGuardianHandler(guardianService)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	dashboardHandler := handler.NewDashboardHandler(dashboardService)
+	academicYearHandler := handler.NewAcademicYearHandler(academicYearService)
 
 	// Setup router with middleware
 	router := setupRouter(cfg, authService)
 
 	return &Server{
-		Config:            cfg,
-		Router:            router,
-		UserHandler:       userHandler,
-		AuthHandler:       authHandler,
-		RoleHandler:       roleHandler,
-		PermissionHandler: permissionHandler,
-		StudentHandler:    studentHandler,
-		ParentHandler:     parentHandler,
-		GuardianHandler:   guardianHandler,
-		EmployeeHandler:   employeeHandler,
-		DashboardHandler:  dashboardHandler,
-		AuthService:       authService,
+		Config:              cfg,
+		Router:              router,
+		UserHandler:         userHandler,
+		AuthHandler:         authHandler,
+		RoleHandler:         roleHandler,
+		PermissionHandler:   permissionHandler,
+		StudentHandler:      studentHandler,
+		ParentHandler:       parentHandler,
+		GuardianHandler:     guardianHandler,
+		EmployeeHandler:     employeeHandler,
+		DashboardHandler:    dashboardHandler,
+		AcademicYearHandler: academicYearHandler,
+		AuthService:         authService,
 	}
 }
 
@@ -173,6 +178,7 @@ func (s *Server) Start() error {
 		s.GuardianHandler,
 		s.EmployeeHandler,
 		s.DashboardHandler,
+		s.AcademicYearHandler,
 	)
 
 	// Start server

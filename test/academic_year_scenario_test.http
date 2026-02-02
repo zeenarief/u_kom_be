@@ -1,0 +1,112 @@
+### Konfigurasi Global
+@baseUrl = http://localhost:8080/api/v1
+@contentType = application/json
+@adminEmail = zainal@sekolah.sch.id
+@adminPassword = PasswordSangatKuat123!
+
+### ========================================================================
+### LANGKAH 0: LOGIN TERLEBIH DAHULU (ADMIN)
+### ========================================================================
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+> {%
+    // Simpan token ke variabel global
+    client.global.set("authToken", response.body.data.access_token);
+%}
+
+### ========================================================================
+### LANGKAH 1: CREATE ACADEMIC YEAR PERTAMA (GANJIL)
+### Harapan: Terbuat dengan status default 'INACTIVE'
+### ========================================================================
+POST {{baseUrl}}/academic-years
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "2024/2025 Ganjil",
+  "start_date": "2024-07-15",
+  "end_date": "2024-12-20"
+}
+
+> {%
+    client.global.set("yearGanjilID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 2: CREATE ACADEMIC YEAR KEDUA (GENAP)
+### Harapan: Terbuat dengan status default 'INACTIVE'
+### ========================================================================
+POST {{baseUrl}}/academic-years
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "2024/2025 Genap",
+  "start_date": "2025-01-06",
+  "end_date": "2025-06-20"
+}
+
+> {%
+    client.global.set("yearGenapID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 3: LIHAT DAFTAR TAHUN AJARAN
+### Harapan: Ada 2 data, keduanya status INACTIVE
+### ========================================================================
+GET {{baseUrl}}/academic-years
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 4: UPDATE TAHUN AJARAN (EDIT DATA)
+### Mengubah tanggal selesai semester Ganjil
+### ========================================================================
+PUT {{baseUrl}}/academic-years/{{yearGanjilID}}
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "end_date": "2024-12-31"
+}
+
+### ========================================================================
+### LANGKAH 5: AKTIFKAN TAHUN AJARAN GANJIL
+### Harapan: Status Ganjil menjadi ACTIVE
+### ========================================================================
+PATCH {{baseUrl}}/academic-years/{{yearGanjilID}}/activate
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 6: VERIFIKASI STATUS (CEK GANJIL AKTIF)
+### ========================================================================
+GET {{baseUrl}}/academic-years/{{yearGanjilID}}
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 7: SWITCH ACTIVE (AKTIFKAN GENAP) - TEST LOGIC UTAMA
+### Harapan:
+### 1. Tahun Genap menjadi ACTIVE
+### 2. Tahun Ganjil OTOMATIS menjadi INACTIVE
+### ========================================================================
+PATCH {{baseUrl}}/academic-years/{{yearGenapID}}/activate
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 8: VERIFIKASI PERPINDAHAN STATUS
+### Cek list lagi untuk memastikan hanya ada 1 ACTIVE
+### ========================================================================
+GET {{baseUrl}}/academic-years
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 9: DELETE TAHUN AJARAN (YANG INACTIVE)
+### Menghapus tahun ganjil yang sudah tidak aktif
+### ========================================================================
+DELETE {{baseUrl}}/academic-years/{{yearGanjilID}}
+Authorization: Bearer {{authToken}}

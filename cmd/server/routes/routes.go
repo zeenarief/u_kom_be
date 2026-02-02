@@ -21,6 +21,7 @@ func SetupRoutes(
 	guardianHandler *handler.GuardianHandler,
 	employeeHandler *handler.EmployeeHandler,
 	dashboardHandler *handler.DashboardHandler,
+	academicYearHandler *handler.AcademicYearHandler,
 ) {
 	// API v1 group
 	apiV1 := router.Group("/api/v1")
@@ -35,6 +36,7 @@ func SetupRoutes(
 	RegisterGuardianRoutes(apiV1, guardianHandler, authService)
 	RegisterEmployeeRoutes(apiV1, employeeHandler, authService)
 	RegisterDashboardRoutes(apiV1, dashboardHandler, authService)
+	RegisterAcademicYearRoutes(apiV1, academicYearHandler, authService)
 
 	// Health check route
 	apiV1.GET("/health", healthCheck)

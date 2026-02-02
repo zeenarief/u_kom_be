@@ -86,6 +86,9 @@ func seedPermissions(db *gorm.DB) error {
 		{Name: "employees.update", Description: "Update employee data"},
 		{Name: "employees.delete", Description: "Delete employee"},
 		{Name: "employees.manage_account", Description: "Link or unlink employee user account"},
+
+		// ===== Academic Year =====
+		{Name: "academic_years.manage", Description: "Manage academic years data"},
 	}
 
 	for _, permission := range permissions {
