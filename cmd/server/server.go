@@ -30,6 +30,7 @@ type Server struct {
 	EmployeeHandler     *handler.EmployeeHandler
 	DashboardHandler    *handler.DashboardHandler
 	AcademicYearHandler *handler.AcademicYearHandler
+	ClassroomHandler    *handler.ClassroomHandler
 	AuthService         service.AuthService
 }
 
@@ -62,6 +63,7 @@ func NewServer() *Server {
 	employeeRepo := repository.NewEmployeeRepository(db)
 	dashboardRepo := repository.NewDashboardRepository(db)
 	academicYearRepo := repository.NewAcademicYearRepository(db)
+	classroomRepo := repository.NewClassroomRepository(db)
 
 	// Initialize utils
 	encryptionUtil, err := utils.NewEncryptionUtil(cfg.EncryptionKey)
@@ -114,6 +116,13 @@ func NewServer() *Server {
 	)
 	dashboardService := service.NewDashboardService(dashboardRepo)
 	academicYearService := service.NewAcademicYearService(academicYearRepo, db)
+	classroomService := service.NewClassroomService(
+		classroomRepo,
+		academicYearRepo,
+		employeeRepo,
+		studentRepo,
+		db,
+	)
 
 	// Initialize handlers
 	userHandler := handler.NewUserHandler(userService)
@@ -126,6 +135,7 @@ func NewServer() *Server {
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	dashboardHandler := handler.NewDashboardHandler(dashboardService)
 	academicYearHandler := handler.NewAcademicYearHandler(academicYearService)
+	classroomHandler := handler.NewClassroomHandler(classroomService)
 
 	// Setup router with middleware
 	router := setupRouter(cfg, authService)
@@ -143,6 +153,7 @@ func NewServer() *Server {
 		EmployeeHandler:     employeeHandler,
 		DashboardHandler:    dashboardHandler,
 		AcademicYearHandler: academicYearHandler,
+		ClassroomHandler:    classroomHandler,
 		AuthService:         authService,
 	}
 }
@@ -179,6 +190,7 @@ func (s *Server) Start() error {
 		s.EmployeeHandler,
 		s.DashboardHandler,
 		s.AcademicYearHandler,
+		s.ClassroomHandler,
 	)
 
 	// Start server

@@ -1,0 +1,181 @@
+### Konfigurasi Global
+@baseUrl = http://localhost:8080/api/v1
+@contentType = application/json
+@adminEmail = zainal@sekolah.sch.id
+@adminPassword = PasswordSangatKuat123!
+
+### ========================================================================
+### LANGKAH 0: LOGIN ADMIN
+### ========================================================================
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+> {%
+    client.global.set("authToken", response.body.data.access_token);
+%}
+
+### ========================================================================
+### LANGKAH 1: PERSIAPAN - BUAT TAHUN AJARAN BARU
+### Kita butuh ID Tahun Ajaran untuk membuat kelas
+### ========================================================================
+POST {{baseUrl}}/academic-years
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "2025/2026 Ganjil (Test Class)",
+  "start_date": "2025-07-15",
+  "end_date": "2025-12-20"
+}
+
+> {%
+    client.global.set("ayID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 2: PERSIAPAN - BUAT GURU (CALON WALI KELAS)
+### ========================================================================
+POST {{baseUrl}}/employees
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "full_name": "Budi Wali Kelas, S.Pd",
+  "nip": "198001012025011001",
+  "job_title": "Guru Matematika",
+  "employment_status": "PNS",
+  "gender": "male",
+  "address": "Jl. Pendidikan No. 1"
+}
+
+> {%
+    client.global.set("teacherID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 3: PERSIAPAN - BUAT 2 SISWA (CALON ANGGOTA KELAS)
+### ========================================================================
+# Siswa 1
+POST {{baseUrl}}/students
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "full_name": "Siswa Satu",
+  "nisn": "9999111101",
+  "gender": "male",
+  "place_of_birth": "Jakarta",
+  "date_of_birth": "2010-05-20T00:00:00Z",
+  "address": "Rumah Siswa 1"
+}
+
+> {%
+    client.global.set("student1ID", response.body.data.id);
+%}
+
+### Siswa 2
+POST {{baseUrl}}/students
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "full_name": "Siswa Dua",
+  "nisn": "9999111102",
+  "gender": "female",
+  "place_of_birth": "Bandung",
+  "date_of_birth": "2010-06-21T00:00:00Z",
+  "address": "Rumah Siswa 2"
+}
+
+> {%
+    client.global.set("student2ID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 4: CREATE CLASSROOM (ROMBEL)
+### Menghubungkan Tahun Ajaran dan Wali Kelas
+### ========================================================================
+POST {{baseUrl}}/classrooms
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "academic_year_id": "{{ayID}}",
+  "homeroom_teacher_id": "{{teacherID}}",
+  "name": "X-IPA-Unggulan",
+  "level": "10",
+  "major": "IPA",
+  "description": "Kelas khusus olimpiade"
+}
+
+> {%
+    client.global.set("classID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 5: GET ALL CLASSROOMS
+### Filter berdasarkan Tahun Ajaran
+### ========================================================================
+GET {{baseUrl}}/classrooms?academic_year_id={{ayID}}
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 6: UPDATE CLASSROOM
+### Mengubah Nama Kelas
+### ========================================================================
+PUT {{baseUrl}}/classrooms/{{classID}}
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "X-Sains-1 (Updated)",
+  "description": "Nama kelas berubah sesuai kurikulum baru"
+}
+
+### ========================================================================
+### LANGKAH 7: ADD STUDENTS TO CLASS (BULK)
+### Memasukkan Siswa 1 dan Siswa 2 ke dalam Kelas
+### ========================================================================
+POST {{baseUrl}}/classrooms/{{classID}}/students
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "student_ids": [
+    "{{student1ID}}",
+    "{{student2ID}}"
+  ]
+}
+
+### ========================================================================
+### LANGKAH 8: GET CLASSROOM DETAIL (VERIFIKASI ANGGOTA)
+### Harapan: Field 'students' berisi 2 data siswa
+### ========================================================================
+GET {{baseUrl}}/classrooms/{{classID}}
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 9: REMOVE STUDENT FROM CLASS
+### Mengeluarkan Siswa 1 dari kelas (misal: pindah sekolah/kelas)
+### ========================================================================
+DELETE {{baseUrl}}/classrooms/{{classID}}/students/{{student1ID}}
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 10: GET DETAIL LAGI (VERIFIKASI PENGHAPUSAN)
+### Harapan: Siswa tinggal 1
+### ========================================================================
+GET {{baseUrl}}/classrooms/{{classID}}
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 11: DELETE CLASSROOM
+### Membersihkan data test
+### ========================================================================
+DELETE {{baseUrl}}/classrooms/{{classID}}
+Authorization: Bearer {{authToken}}
