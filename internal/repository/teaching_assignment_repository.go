@@ -8,6 +8,7 @@ import (
 
 type TeachingAssignmentRepository interface {
 	Create(assignment *domain.TeachingAssignment) error
+	FindByID(id string) (*domain.TeachingAssignment, error)
 	FindByClassroomID(classroomID string) ([]domain.TeachingAssignment, error)
 	FindByTeacherID(teacherID string) ([]domain.TeachingAssignment, error)
 	FindOne(classroomID, subjectID string) (*domain.TeachingAssignment, error)
@@ -24,6 +25,16 @@ func NewTeachingAssignmentRepository(db *gorm.DB) TeachingAssignmentRepository {
 
 func (r *teachingAssignmentRepository) Create(assignment *domain.TeachingAssignment) error {
 	return r.db.Create(assignment).Error
+}
+
+func (r *teachingAssignmentRepository) FindByID(id string) (*domain.TeachingAssignment, error) {
+	var assignment domain.TeachingAssignment
+	err := r.db.Preload("Classroom").Preload("Subject").Preload("Teacher").
+		First(&assignment, "id = ?", id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &assignment, nil
 }
 
 func (r *teachingAssignmentRepository) FindByClassroomID(classroomID string) ([]domain.TeachingAssignment, error) {

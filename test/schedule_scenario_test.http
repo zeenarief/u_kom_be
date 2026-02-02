@@ -1,0 +1,239 @@
+### Konfigurasi Global
+@baseUrl = http://localhost:8080/api/v1
+@contentType = application/json
+@adminEmail = zainal@sekolah.sch.id
+@adminPassword = PasswordSangatKuat123!
+
+### ========================================================================
+### LANGKAH 0: LOGIN ADMIN
+### ========================================================================
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+> {%
+    client.global.set("authToken", response.body.data.access_token);
+%}
+
+### ========================================================================
+### PERSIAPAN DATA (SETUP)
+### Kita butuh 2 Kelas, 2 Guru, 2 Mapel untuk simulasi bentrok
+### ========================================================================
+
+### 1. Buat Tahun Ajaran
+POST {{baseUrl}}/academic-years
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "2025/2026 Genap (Schedule Test)",
+  "start_date": "2026-01-01",
+  "end_date": "2026-06-20"
+}
+
+> {% client.global.set("ayID", response.body.data.id); %}
+
+### 2. Buat Kelas A (X-IPA-1)
+POST {{baseUrl}}/classrooms
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "academic_year_id": "{{ayID}}",
+  "name": "X-IPA-1",
+  "level": "10",
+  "major": "IPA"
+}
+
+> {% client.global.set("classID_A", response.body.data.id); %}
+
+### 3. Buat Kelas B (X-IPA-2)
+POST {{baseUrl}}/classrooms
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "academic_year_id": "{{ayID}}",
+  "name": "X-IPA-2",
+  "level": "10",
+  "major": "IPA"
+}
+
+> {% client.global.set("classID_B", response.body.data.id); %}
+
+### 4. Buat Guru 1 (Einstein - Matematika)
+POST {{baseUrl}}/employees
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "full_name": "Albert Einstein",
+  "nip": "19990101",
+  "job_title": "Guru MTK",
+  "employment_status": "Tetap"
+}
+
+> {% client.global.set("teacherID_1", response.body.data.id); %}
+
+### 5. Buat Guru 2 (Newton - Fisika)
+POST {{baseUrl}}/employees
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "full_name": "Isaac Newton",
+  "nip": "19990102",
+  "job_title": "Guru Fisika",
+  "employment_status": "Tetap"
+}
+
+> {% client.global.set("teacherID_2", response.body.data.id); %}
+
+### 6. Buat Mapel Matematika
+POST {{baseUrl}}/subjects
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "code": "MTK-SCH",
+  "name": "Matematika Jadwal",
+  "type": "Umum"
+}
+
+> {% client.global.set("subjectID_MTK", response.body.data.id); %}
+
+### 7. Buat Mapel Fisika
+POST {{baseUrl}}/subjects
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "code": "FIS-SCH",
+  "name": "Fisika Jadwal",
+  "type": "Umum"
+}
+
+> {% client.global.set("subjectID_FIS", response.body.data.id); %}
+
+### ========================================================================
+### ASSIGNMENT (PENUGASAN GURU)
+### ========================================================================
+
+### 8. Assign Einstein (MTK) ke Kelas A
+POST {{baseUrl}}/assignments
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "classroom_id": "{{classID_A}}",
+  "subject_id": "{{subjectID_MTK}}",
+  "teacher_id": "{{teacherID_1}}"
+}
+
+> {% client.global.set("assignID_A_MTK", response.body.data.id); %}
+
+### 9. Assign Newton (Fisika) ke Kelas A
+POST {{baseUrl}}/assignments
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "classroom_id": "{{classID_A}}",
+  "subject_id": "{{subjectID_FIS}}",
+  "teacher_id": "{{teacherID_2}}"
+}
+
+> {% client.global.set("assignID_A_FIS", response.body.data.id); %}
+
+### 10. Assign Einstein (MTK) ke Kelas B (Penting untuk test bentrok guru)
+POST {{baseUrl}}/assignments
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "classroom_id": "{{classID_B}}",
+  "subject_id": "{{subjectID_MTK}}",
+  "teacher_id": "{{teacherID_1}}"
+}
+
+> {% client.global.set("assignID_B_MTK", response.body.data.id); %}
+
+
+### ========================================================================
+### TEST SKENARIO JADWAL (CORE TEST)
+### ========================================================================
+
+### 11. HAPPY PATH: Buat Jadwal MTK di Kelas A (Senin 07:00 - 08:30)
+### Harapan: 201 Created
+POST {{baseUrl}}/schedules
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "teaching_assignment_id": "{{assignID_A_MTK}}",
+  "day_of_week": 1,
+  "start_time": "07:00",
+  "end_time": "08:30"
+}
+
+> {% client.global.set("scheduleID_1", response.body.data.id); %}
+
+### 12. TEST BENTROK KELAS: Buat Jadwal Fisika di Kelas A (Senin 08:00 - 09:30)
+### Skenario: Jam 08:00 bertabrakan dengan MTK (07:00-08:30) di kelas yang sama.
+### Harapan: 400 Bad Request ("classroom is occupied")
+POST {{baseUrl}}/schedules
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "teaching_assignment_id": "{{assignID_A_FIS}}",
+  "day_of_week": 1,
+  "start_time": "08:00",
+  "end_time": "09:30"
+}
+
+### 13. TEST BENTROK GURU: Buat Jadwal MTK di Kelas B (Senin 07:00 - 08:30)
+### Skenario: Einstein (Guru MTK) sudah mengajar di Kelas A pada jam segitu.
+### Harapan: 400 Bad Request ("teacher is teaching in another class")
+POST {{baseUrl}}/schedules
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "teaching_assignment_id": "{{assignID_B_MTK}}",
+  "day_of_week": 1,
+  "start_time": "07:00",
+  "end_time": "08:30"
+}
+
+### 14. HAPPY PATH 2: Buat Jadwal Fisika di Kelas A (Senin 08:30 - 10:00)
+### Skenario: Dimulai tepat setelah MTK selesai.
+### Harapan: 201 Created
+POST {{baseUrl}}/schedules
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "teaching_assignment_id": "{{assignID_A_FIS}}",
+  "day_of_week": 1,
+  "start_time": "08:30",
+  "end_time": "10:00"
+}
+
+### 15. GET Schedules By Class
+### Harapan: Muncul 2 jadwal (MTK & Fisika) berurutan
+GET {{baseUrl}}/schedules/by-class?classroom_id={{classID_A}}
+Authorization: Bearer {{authToken}}
+
+### 16. GET Schedules By Teacher (Einstein)
+### Harapan: Muncul 1 jadwal (di Kelas A)
+GET {{baseUrl}}/schedules/by-teacher?teacher_id={{teacherID_1}}
+Authorization: Bearer {{authToken}}
+
+### 17. DELETE Schedule
+DELETE {{baseUrl}}/schedules/{{scheduleID_1}}
+Authorization: Bearer {{authToken}}

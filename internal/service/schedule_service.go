@@ -1,0 +1,130 @@
+package service
+
+import (
+	"errors"
+	"u_kom_be/internal/model/domain"
+	"u_kom_be/internal/model/request"
+	"u_kom_be/internal/model/response"
+	"u_kom_be/internal/repository"
+)
+
+type ScheduleService interface {
+	Create(req request.ScheduleCreateRequest) (*response.ScheduleResponse, error)
+	GetByClassroom(classroomID string) ([]response.ScheduleResponse, error)
+	GetByTeacher(teacherID string) ([]response.ScheduleResponse, error)
+	Delete(id string) error
+}
+
+type scheduleService struct {
+	repo                   repository.ScheduleRepository
+	teachingAssignmentRepo repository.TeachingAssignmentRepository // Butuh ini untuk cek TeacherID & ClassID
+}
+
+func NewScheduleService(
+	repo repository.ScheduleRepository,
+	taRepo repository.TeachingAssignmentRepository,
+) ScheduleService {
+	return &scheduleService{repo: repo, teachingAssignmentRepo: taRepo}
+}
+
+// Helper: Convert int day to string indonesian
+func getDayName(day int) string {
+	days := []string{"", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"}
+	if day >= 1 && day <= 7 {
+		return days[day]
+	}
+	return "Unknown"
+}
+
+func (s *scheduleService) toResponse(d *domain.Schedule) response.ScheduleResponse {
+	return response.ScheduleResponse{
+		ID:            d.ID,
+		DayOfWeek:     d.DayOfWeek,
+		DayName:       getDayName(d.DayOfWeek),
+		StartTime:     d.StartTime,
+		EndTime:       d.EndTime,
+		SubjectName:   d.TeachingAssignment.Subject.Name,
+		TeacherName:   d.TeachingAssignment.Teacher.FullName,
+		ClassroomName: d.TeachingAssignment.Classroom.Name,
+	}
+}
+
+func (s *scheduleService) Create(req request.ScheduleCreateRequest) (*response.ScheduleResponse, error) {
+	// 1. Ambil detail Assignment (untuk tahu Guru & Kelas siapa)
+	// Kita reuse FindOne dari repo assignment (tapi repo aslinya butuh classroom_id & subject_id)
+	// Jadi lebih aman kita fetch by ID assignment-nya langsung.
+	// *Catatan: Kita perlu tambahkan FindByID di TeachingAssignmentRepository dulu (lihat bawah)*
+	assignment, err := s.teachingAssignmentRepo.FindByID(req.TeachingAssignmentID)
+	if err != nil || assignment == nil {
+		return nil, errors.New("teaching assignment not found")
+	}
+
+	// 2. Validasi Logic: EndTime harus > StartTime
+	if req.EndTime <= req.StartTime {
+		return nil, errors.New("end time must be greater than start time")
+	}
+
+	// 3. Cek Bentrok KELAS (Apakah kelas ini sedang belajar mapel lain?)
+	conflictClass, err := s.repo.CheckClassroomConflict(assignment.ClassroomID, req.DayOfWeek, req.StartTime, req.EndTime)
+	if err != nil {
+		return nil, err
+	}
+	if conflictClass {
+		return nil, errors.New("conflict: classroom is occupied at this time")
+	}
+
+	// 4. Cek Bentrok GURU (Apakah guru ini sedang mengajar di kelas lain?)
+	conflictTeacher, err := s.repo.CheckTeacherConflict(assignment.TeacherID, req.DayOfWeek, req.StartTime, req.EndTime)
+	if err != nil {
+		return nil, err
+	}
+	if conflictTeacher {
+		return nil, errors.New("conflict: teacher is teaching in another class at this time")
+	}
+
+	// 5. Simpan
+	schedule := &domain.Schedule{
+		TeachingAssignmentID: req.TeachingAssignmentID,
+		DayOfWeek:            req.DayOfWeek,
+		StartTime:            req.StartTime,
+		EndTime:              req.EndTime,
+	}
+
+	if err := s.repo.Create(schedule); err != nil {
+		return nil, err
+	}
+
+	// Attach relasi manual untuk response
+	schedule.TeachingAssignment = *assignment
+
+	res := s.toResponse(schedule)
+	return &res, nil
+}
+
+func (s *scheduleService) GetByClassroom(classroomID string) ([]response.ScheduleResponse, error) {
+	data, err := s.repo.FindByClassroomID(classroomID)
+	if err != nil {
+		return nil, err
+	}
+	var res []response.ScheduleResponse
+	for _, d := range data {
+		res = append(res, s.toResponse(&d))
+	}
+	return res, nil
+}
+
+func (s *scheduleService) GetByTeacher(teacherID string) ([]response.ScheduleResponse, error) {
+	data, err := s.repo.FindByTeacherID(teacherID)
+	if err != nil {
+		return nil, err
+	}
+	var res []response.ScheduleResponse
+	for _, d := range data {
+		res = append(res, s.toResponse(&d))
+	}
+	return res, nil
+}
+
+func (s *scheduleService) Delete(id string) error {
+	return s.repo.Delete(id)
+}
