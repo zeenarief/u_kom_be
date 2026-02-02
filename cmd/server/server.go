@@ -18,21 +18,22 @@ import (
 
 // Server holds the application dependencies
 type Server struct {
-	Config              *config.Config
-	Router              *gin.Engine
-	UserHandler         *handler.UserHandler
-	AuthHandler         *handler.AuthHandler
-	RoleHandler         *handler.RoleHandler
-	PermissionHandler   *handler.PermissionHandler
-	StudentHandler      *handler.StudentHandler
-	ParentHandler       *handler.ParentHandler
-	GuardianHandler     *handler.GuardianHandler
-	EmployeeHandler     *handler.EmployeeHandler
-	DashboardHandler    *handler.DashboardHandler
-	AcademicYearHandler *handler.AcademicYearHandler
-	ClassroomHandler    *handler.ClassroomHandler
-	SubjectHandler      *handler.SubjectHandler
-	AuthService         service.AuthService
+	Config                    *config.Config
+	Router                    *gin.Engine
+	UserHandler               *handler.UserHandler
+	AuthHandler               *handler.AuthHandler
+	RoleHandler               *handler.RoleHandler
+	PermissionHandler         *handler.PermissionHandler
+	StudentHandler            *handler.StudentHandler
+	ParentHandler             *handler.ParentHandler
+	GuardianHandler           *handler.GuardianHandler
+	EmployeeHandler           *handler.EmployeeHandler
+	DashboardHandler          *handler.DashboardHandler
+	AcademicYearHandler       *handler.AcademicYearHandler
+	ClassroomHandler          *handler.ClassroomHandler
+	SubjectHandler            *handler.SubjectHandler
+	TeachingAssignmentHandler *handler.TeachingAssignmentHandler
+	AuthService               service.AuthService
 }
 
 // NewServer creates a new server instance with all dependencies
@@ -66,6 +67,7 @@ func NewServer() *Server {
 	academicYearRepo := repository.NewAcademicYearRepository(db)
 	classroomRepo := repository.NewClassroomRepository(db)
 	subjectRepo := repository.NewSubjectRepository(db)
+	teachingAssignmentRepo := repository.NewTeachingAssignmentRepository(db)
 
 	// Initialize utils
 	encryptionUtil, err := utils.NewEncryptionUtil(cfg.EncryptionKey)
@@ -126,6 +128,12 @@ func NewServer() *Server {
 		db,
 	)
 	subjectService := service.NewSubjectService(subjectRepo)
+	teachingAssignmentService := service.NewTeachingAssignmentService(
+		teachingAssignmentRepo,
+		classroomRepo,
+		subjectRepo,
+		employeeRepo,
+	)
 
 	// Initialize handlers
 	userHandler := handler.NewUserHandler(userService)
@@ -140,26 +148,28 @@ func NewServer() *Server {
 	academicYearHandler := handler.NewAcademicYearHandler(academicYearService)
 	classroomHandler := handler.NewClassroomHandler(classroomService)
 	subjectHandler := handler.NewSubjectHandler(subjectService)
+	teachingAssignmentHandler := handler.NewTeachingAssignmentHandler(teachingAssignmentService)
 
 	// Setup router with middleware
 	router := setupRouter(cfg, authService)
 
 	return &Server{
-		Config:              cfg,
-		Router:              router,
-		UserHandler:         userHandler,
-		AuthHandler:         authHandler,
-		RoleHandler:         roleHandler,
-		PermissionHandler:   permissionHandler,
-		StudentHandler:      studentHandler,
-		ParentHandler:       parentHandler,
-		GuardianHandler:     guardianHandler,
-		EmployeeHandler:     employeeHandler,
-		DashboardHandler:    dashboardHandler,
-		AcademicYearHandler: academicYearHandler,
-		ClassroomHandler:    classroomHandler,
-		SubjectHandler:      subjectHandler,
-		AuthService:         authService,
+		Config:                    cfg,
+		Router:                    router,
+		UserHandler:               userHandler,
+		AuthHandler:               authHandler,
+		RoleHandler:               roleHandler,
+		PermissionHandler:         permissionHandler,
+		StudentHandler:            studentHandler,
+		ParentHandler:             parentHandler,
+		GuardianHandler:           guardianHandler,
+		EmployeeHandler:           employeeHandler,
+		DashboardHandler:          dashboardHandler,
+		AcademicYearHandler:       academicYearHandler,
+		ClassroomHandler:          classroomHandler,
+		SubjectHandler:            subjectHandler,
+		TeachingAssignmentHandler: teachingAssignmentHandler,
+		AuthService:               authService,
 	}
 }
 
@@ -197,6 +207,7 @@ func (s *Server) Start() error {
 		s.AcademicYearHandler,
 		s.ClassroomHandler,
 		s.SubjectHandler,
+		s.TeachingAssignmentHandler,
 	)
 
 	// Start server

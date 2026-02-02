@@ -1,0 +1,153 @@
+### Konfigurasi Global
+@baseUrl = http://localhost:8080/api/v1
+@contentType = application/json
+@adminEmail = zainal@sekolah.sch.id
+@adminPassword = PasswordSangatKuat123!
+
+### ========================================================================
+### LANGKAH 0: LOGIN ADMIN
+### ========================================================================
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+> {%
+    client.global.set("authToken", response.body.data.access_token);
+%}
+
+### ========================================================================
+### LANGKAH 1: PERSIAPAN - BUAT MAPEL (SUBJECT)
+### ========================================================================
+POST {{baseUrl}}/subjects
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "code": "FIS-10",
+  "name": "Fisika Dasar X",
+  "type": "Muatan Peminatan"
+}
+
+> {%
+    client.global.set("subjectID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 2: PERSIAPAN - BUAT TAHUN AJARAN
+### ========================================================================
+POST {{baseUrl}}/academic-years
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "2025/2026 Ganjil (Assignment Test)",
+  "start_date": "2025-07-15",
+  "end_date": "2025-12-20"
+}
+
+> {%
+    client.global.set("ayID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 3: PERSIAPAN - BUAT GURU (EMPLOYEE)
+### ========================================================================
+POST {{baseUrl}}/employees
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "full_name": "Einstein S.Pd",
+  "nip": "199002022025011005",
+  "job_title": "Guru Fisika",
+  "employment_status": "PNS",
+  "gender": "male",
+  "address": "Jl. Relativitas No. E=mc2"
+}
+
+> {%
+    client.global.set("teacherID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 4: PERSIAPAN - BUAT KELAS (CLASSROOM)
+### ========================================================================
+POST {{baseUrl}}/classrooms
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "academic_year_id": "{{ayID}}",
+  "name": "X-MIPA-1",
+  "level": "10",
+  "major": "MIPA"
+}
+
+> {%
+    client.global.set("classID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 5: CREATE TEACHING ASSIGNMENT (TEST UTAMA)
+### Menugaskan Guru Einstein untuk mengajar Fisika di Kelas X-MIPA-1
+### ========================================================================
+POST {{baseUrl}}/assignments
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "classroom_id": "{{classID}}",
+  "subject_id": "{{subjectID}}",
+  "teacher_id": "{{teacherID}}"
+}
+
+> {%
+    client.global.set("assignmentID", response.body.data.id);
+%}
+
+### ========================================================================
+### LANGKAH 6: TEST DUPLICATE ASSIGNMENT (VALIDASI)
+### Mencoba menugaskan guru lain (atau guru sama) untuk mapel YG SAMA di kelas YG SAMA.
+### Harapan: Error 400 (Conflict)
+### ========================================================================
+POST {{baseUrl}}/assignments
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "classroom_id": "{{classID}}",
+  "subject_id": "{{subjectID}}",
+  "teacher_id": "{{teacherID}}"
+}
+
+### ========================================================================
+### LANGKAH 7: GET ASSIGNMENTS BY CLASSROOM
+### Melihat daftar guru yang mengajar di kelas X-MIPA-1
+### ========================================================================
+GET {{baseUrl}}/assignments/by-class?classroom_id={{classID}}
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 8: GET ASSIGNMENTS BY TEACHER
+### Melihat jadwal mengajar Guru Einstein
+### ========================================================================
+GET {{baseUrl}}/assignments/by-teacher?teacher_id={{teacherID}}
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 9: DELETE ASSIGNMENT
+### Menghapus penugasan
+### ========================================================================
+DELETE {{baseUrl}}/assignments/{{assignmentID}}
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### LANGKAH 10: CLEANUP (OPSIONAL)
+### Menghapus data dummy
+### ========================================================================
+DELETE {{baseUrl}}/classrooms/{{classID}}
+Authorization: Bearer {{authToken}}
