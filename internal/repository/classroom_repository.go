@@ -34,9 +34,10 @@ func (r *classroomRepository) Create(classroom *domain.Classroom) error {
 
 func (r *classroomRepository) FindAll(academicYearID string) ([]domain.Classroom, error) {
 	var classrooms []domain.Classroom
+
+	// Query ini akan otomatis mengisi field TotalStudents di struct domain karena namanya cocok
 	query := r.db.Preload("AcademicYear").Preload("HomeroomTeacher").
-		// Preload count students (Subquery optimization)
-		Select("classrooms.*, (SELECT COUNT(*) FROM student_classrooms WHERE student_classrooms.classroom_id = classrooms.id) as total_students")
+		Select("classrooms.*, (SELECT COUNT(*) FROM student_classrooms WHERE student_classrooms.classroom_id = classrooms.id AND student_classrooms.status = 'ACTIVE') as total_students")
 
 	if academicYearID != "" {
 		query = query.Where("academic_year_id = ?", academicYearID)

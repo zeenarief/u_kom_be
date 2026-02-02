@@ -18,6 +18,8 @@ type Classroom struct {
 	CreatedAt         time.Time `json:"created_at"`
 	UpdatedAt         time.Time `json:"updated_at"`
 
+	TotalStudents int64 `gorm:"->"` // Menampung hasil subquery COUNT
+
 	// Relations
 	AcademicYear    AcademicYear `gorm:"foreignKey:AcademicYearID" json:"academic_year,omitempty"`
 	HomeroomTeacher *Employee    `gorm:"foreignKey:HomeroomTeacherID" json:"homeroom_teacher,omitempty"`

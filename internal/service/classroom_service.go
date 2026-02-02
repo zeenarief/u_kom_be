@@ -48,12 +48,16 @@ func NewClassroomService(
 // Helper untuk mapping response
 func (s *classroomService) toResponse(c *domain.Classroom) *response.ClassroomResponse {
 	teacherName := "-"
+	// Tambahkan variabel teacherID
+	var teacherID *string
+
 	if c.HomeroomTeacher != nil {
 		teacherName = c.HomeroomTeacher.FullName
+		teacherID = &c.HomeroomTeacher.ID // Ambil ID
+	} else if c.HomeroomTeacherID != nil {
+		// Fallback jika preload teacher gagal tapi ID ada
+		teacherID = c.HomeroomTeacherID
 	}
-
-	// Hacky way to get count if not preloaded (usually handled in repo query)
-	// totalStudents := len(c.StudentClassrooms)
 
 	return &response.ClassroomResponse{
 		ID:          c.ID,
@@ -64,9 +68,11 @@ func (s *classroomService) toResponse(c *domain.Classroom) *response.ClassroomRe
 		AcademicYear: response.AcademicYearResponse{
 			ID:   c.AcademicYear.ID,
 			Name: c.AcademicYear.Name,
-			// ... field lain
+			// ... pastikan field lain mappingnya benar
 		},
+		HomeroomTeacherID:   teacherID, // MAP ID DI SINI
 		HomeroomTeacherName: teacherName,
+		TotalStudents:       c.TotalStudents, // AMBIL DARI DOMAIN (Hasil Query Repository)
 		CreatedAt:           c.CreatedAt,
 	}
 }
@@ -148,7 +154,7 @@ func (s *classroomService) FindByID(id string) (*response.ClassroomDetailRespons
 		})
 	}
 
-	baseRes.TotalStudents = len(studentResponses)
+	baseRes.TotalStudents = int64(len(studentResponses))
 
 	return &response.ClassroomDetailResponse{
 		ClassroomResponse: *baseRes,
@@ -176,17 +182,32 @@ func (s *classroomService) Update(id string, req request.ClassroomUpdateRequest)
 	}
 	c.Description = req.Description // Boleh kosong
 
-	// Handle pointer update
+	// Handle pointer update untuk Wali Kelas
 	if req.HomeroomTeacherID != nil {
+		// 1. Validasi: Pastikan Guru ada di DB (kecuali string kosong untuk menghapus)
+		if *req.HomeroomTeacherID != "" {
+			emp, err := s.employeeRepo.FindByID(*req.HomeroomTeacherID)
+			if err != nil || emp == nil {
+				return nil, errors.New("homeroom teacher not found")
+			}
+		}
+
+		// 2. Assign ID Baru
 		c.HomeroomTeacherID = req.HomeroomTeacherID
+
+		// 3. FIX: Kosongkan struct relasi agar GORM mengupdate berdasarkan ID baru
+		c.HomeroomTeacher = nil
 	}
 
 	if err := s.repo.Update(c); err != nil {
 		return nil, err
 	}
 
-	// Load ulang
+	// Load ulang untuk memastikan response mendapatkan data relasi terbaru
 	updated, _ := s.repo.FindByID(id)
+
+	// FIX: Kembalikan 'updated' object, bukan 'c'
+	// (Walaupun kode lama sudah pakai 'updated', pastikan ini konsisten)
 	return s.toResponse(updated), nil
 }
 
