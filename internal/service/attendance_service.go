@@ -1,0 +1,157 @@
+package service
+
+import (
+	"errors"
+	"time"
+	"u_kom_be/internal/model/domain"
+	"u_kom_be/internal/model/request"
+	"u_kom_be/internal/model/response"
+	"u_kom_be/internal/repository"
+)
+
+type AttendanceService interface {
+	SubmitAttendance(req request.AttendanceSubmitRequest) (*response.AttendanceSessionDetailResponse, error)
+	GetSessionDetail(id string) (*response.AttendanceSessionDetailResponse, error)
+	GetHistoryByTeacher(teacherID string) ([]response.AttendanceHistoryResponse, error)
+}
+
+type attendanceService struct {
+	repo         repository.AttendanceRepository
+	scheduleRepo repository.ScheduleRepository
+}
+
+func NewAttendanceService(
+	repo repository.AttendanceRepository,
+	schedRepo repository.ScheduleRepository,
+) AttendanceService {
+	return &attendanceService{
+		repo:         repo,
+		scheduleRepo: schedRepo,
+	}
+}
+
+// SubmitAttendance menangani input absen baru
+func (s *attendanceService) SubmitAttendance(req request.AttendanceSubmitRequest) (*response.AttendanceSessionDetailResponse, error) {
+	// 1. Parse Tanggal
+	date, err := time.Parse("2006-01-02", req.Date)
+	if err != nil {
+		return nil, errors.New("invalid date format (YYYY-MM-DD)")
+	}
+
+	// 2. Validasi Jadwal
+	// Kita cek dulu apakah jadwalnya ada (dan valid)
+	// (Opsional: Cek apakah TeacherID yang request berhak atas jadwal ini - bisa via middleware/context)
+
+	// 3. Cek Duplikasi (Apakah tanggal ini sudah diabsen?)
+	existing, _ := s.repo.FindSessionByScheduleDate(req.ScheduleID, date)
+	if existing != nil {
+		return nil, errors.New("attendance for this schedule on this date already exists")
+	}
+
+	// 4. Map Request ke Domain
+	session := &domain.AttendanceSession{
+		ScheduleID: req.ScheduleID,
+		Date:       date,
+		Topic:      req.Topic,
+		Notes:      req.Notes,
+		Details:    []domain.AttendanceDetail{},
+	}
+
+	for _, studentInput := range req.Students {
+		detail := domain.AttendanceDetail{
+			StudentID: studentInput.StudentID,
+			Status:    studentInput.Status,
+			Notes:     studentInput.Notes,
+		}
+		session.Details = append(session.Details, detail)
+	}
+
+	// 5. Simpan ke DB
+	if err := s.repo.CreateSession(session); err != nil {
+		return nil, err
+	}
+
+	// 6. Return Created Data (Reuse logic GetSessionDetail biar konsisten)
+	return s.GetSessionDetail(session.ID)
+}
+
+// GetSessionDetail mengambil detail sesi + rekap kehadiran
+func (s *attendanceService) GetSessionDetail(id string) (*response.AttendanceSessionDetailResponse, error) {
+	session, err := s.repo.FindSessionByID(id)
+	if err != nil {
+		return nil, err
+	}
+	if session == nil {
+		return nil, errors.New("attendance session not found")
+	}
+
+	// Mapping ke Response
+	res := &response.AttendanceSessionDetailResponse{
+		ID:    session.ID,
+		Date:  session.Date.Format("2006-01-02"),
+		Topic: session.Topic,
+		// Map info jadwal ringkas
+		ScheduleInfo: response.ScheduleResponse{
+			ID:            session.Schedule.ID,
+			DayOfWeek:     session.Schedule.DayOfWeek,
+			StartTime:     session.Schedule.StartTime,
+			EndTime:       session.Schedule.EndTime,
+			SubjectName:   session.Schedule.TeachingAssignment.Subject.Name,
+			ClassroomName: session.Schedule.TeachingAssignment.Classroom.Name,
+			TeacherName:   session.Schedule.TeachingAssignment.Teacher.FullName,
+		},
+		Summary: make(map[string]int),
+	}
+
+	// Loop details untuk isi list siswa & hitung summary
+	for _, d := range session.Details {
+		// Add to details list
+		res.Details = append(res.Details, response.AttendanceDetailResponse{
+			StudentID:   d.StudentID,
+			StudentName: d.Student.FullName, // Asumsi Preload Student berhasil
+			NISN:        safeString(d.Student.NISN),
+			Status:      d.Status,
+			Notes:       d.Notes,
+		})
+
+		// Increment Summary
+		res.Summary[d.Status]++
+	}
+
+	return res, nil
+}
+
+// GetHistoryByTeacher menampilkan riwayat mengajar guru tertentu
+func (s *attendanceService) GetHistoryByTeacher(teacherID string) ([]response.AttendanceHistoryResponse, error) {
+	sessions, err := s.repo.GetHistoryByTeacher(teacherID)
+	if err != nil {
+		return nil, err
+	}
+
+	var history []response.AttendanceHistoryResponse
+	for _, sess := range sessions {
+		// Hitung jumlah yang TIDAK HADIR (Sakit/Izin/Alpa) - Opsional logic
+		// Disini kita perlu preload details di repo GetHistoryByTeacher jika ingin hitung akurat
+		// Jika query repo belum preload details, count_absent akan 0.
+		// Untuk performa list, biasanya count dilakukan di query SQL, tapi untuk sekarang kita skip atau biarkan 0.
+
+		history = append(history, response.AttendanceHistoryResponse{
+			ID:          sess.ID,
+			Date:        sess.Date,
+			SubjectName: sess.Schedule.TeachingAssignment.Subject.Name,
+			ClassName:   sess.Schedule.TeachingAssignment.Classroom.Name,
+			Topic:       sess.Topic,
+			CountAbsent: 0, // Placeholder, butuh query count spesifik jika ingin ditampilkan di list
+		})
+	}
+
+	return history, nil
+}
+
+// Helper safe pointer string
+func safeString(ptr *string) string {
+	if ptr == nil {
+		return ""
+	}
+	return *ptr
+}

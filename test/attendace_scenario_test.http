@@ -1,0 +1,200 @@
+### Konfigurasi Global
+@baseUrl = http://localhost:8080/api/v1
+@contentType = application/json
+@adminEmail = zainal@sekolah.sch.id
+@adminPassword = PasswordSangatKuat123!
+
+### ========================================================================
+### LANGKAH 0: LOGIN ADMIN
+### ========================================================================
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+> {% client.global.set("authToken", response.body.data.access_token); %}
+
+### ========================================================================
+### PART 1: SETUP DATA MASTER & OPERASIONAL (Prasyarat)
+### ========================================================================
+
+### 1. Buat Tahun Ajaran
+POST {{baseUrl}}/academic-years
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "name": "2025/2026 Genap (Attendance Test)",
+  "start_date": "2026-01-01",
+  "end_date": "2026-06-20"
+}
+
+> {% client.global.set("ayID", response.body.data.id); %}
+
+### 2. Buat Guru (Pengajar)
+POST {{baseUrl}}/employees
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "full_name": "Guru Budi (Test Absen)",
+  "nip": "198501012025011009",
+  "job_title": "Guru Biologi",
+  "employment_status": "Tetap"
+}
+
+> {% client.global.set("teacherID", response.body.data.id); %}
+
+### 3. Buat Kelas
+POST {{baseUrl}}/classrooms
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "academic_year_id": "{{ayID}}",
+  "name": "XI-IPA-Absen",
+  "level": "11",
+  "major": "IPA"
+}
+
+> {% client.global.set("classID", response.body.data.id); %}
+
+### 4. Buat Siswa 1 (Si Rajin)
+POST {{baseUrl}}/students
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "full_name": "Siswa Rajin",
+  "nisn": "9991112221",
+  "gender": "male",
+  "date_of_birth": "2006-01-01T00:00:00Z"
+}
+
+> {% client.global.set("student1ID", response.body.data.id); %}
+
+### 5. Buat Siswa 2 (Si Bolos)
+POST {{baseUrl}}/students
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "full_name": "Siswa Bolos",
+  "nisn": "9991112222",
+  "gender": "male",
+  "date_of_birth": "2006-01-01T00:00:00Z"
+}
+
+> {% client.global.set("student2ID", response.body.data.id); %}
+
+### 6. Masukkan Siswa ke Kelas
+POST {{baseUrl}}/classrooms/{{classID}}/students
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "student_ids": ["{{student1ID}}", "{{student2ID}}"]
+}
+
+### 7. Buat Mapel
+POST {{baseUrl}}/subjects
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "code": "BIO-11",
+  "name": "Biologi XI"
+}
+
+> {% client.global.set("subjectID", response.body.data.id); %}
+
+### 8. Assign Guru ke Kelas
+POST {{baseUrl}}/assignments
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "classroom_id": "{{classID}}",
+  "subject_id": "{{subjectID}}",
+  "teacher_id": "{{teacherID}}"
+}
+
+> {% client.global.set("assignmentID", response.body.data.id); %}
+
+### 9. Buat Jadwal (Senin jam 07:00)
+### Ini ID yang paling penting untuk absensi
+POST {{baseUrl}}/schedules
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "teaching_assignment_id": "{{assignmentID}}",
+  "day_of_week": 1,
+  "start_time": "07:00",
+  "end_time": "08:30"
+}
+
+> {% client.global.set("scheduleID", response.body.data.id); %}
+
+
+### ========================================================================
+### PART 2: TEST CORE ATTENDANCE (Inti Pengujian)
+### ========================================================================
+
+### 10. SUBMIT ATTENDANCE (HARI INI)
+### Skenario: Siswa 1 Hadir, Siswa 2 Sakit
+POST {{baseUrl}}/attendances
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "schedule_id": "{{scheduleID}}",
+  "date": "2026-02-05",
+  "topic": "Bab 1: Sel Hewan dan Tumbuhan",
+  "notes": "Kelas kondusif, Siswa Bolos sakit demam.",
+  "students": [
+    {
+      "student_id": "{{student1ID}}",
+      "status": "PRESENT",
+      "notes": ""
+    },
+    {
+      "student_id": "{{student2ID}}",
+      "status": "SICK",
+      "notes": "Demam tinggi"
+    }
+  ]
+}
+
+> {% client.global.set("sessionID", response.body.data.id); %}
+
+### 11. TEST DUPLICATE SUBMISSION (NEGATIVE TEST)
+### Mencoba absen lagi di jadwal dan tanggal yang sama. Harapan: ERROR 400
+POST {{baseUrl}}/attendances
+Authorization: Bearer {{authToken}}
+Content-Type: {{contentType}}
+
+{
+  "schedule_id": "{{scheduleID}}",
+  "date": "2026-02-05",
+  "students": []
+}
+
+### 12. GET SESSION DETAIL
+### Memastikan data tersimpan dan Summary terhitung (Hadir: 1, Sakit: 1)
+GET {{baseUrl}}/attendances/{{sessionID}}
+Authorization: Bearer {{authToken}}
+
+### 13. GET HISTORY BY TEACHER
+### Melihat riwayat mengajar Guru Budi
+GET {{baseUrl}}/attendances/history?teacher_id={{teacherID}}
+Authorization: Bearer {{authToken}}
+
+### ========================================================================
+### CLEANUP (Opsional)
+### ========================================================================
+DELETE {{baseUrl}}/classrooms/{{classID}}
+Authorization: Bearer {{authToken}}
