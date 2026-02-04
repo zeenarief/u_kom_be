@@ -72,7 +72,7 @@ func (r *guardianRepository) FindAll(search string) ([]domain.Guardian, error) {
 
 	if search != "" {
 		searchPattern := "%" + search + "%"
-		query = query.Where("full_name LIKE ?", searchPattern)
+		query = query.Where("full_name LIKE ? OR email LIKE ? OR phone_number LIKE ?", searchPattern, searchPattern, searchPattern)
 	}
 
 	err := query.Find(&guardians).Error

@@ -73,7 +73,7 @@ func (r *parentRepository) FindAll(search string) ([]domain.Parent, error) {
 
 	if search != "" {
 		searchPattern := "%" + search + "%"
-		query = query.Where("full_name LIKE ?", searchPattern)
+		query = query.Where("full_name LIKE ? OR email LIKE ? OR phone_number LIKE ?", searchPattern, searchPattern, searchPattern)
 	}
 
 	err := query.Find(&parents).Error

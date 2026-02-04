@@ -86,7 +86,7 @@ func (r *employeeRepository) FindAll(search string) ([]domain.Employee, error) {
 
 	if search != "" {
 		searchPattern := "%" + search + "%"
-		query = query.Where("full_name LIKE ? OR nip LIKE ?", searchPattern, searchPattern)
+		query = query.Where("full_name LIKE ? OR nip LIKE ? OR phone_number LIKE ?", searchPattern, searchPattern, searchPattern)
 	}
 
 	err := query.Find(&employees).Error

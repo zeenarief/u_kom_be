@@ -76,7 +76,7 @@ func (r *studentRepository) FindAll(search string) ([]domain.Student, error) {
 
 	if search != "" {
 		searchPattern := "%" + search + "%"
-		query = query.Where("full_name LIKE ? OR nisn LIKE ? OR city LIKE ?", searchPattern, searchPattern, searchPattern)
+		query = query.Where("full_name LIKE ? OR nisn LIKE ? OR nim LIKE ? OR city LIKE ?", searchPattern, searchPattern, searchPattern, searchPattern)
 	}
 
 	err := query.Find(&students).Error
