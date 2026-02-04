@@ -1,0 +1,93 @@
+paths:
+  # === /schedules ===
+  /schedules:
+    post:
+      tags: [Schedule]
+      summary: "Create Schedule"
+      description: "Membuat jadwal baru."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/schedule.yaml#/schemas/ScheduleCreateRequest'
+      responses:
+        '201':
+          description: "Berhasil dibuat."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseScheduleDetail'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+  # === /schedules/classroom ===
+  /schedules/classroom:
+    get:
+      tags: [Schedule]
+      summary: "Get Schedules by Classroom"
+      description: "Melihat jadwal berdasarkan kelas."
+      parameters:
+        - name: classroom_id
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: "Berhasil mengambil data."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseScheduleList'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+  # === /schedules/teacher ===
+  /schedules/teacher:
+    get:
+      tags: [Schedule]
+      summary: "Get Schedules by Teacher"
+      description: "Melihat jadwal berdasarkan guru (teacher_id)."
+      parameters:
+        - name: teacher_id
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: "Berhasil mengambil data."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseScheduleList'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+  # === /schedules/{id} ===
+  /schedules/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    delete:
+      tags: [Schedule]
+      summary: "Delete Schedule"
+      description: "Menghapus jadwal."
+      responses:
+        '200':
+          description: "Berhasil dihapus."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }

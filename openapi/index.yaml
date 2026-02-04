@@ -26,6 +26,14 @@ tags:
     description: "Mengelola data wali (pihak lain) siswa"
   - name: "Employee"
     description: "Mengelola data pegawai (Guru, Staf, dll)"
+  - name: "AcademicYear"
+    description: "Mengelola Tahun Ajaran"
+  - name: "Classroom"
+    description: "Mengelola Kelas dan anggota kelas"
+  - name: "Schedule"
+    description: "Mengelola Jadwal Pelajaran"
+  - name: "Subject"
+    description: "Mengelola Mata Pelajaran"
 
 # 2. Keamanan Global
 security:
@@ -116,6 +124,40 @@ paths:
     $ref: './paths/employees.yaml#/paths/~1employees~1{id}~1link-user'
   /employees/{id}/unlink-user:
     $ref: './paths/employees.yaml#/paths/~1employees~1{id}~1unlink-user'
+
+  # === Academic Year Paths ===
+  /academic-years:
+    $ref: './paths/academic_years.yaml#/paths/~1academic-years'
+  /academic-years/{id}:
+    $ref: './paths/academic_years.yaml#/paths/~1academic-years~1{id}'
+  /academic-years/{id}/activate:
+    $ref: './paths/academic_years.yaml#/paths/~1academic-years~1{id}~1activate'
+  
+  # === Classroom Paths ===
+  /classrooms:
+    $ref: './paths/classrooms.yaml#/paths/~1classrooms'
+  /classrooms/{id}:
+    $ref: './paths/classrooms.yaml#/paths/~1classrooms~1{id}'
+  /classrooms/{id}/students:
+    $ref: './paths/classrooms.yaml#/paths/~1classrooms~1{id}~1students'
+  /classrooms/{id}/students/{studentId}:
+    $ref: './paths/classrooms.yaml#/paths/~1classrooms~1{id}~1students~1{studentId}'
+
+  # === Schedule Paths ===
+  /schedules:
+    $ref: './paths/schedules.yaml#/paths/~1schedules'
+  /schedules/classroom:
+    $ref: './paths/schedules.yaml#/paths/~1schedules~1classroom'
+  /schedules/teacher:
+    $ref: './paths/schedules.yaml#/paths/~1schedules~1teacher'
+  /schedules/{id}:
+    $ref: './paths/schedules.yaml#/paths/~1schedules~1{id}'
+
+  # === Subject Paths ===
+  /subjects:
+    $ref: './paths/subjects.yaml#/paths/~1subjects'
+  /subjects/{id}:
+    $ref: './paths/subjects.yaml#/paths/~1subjects~1{id}'
 
 
 # 4. Definisi Components (BAGIAN YANG DIPERBAIKI)

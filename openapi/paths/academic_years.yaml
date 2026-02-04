@@ -1,0 +1,126 @@
+paths:
+  # === /academic-years ===
+  /academic-years:
+    get:
+      tags: [AcademicYear]
+      summary: "Get All Academic Years"
+      description: "Mengambil daftar semua tahun ajaran."
+      responses:
+        '200':
+          description: "Berhasil mengambil data."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseAcademicYearList'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    post:
+      tags: [AcademicYear]
+      summary: "Create Academic Year"
+      description: "Membuat tahun ajaran baru."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/academic_year.yaml#/schemas/AcademicYearCreateRequest'
+      responses:
+        '201':
+          description: "Berhasil dibuat."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseAcademicYearDetail'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+  # === /academic-years/{id} ===
+  /academic-years/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+        description: "ID Tahun Ajaran"
+
+    get:
+      tags: [AcademicYear]
+      summary: "Get Academic Year by ID"
+      description: "Mengambil detail tahun ajaran."
+      responses:
+        '200':
+          description: "Berhasil mengambil detail."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseAcademicYearDetail'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    put:
+      tags: [AcademicYear]
+      summary: "Update Academic Year"
+      description: "Mengupdate data tahun ajaran."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/academic_year.yaml#/schemas/AcademicYearUpdateRequest'
+      responses:
+        '200':
+          description: "Berhasil diupdate."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseAcademicYearDetail'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    delete:
+      tags: [AcademicYear]
+      summary: "Delete Academic Year"
+      description: "Menghapus tahun ajaran."
+      responses:
+        '200':
+          description: "Berhasil dihapus."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+  # === /academic-years/{id}/activate ===
+  /academic-years/{id}/activate:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      tags: [AcademicYear]
+      summary: "Activate Academic Year"
+      description: "Mengaktifkan tahun ajaran ini dan menonaktifkan yang lain."
+      responses:
+        '200':
+          description: "Berhasil diaktifkan."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }

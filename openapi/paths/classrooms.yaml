@@ -1,89 +1,89 @@
 paths:
-  # === /parents ===
-  /parents:
+  # === /classrooms ===
+  /classrooms:
     get:
-      tags: [Parent]
-      summary: "Get All Parents (List)"
-      description: "Mengambil daftar semua orang tua dalam format ringkas (ListResponse). Memerlukan permission 'parents.read'."
+      tags: [Classroom]
+      summary: "Get All Classrooms"
+      description: "Mengambil daftar kelas, opsional filter by academic_year_id via query param."
       parameters:
-        - $ref: '../components/parameters.yaml#/parameters/SearchQuery'
+        - name: academic_year_id
+          in: query
+          required: false
+          schema: { type: string, format: uuid }
       responses:
         '200':
-          description: "Daftar orang tua berhasil diambil."
+          description: "Berhasil mengambil data."
           content:
             application/json:
               schema:
-                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseParentList'
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseClassroomList'
         '401': { $ref: '../components/responses.yaml#/Unauthorized' }
         '403': { $ref: '../components/responses.yaml#/Forbidden' }
         '500': { $ref: '../components/responses.yaml#/InternalError' }
 
     post:
-      tags: [Parent]
-      summary: "Create New Parent"
-      description: "Membuat data orang tua baru. Memerlukan permission 'parents.create'."
+      tags: [Classroom]
+      summary: "Create Classroom"
+      description: "Membuat kelas baru."
       requestBody:
-        description: "Data orang tua baru"
         required: true
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/parent.yaml#/schemas/ParentCreateRequest'
+              $ref: '../components/schemas/classroom.yaml#/schemas/ClassroomCreateRequest'
       responses:
         '201':
-          description: "Orang tua berhasil dibuat. Mengembalikan data detail."
+          description: "Berhasil dibuat."
           content:
             application/json:
               schema:
-                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseParentDetail'
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseClassroomDetail'
         '400': { $ref: '../components/responses.yaml#/BadRequest' }
         '401': { $ref: '../components/responses.yaml#/Unauthorized' }
         '403': { $ref: '../components/responses.yaml#/Forbidden' }
         '500': { $ref: '../components/responses.yaml#/InternalError' }
 
-  # === /parents/{id} ===
-  /parents/{id}:
+  # === /classrooms/{id} ===
+  /classrooms/{id}:
     parameters:
       - name: id
         in: path
         required: true
         schema: { type: string, format: uuid }
-        description: "ID Orang Tua (UUID)"
 
     get:
-      tags: [Parent]
-      summary: "Get Parent by ID (Detail)"
-      description: "Mengambil data detail lengkap seorang orang tua. Memerlukan permission 'parents.read'."
+      tags: [Classroom]
+      summary: "Get Classroom by ID"
+      description: "Mengambil detail kelas."
       responses:
         '200':
-          description: "Data detail orang tua berhasil diambil."
+          description: "Berhasil mengambil detail."
           content:
             application/json:
               schema:
-                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseParentDetail'
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseClassroomDetail'
         '401': { $ref: '../components/responses.yaml#/Unauthorized' }
         '403': { $ref: '../components/responses.yaml#/Forbidden' }
         '404': { $ref: '../components/responses.yaml#/NotFound' }
         '500': { $ref: '../components/responses.yaml#/InternalError' }
 
     put:
-      tags: [Parent]
-      summary: "Update Parent"
-      description: "Memperbarui data orang tua. Hanya field yang dikirim yang akan diupdate. Memerlukan permission 'parents.update'."
+      tags: [Classroom]
+      summary: "Update Classroom"
+      description: "Mengupdate data kelas."
       requestBody:
-        description: "Data orang tua yang ingin diupdate"
         required: true
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/parent.yaml#/schemas/ParentUpdateRequest'
+              $ref: '../components/schemas/classroom.yaml#/schemas/ClassroomUpdateRequest'
       responses:
         '200':
-          description: "Orang tua berhasil diupdate. Mengembalikan data detail terbaru."
+          description: "Berhasil diupdate."
           content:
             application/json:
               schema:
-                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseParentDetail'
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseClassroomDetail'
         '400': { $ref: '../components/responses.yaml#/BadRequest' }
         '401': { $ref: '../components/responses.yaml#/Unauthorized' }
         '403': { $ref: '../components/responses.yaml#/Forbidden' }
@@ -91,12 +91,12 @@ paths:
         '500': { $ref: '../components/responses.yaml#/InternalError' }
 
     delete:
-      tags: [Parent]
-      summary: "Delete Parent"
-      description: "Menghapus data orang tua. Memerlukan permission 'parents.delete'."
+      tags: [Classroom]
+      summary: "Delete Classroom"
+      description: "Menghapus kelas."
       responses:
         '200':
-          description: "Orang tua berhasil dihapus."
+          description: "Berhasil dihapus."
           content:
             application/json:
               schema:
@@ -106,23 +106,27 @@ paths:
         '404': { $ref: '../components/responses.yaml#/NotFound' }
         '500': { $ref: '../components/responses.yaml#/InternalError' }
 
-  /parents/{id}/link-user:
+  # === /classrooms/{id}/students ===
+  /classrooms/{id}/students:
     parameters:
-      - $ref: '../components/parameters.yaml#/parameters/ParentId'
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+        description: "ID Kelas"
     post:
-      tags: [ Parent ]
-      summary: "Link Parent to User Account"
-      description: "Menautkan profil orang tua ke akun user. Memerlukan permission 'parents.manage_account'."
+      tags: [Classroom]
+      summary: "Add Students to Classroom"
+      description: "Menambahkan siswa ke dalam kelas (bulk)."
       requestBody:
-        description: "ID User yang akan ditautkan"
         required: true
         content:
           application/json:
             schema:
-              $ref: '../components/schemas/common.yaml#/schemas/LinkUserRequest'
+              $ref: '../components/schemas/classroom.yaml#/schemas/AddStudentsToClassRequest'
       responses:
         '200':
-          description: "Orang tua berhasil ditautkan."
+          description: "Berhasil ditambahkan."
           content:
             application/json:
               schema:
@@ -131,17 +135,28 @@ paths:
         '401': { $ref: '../components/responses.yaml#/Unauthorized' }
         '403': { $ref: '../components/responses.yaml#/Forbidden' }
         '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
 
-  /parents/{id}/unlink-user:
+  # === /classrooms/{id}/students/{studentId} ===
+  /classrooms/{id}/students/{studentId}:
     parameters:
-      - $ref: '../components/parameters.yaml#/parameters/ParentId'
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+        description: "ID Kelas"
+      - name: studentId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+        description: "ID Siswa"
     delete:
-      tags: [ Parent ]
-      summary: "Unlink Parent from User Account"
-      description: "Menghapus tautan orang tua dari akun user. Memerlukan permission 'parents.manage_account'."
+      tags: [Classroom]
+      summary: "Remove Student from Classroom"
+      description: "Mengeluarkan siswa dari kelas."
       responses:
         '200':
-          description: "Tautan orang tua berhasil dihapus."
+          description: "Berhasil dikeluarkan."
           content:
             application/json:
               schema:
@@ -149,3 +164,4 @@ paths:
         '401': { $ref: '../components/responses.yaml#/Unauthorized' }
         '403': { $ref: '../components/responses.yaml#/Forbidden' }
         '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }

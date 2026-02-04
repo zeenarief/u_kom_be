@@ -1,0 +1,101 @@
+schemas:
+  # --- Request DTOs ---
+  ClassroomCreateRequest:
+    type: object
+    required:
+      - academic_year_id
+      - name
+      - level
+    properties:
+      academic_year_id:
+        type: string
+        format: uuid
+        example: "uuid-academic-year-1"
+      homeroom_teacher_id:
+        type: string
+        format: uuid
+        nullable: true
+        example: "uuid-teacher-1"
+      name:
+        type: string
+        example: "X IPA 1"
+      level:
+        type: string
+        example: "10"
+        description: "10, 11, 12"
+      major:
+        type: string
+        example: "IPA"
+        description: "IPA, IPS, etc."
+      description:
+        type: string
+        example: "Kelas 10 IPA 1"
+
+  ClassroomUpdateRequest:
+    type: object
+    properties:
+      homeroom_teacher_id:
+        type: string
+        format: uuid
+        nullable: true
+        example: "uuid-teacher-1"
+      name:
+        type: string
+        example: "X IPA 1"
+      level:
+        type: string
+        example: "10"
+      major:
+        type: string
+        example: "IPA"
+      description:
+        type: string
+        example: "Kelas 10 IPA 1"
+
+  AddStudentsToClassRequest:
+    type: object
+    required:
+      - student_ids
+    properties:
+      student_ids:
+        type: array
+        items:
+          type: string
+          format: uuid
+        example: ["uuid-student-1", "uuid-student-2"]
+
+  # --- Response DTOs ---
+  ClassroomResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-classroom-1"
+      academic_year_id:
+        type: string
+        format: uuid
+        example: "uuid-academic-year-1"
+      homeroom_teacher_id:
+        type: string
+        format: uuid
+        nullable: true
+        example: "uuid-teacher-1"
+      name:
+        type: string
+        example: "X IPA 1"
+      level:
+        type: string
+        example: "10"
+      major:
+        type: string
+        example: "IPA"
+      description:
+        type: string
+        example: "Kelas 10 IPA 1"
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time

@@ -1,0 +1,65 @@
+schemas:
+  # --- Request DTOs ---
+  AcademicYearCreateRequest:
+    type: object
+    required:
+      - name
+      - start_date
+      - end_date
+    properties:
+      name:
+        type: string
+        example: "2023/2024"
+      start_date:
+        type: string
+        format: date
+        example: "2023-07-01"
+      end_date:
+        type: string
+        format: date
+        example: "2024-06-30"
+
+  AcademicYearUpdateRequest:
+    type: object
+    description: "Send only fields you want to update"
+    properties:
+      name:
+        type: string
+        example: "2023/2024"
+      start_date:
+        type: string
+        format: date
+        example: "2023-07-01"
+      end_date:
+        type: string
+        format: date
+        example: "2024-06-30"
+
+  # --- Response DTOs ---
+  AcademicYearResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-academic-year-1"
+      name:
+        type: string
+        example: "2023/2024"
+      start_date:
+        type: string
+        format: date
+        example: "2023-07-01"
+      end_date:
+        type: string
+        format: date
+        example: "2024-06-30"
+      is_active:
+        type: boolean
+        example: true
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time

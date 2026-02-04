@@ -1,0 +1,56 @@
+schemas:
+  # --- Request DTOs ---
+  ScheduleCreateRequest:
+    type: object
+    required:
+      - teaching_assignment_id
+      - day_of_week
+      - start_time
+      - end_time
+    properties:
+      teaching_assignment_id:
+        type: string
+        format: uuid
+        example: "uuid-teaching-assignment-1"
+      day_of_week:
+        type: integer
+        minimum: 1
+        maximum: 7
+        example: 1
+        description: "1=Monday, 7=Sunday"
+      start_time:
+        type: string
+        example: "07:00"
+        description: "HH:MM"
+      end_time:
+        type: string
+        example: "08:30"
+        description: "HH:MM"
+
+  # --- Response DTOs ---
+  ScheduleResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-schedule-1"
+      teaching_assignment_id:
+        type: string
+        format: uuid
+        example: "uuid-teaching-assignment-1"
+      day_of_week:
+        type: integer
+        example: 1
+      start_time:
+        type: string
+        example: "07:00"
+      end_time:
+        type: string
+        example: "08:30"
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time

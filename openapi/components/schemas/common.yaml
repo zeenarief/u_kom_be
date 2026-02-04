@@ -220,4 +220,81 @@ schemas:
             items:
               $ref: './employee.yaml#/schemas/EmployeeListResponse'
 
+  # === Wrapper untuk Academic Year ===
+  SuccessResponseAcademicYearDetail:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            $ref: './academic_year.yaml#/schemas/AcademicYearResponse'
+
+  SuccessResponseAcademicYearList:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            type: array
+            items:
+              $ref: './academic_year.yaml#/schemas/AcademicYearResponse'
+
+  # === Wrapper untuk Classroom ===
+  SuccessResponseClassroomDetail:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            $ref: './classroom.yaml#/schemas/ClassroomResponse'
+
+  SuccessResponseClassroomList:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            type: array
+            items:
+              $ref: './classroom.yaml#/schemas/ClassroomResponse'
+
+  # === Wrapper untuk Schedule ===
+  SuccessResponseScheduleDetail:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            $ref: './schedule.yaml#/schemas/ScheduleResponse'
+
+  SuccessResponseScheduleList:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            type: array
+            items:
+              $ref: './schedule.yaml#/schemas/ScheduleResponse'
+
+  # === Wrapper untuk Subject ===
+  SuccessResponseSubjectDetail:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            $ref: './subject.yaml#/schemas/SubjectResponse'
+
+  SuccessResponseSubjectList:
+    allOf:
+      - $ref: '#/schemas/SuccessWrapper'
+      - type: object
+        properties:
+          data:
+            type: array
+            items:
+              $ref: './subject.yaml#/schemas/SubjectResponse'
+
+
 

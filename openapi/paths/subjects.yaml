@@ -1,0 +1,104 @@
+paths:
+  # === /subjects ===
+  /subjects:
+    get:
+      tags: [Subject]
+      summary: "Get All Subjects"
+      description: "Mengambil daftar mata pelajaran, support search (q)."
+      parameters:
+        - $ref: '../components/parameters.yaml#/parameters/SearchQuery'
+      responses:
+        '200':
+          description: "Berhasil mengambil data."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseSubjectList'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    post:
+      tags: [Subject]
+      summary: "Create Subject"
+      description: "Membuat mata pelajaran baru."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/subject.yaml#/schemas/SubjectCreateRequest'
+      responses:
+        '201':
+          description: "Berhasil dibuat."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseSubjectDetail'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+  # === /subjects/{id} ===
+  /subjects/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    
+    get:
+      tags: [Subject]
+      summary: "Get Subject by ID"
+      description: "Mengambil detail mata pelajaran."
+      responses:
+        '200':
+          description: "Berhasil mengambil detail."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseSubjectDetail'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    put:
+      tags: [Subject]
+      summary: "Update Subject"
+      description: "Update mata pelajaran."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/subject.yaml#/schemas/SubjectUpdateRequest'
+      responses:
+        '200':
+          description: "Berhasil diupdate."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseSubjectDetail'
+        '400': { $ref: '../components/responses.yaml#/BadRequest' }
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+    delete:
+      tags: [Subject]
+      summary: "Delete Subject"
+      description: "Menghapus mata pelajaran."
+      responses:
+        '200':
+          description: "Berhasil dihapus."
+          content:
+            application/json:
+              schema:
+                $ref: '../components/schemas/common.yaml#/schemas/SuccessResponseEmpty'
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }

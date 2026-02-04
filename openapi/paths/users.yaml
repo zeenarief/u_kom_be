@@ -5,6 +5,8 @@ paths:
       tags: [User]
       summary: "Get All Users"
       description: "Mengambil daftar semua pengguna (format list). Memerlukan permission 'users.read'."
+      parameters:
+        - $ref: '../components/parameters.yaml#/parameters/SearchQuery'
       responses:
         '200':
           description: "Daftar pengguna berhasil diambil."

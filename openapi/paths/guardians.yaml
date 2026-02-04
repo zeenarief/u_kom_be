@@ -5,6 +5,8 @@ paths:
       tags: [Guardian]
       summary: "Get All Guardians (List)"
       description: "Mengambil daftar semua wali (pihak lain) dalam format ringkas. Memerlukan permission 'guardians.read'."
+      parameters:
+        - $ref: '../components/parameters.yaml#/parameters/SearchQuery'
       responses:
         '200':
           description: "Daftar wali berhasil diambil."

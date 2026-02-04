@@ -5,6 +5,8 @@ paths:
       tags: [Employee]
       summary: "Get All Employees (List)"
       description: "Mengambil daftar semua pegawai (ringkas). Memerlukan permission 'employees.read'."
+      parameters:
+        - $ref: '../components/parameters.yaml#/parameters/SearchQuery'
       responses:
         '200':
           description: "Daftar pegawai berhasil diambil."

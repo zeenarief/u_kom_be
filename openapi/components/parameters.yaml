@@ -56,3 +56,10 @@ parameters:
       type: string
       format: uuid
     description: "ID Pegawai (UUID)"
+  SearchQuery:
+    name: q
+    in: query
+    required: false
+    schema:
+      type: string
+    description: "Search keyword (partial match, case-insensitive)"

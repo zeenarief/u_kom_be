@@ -1,0 +1,64 @@
+schemas:
+  # --- Request DTOs ---
+  SubjectCreateRequest:
+    type: object
+    required:
+      - code
+      - name
+    properties:
+      code:
+        type: string
+        example: "MTK10"
+      name:
+        type: string
+        example: "Matematika Kelas 10"
+      type:
+        type: string
+        example: "Wajib"
+        description: "Optional, e.g. Wajib, Peminatan"
+      description:
+        type: string
+        example: "Deskripsi mata pelajaran"
+
+  SubjectUpdateRequest:
+    type: object
+    properties:
+      code:
+        type: string
+        example: "MTK10"
+      name:
+        type: string
+        example: "Matematika Kelas 10"
+      type:
+        type: string
+        example: "Wajib"
+      description:
+        type: string
+        example: "Deskripsi mata pelajaran"
+
+  # --- Response DTOs ---
+  SubjectResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        format: uuid
+        example: "uuid-subject-1"
+      code:
+        type: string
+        example: "MTK10"
+      name:
+        type: string
+        example: "Matematika Kelas 10"
+      type:
+        type: string
+        example: "Wajib"
+      description:
+        type: string
+        example: "Deskripsi mata pelajaran"
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time

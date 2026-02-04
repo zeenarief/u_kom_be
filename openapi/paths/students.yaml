@@ -5,6 +5,8 @@ paths:
       tags: [Student]
       summary: "Get All Students (List)"
       description: "Mengambil daftar semua siswa dalam format ringkas (ListResponse). Memerlukan permission 'students.read'."
+      parameters:
+        - $ref: '../components/parameters.yaml#/parameters/SearchQuery'
       responses:
         '200':
           description: "Daftar siswa berhasil diambil."
@@ -37,6 +39,63 @@ paths:
         '400': { $ref: '../components/responses.yaml#/BadRequest' }
         '401': { $ref: '../components/responses.yaml#/Unauthorized' }
         '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+  # === /students/export/excel ===
+  /students/export/excel:
+    get:
+      tags: [Student]
+      summary: "Export Students to Excel"
+      description: "Mengekspor data siswa ke file Excel. Memerlukan permission 'students.read'."
+      responses:
+        '200':
+          description: "File Excel berhasil di-generate."
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+  # === /students/export/pdf ===
+  /students/export/pdf:
+    get:
+      tags: [Student]
+      summary: "Export Students to PDF"
+      description: "Mengekspor data siswa ke file PDF (List). Memerlukan permission 'students.read'."
+      responses:
+        '200':
+          description: "File PDF berhasil di-generate."
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '500': { $ref: '../components/responses.yaml#/InternalError' }
+
+  # === /students/{id}/export/pdf ===
+  /students/{id}/export/pdf:
+    parameters:
+      - $ref: '../components/parameters.yaml#/parameters/StudentId'
+    get:
+      tags: [Student]
+      summary: "Export Student Biodata to PDF"
+      description: "Mengekspor biodata satu siswa ke file PDF. Memerlukan permission 'students.read'."
+      responses:
+        '200':
+          description: "File PDF Biodata berhasil di-generate."
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401': { $ref: '../components/responses.yaml#/Unauthorized' }
+        '403': { $ref: '../components/responses.yaml#/Forbidden' }
+        '404': { $ref: '../components/responses.yaml#/NotFound' }
         '500': { $ref: '../components/responses.yaml#/InternalError' }
 
   # === /students/{id} ===
