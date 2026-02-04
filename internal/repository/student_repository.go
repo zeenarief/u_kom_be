@@ -12,7 +12,7 @@ type StudentRepository interface {
 	FindByID(id string) (*domain.Student, error)
 	FindByNISN(nisn string) (*domain.Student, error)
 	FindByNIM(nim string) (*domain.Student, error)
-	FindAll() ([]domain.Student, error)
+	FindAll(search string) ([]domain.Student, error)
 	Update(student *domain.Student) error
 	Delete(id string) error
 	FindByIDWithParents(id string) (*domain.Student, error)
@@ -70,9 +70,16 @@ func (r *studentRepository) FindByNIM(nim string) (*domain.Student, error) {
 	return &student, nil
 }
 
-func (r *studentRepository) FindAll() ([]domain.Student, error) {
+func (r *studentRepository) FindAll(search string) ([]domain.Student, error) {
 	var students []domain.Student
-	err := r.db.Find(&students).Error
+	query := r.db
+
+	if search != "" {
+		searchPattern := "%" + search + "%"
+		query = query.Where("full_name LIKE ? OR nisn LIKE ? OR city LIKE ?", searchPattern, searchPattern, searchPattern)
+	}
+
+	err := query.Find(&students).Error
 	return students, err
 }
 

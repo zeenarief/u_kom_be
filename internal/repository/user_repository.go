@@ -15,7 +15,7 @@ type UserRepository interface {
 	FindByIDWithRelations(id string) (*domain.User, error)
 	FindByEmailWithRelations(email string) (*domain.User, error)
 	FindByUsernameWithRelations(username string) (*domain.User, error)
-	FindAll() ([]domain.User, error)
+	FindAll(search string) ([]domain.User, error)
 	Update(user *domain.User) error
 	Delete(id string) error
 	UpdateTokenHash(id string, tokenHash *string) error
@@ -126,14 +126,20 @@ func (r *userRepository) FindByUsernameWithRelations(username string) (*domain.U
 	return &user, err
 }
 
-func (r *userRepository) FindAll() ([]domain.User, error) {
+func (r *userRepository) FindAll(search string) ([]domain.User, error) {
 	var users []domain.User
 
-	err := r.db.
+	query := r.db.
 		Preload("Roles").
 		Preload("Roles.Permissions").
-		Preload("Permissions").
-		Find(&users).Error
+		Preload("Permissions")
+
+	if search != "" {
+		searchPattern := "%" + search + "%"
+		query = query.Where("name LIKE ? OR username LIKE ? OR email LIKE ?", searchPattern, searchPattern, searchPattern)
+	}
+
+	err := query.Find(&users).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil

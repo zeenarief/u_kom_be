@@ -12,7 +12,7 @@ type GuardianRepository interface {
 	FindByID(id string) (*domain.Guardian, error)
 	FindByPhone(phone string) (*domain.Guardian, error)
 	FindByEmail(email string) (*domain.Guardian, error)
-	FindAll() ([]domain.Guardian, error)
+	FindAll(search string) ([]domain.Guardian, error)
 	Update(guardian *domain.Guardian) error
 	Delete(id string) error
 	SetUserID(guardianID string, userID *string) error
@@ -66,9 +66,16 @@ func (r *guardianRepository) FindByEmail(email string) (*domain.Guardian, error)
 	return &guardian, nil
 }
 
-func (r *guardianRepository) FindAll() ([]domain.Guardian, error) {
+func (r *guardianRepository) FindAll(search string) ([]domain.Guardian, error) {
 	var guardians []domain.Guardian
-	err := r.db.Find(&guardians).Error
+	query := r.db
+
+	if search != "" {
+		searchPattern := "%" + search + "%"
+		query = query.Where("full_name LIKE ?", searchPattern)
+	}
+
+	err := query.Find(&guardians).Error
 	return guardians, err
 }
 

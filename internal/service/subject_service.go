@@ -10,7 +10,7 @@ import (
 
 type SubjectService interface {
 	Create(req request.SubjectCreateRequest) (*response.SubjectResponse, error)
-	FindAll() ([]response.SubjectResponse, error)
+	FindAll(search string) ([]response.SubjectResponse, error)
 	FindByID(id string) (*response.SubjectResponse, error)
 	Update(id string, req request.SubjectUpdateRequest) (*response.SubjectResponse, error)
 	Delete(id string) error
@@ -57,8 +57,8 @@ func (s *subjectService) Create(req request.SubjectCreateRequest) (*response.Sub
 	return s.toResponse(subject), nil
 }
 
-func (s *subjectService) FindAll() ([]response.SubjectResponse, error) {
-	subjects, err := s.repo.FindAll()
+func (s *subjectService) FindAll(search string) ([]response.SubjectResponse, error) {
+	subjects, err := s.repo.FindAll(search)
 	if err != nil {
 		return nil, err
 	}

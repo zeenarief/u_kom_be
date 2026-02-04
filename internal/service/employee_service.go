@@ -14,7 +14,7 @@ import (
 type EmployeeService interface {
 	CreateEmployee(req request.EmployeeCreateRequest) (*response.EmployeeDetailResponse, error)
 	GetEmployeeByID(id string) (*response.EmployeeDetailResponse, error)
-	GetAllEmployees() ([]response.EmployeeListResponse, error)
+	GetAllEmployees(search string) ([]response.EmployeeListResponse, error)
 	UpdateEmployee(id string, req request.EmployeeUpdateRequest) (*response.EmployeeDetailResponse, error)
 	DeleteEmployee(id string) error
 
@@ -143,8 +143,8 @@ func (s *employeeService) GetEmployeeByID(id string) (*response.EmployeeDetailRe
 }
 
 // GetAllEmployees mengambil semua data pegawai (ringkas)
-func (s *employeeService) GetAllEmployees() ([]response.EmployeeListResponse, error) {
-	employees, err := s.employeeRepo.FindAll()
+func (s *employeeService) GetAllEmployees(search string) ([]response.EmployeeListResponse, error) {
+	employees, err := s.employeeRepo.FindAll(search)
 	if err != nil {
 		return nil, err
 	}

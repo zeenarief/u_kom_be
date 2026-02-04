@@ -22,13 +22,13 @@ func RegisterAttendanceRoutes(router *gin.RouterGroup, h *handler.AttendanceHand
 		// Get Detail
 		// Sebaiknya juga dilindungi permission read
 		group.GET("/:id",
-			// middleware.PermissionMiddleware("attendance.read", authService), // Opsional
+			middleware.PermissionMiddleware("attendance.read", authService), // Opsional
 			h.GetDetail,
 		)
 
 		// Get History
 		group.GET("/history",
-			// middleware.PermissionMiddleware("attendance.read", authService), // Opsional
+			middleware.PermissionMiddleware("attendance.read", authService), // Opsional
 			h.GetHistory,
 		)
 

@@ -95,6 +95,7 @@ func seedPermissions(db *gorm.DB) error {
 		{Name: "assignments.manage", Description: "Manage teaching assignments"},
 		{Name: "schedules.manage", Description: "Manage schedule"},
 		{Name: "attendance.submit", Description: "Manage attendance"},
+		{Name: "attendance.read", Description: "Read attendance"},
 	}
 
 	for _, permission := range permissions {

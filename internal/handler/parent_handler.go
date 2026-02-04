@@ -37,7 +37,8 @@ func (h *ParentHandler) CreateParent(c *gin.Context) {
 }
 
 func (h *ParentHandler) GetAllParents(c *gin.Context) {
-	parents, err := h.parentService.GetAllParents()
+	searchQuery := c.Query("q")
+	parents, err := h.parentService.GetAllParents(searchQuery)
 	if err != nil {
 		InternalServerError(c, err.Error())
 		return

@@ -13,7 +13,7 @@ type EmployeeRepository interface {
 	FindByNIP(nip string) (*domain.Employee, error)
 	FindByPhone(phone string) (*domain.Employee, error)
 	FindByUserID(userID string) (*domain.Employee, error)
-	FindAll() ([]domain.Employee, error)
+	FindAll(search string) ([]domain.Employee, error)
 	Update(employee *domain.Employee) error
 	Delete(id string) error
 	SetUserID(employeeID string, userID *string) error // Untuk link/unlink user
@@ -80,10 +80,16 @@ func (r *employeeRepository) FindByUserID(userID string) (*domain.Employee, erro
 	return &employee, nil
 }
 
-func (r *employeeRepository) FindAll() ([]domain.Employee, error) {
+func (r *employeeRepository) FindAll(search string) ([]domain.Employee, error) {
 	var employees []domain.Employee
-	// FindAll tidak melakukan Preload User untuk performa
-	err := r.db.Find(&employees).Error
+	query := r.db
+
+	if search != "" {
+		searchPattern := "%" + search + "%"
+		query = query.Where("full_name LIKE ? OR nip LIKE ?", searchPattern, searchPattern)
+	}
+
+	err := query.Find(&employees).Error
 	return employees, err
 }
 

@@ -9,7 +9,7 @@ import (
 
 type SubjectRepository interface {
 	Create(subject *domain.Subject) error
-	FindAll() ([]domain.Subject, error)
+	FindAll(search string) ([]domain.Subject, error)
 	FindByID(id string) (*domain.Subject, error)
 	FindByCode(code string) (*domain.Subject, error)
 	Update(subject *domain.Subject) error
@@ -28,9 +28,16 @@ func (r *subjectRepository) Create(subject *domain.Subject) error {
 	return r.db.Create(subject).Error
 }
 
-func (r *subjectRepository) FindAll() ([]domain.Subject, error) {
+func (r *subjectRepository) FindAll(search string) ([]domain.Subject, error) {
 	var subjects []domain.Subject
-	err := r.db.Order("code asc").Find(&subjects).Error
+	query := r.db.Order("code asc")
+
+	if search != "" {
+		searchPattern := "%" + search + "%"
+		query = query.Where("name LIKE ? OR code LIKE ? OR type LIKE ?", searchPattern, searchPattern, searchPattern)
+	}
+
+	err := query.Find(&subjects).Error
 	return subjects, err
 }
 

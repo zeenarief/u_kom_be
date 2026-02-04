@@ -39,7 +39,8 @@ func (h *EmployeeHandler) CreateEmployee(c *gin.Context) {
 
 // GetAllEmployees menangani GET /employees
 func (h *EmployeeHandler) GetAllEmployees(c *gin.Context) {
-	employees, err := h.employeeService.GetAllEmployees()
+	searchQuery := c.Query("q")
+	employees, err := h.employeeService.GetAllEmployees(searchQuery)
 	if err != nil {
 		InternalServerError(c, err.Error())
 		return

@@ -12,7 +12,7 @@ type ParentRepository interface {
 	FindByID(id string) (*domain.Parent, error)
 	FindByPhone(phone string) (*domain.Parent, error)
 	FindByEmail(email string) (*domain.Parent, error)
-	FindAll() ([]domain.Parent, error)
+	FindAll(search string) ([]domain.Parent, error)
 	Update(parent *domain.Parent) error
 	Delete(id string) error
 	SetUserID(parentID string, userID *string) error
@@ -67,9 +67,16 @@ func (r *parentRepository) FindByEmail(email string) (*domain.Parent, error) {
 	return &parent, nil
 }
 
-func (r *parentRepository) FindAll() ([]domain.Parent, error) {
+func (r *parentRepository) FindAll(search string) ([]domain.Parent, error) {
 	var parents []domain.Parent
-	err := r.db.Find(&parents).Error
+	query := r.db
+
+	if search != "" {
+		searchPattern := "%" + search + "%"
+		query = query.Where("full_name LIKE ?", searchPattern)
+	}
+
+	err := query.Find(&parents).Error
 	return parents, err
 }
 

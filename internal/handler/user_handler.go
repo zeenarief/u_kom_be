@@ -51,7 +51,8 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 }
 
 func (h *UserHandler) GetAllUsers(c *gin.Context) {
-	users, err := h.userService.GetAllUsers()
+	searchQuery := c.Query("q")
+	users, err := h.userService.GetAllUsers(searchQuery)
 	if err != nil {
 		InternalServerError(c, err.Error())
 		return

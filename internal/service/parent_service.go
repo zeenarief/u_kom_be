@@ -15,7 +15,7 @@ import (
 type ParentService interface {
 	CreateParent(req request.ParentCreateRequest) (*response.ParentDetailResponse, error)
 	GetParentByID(id string) (*response.ParentDetailResponse, error)
-	GetAllParents() ([]response.ParentListResponse, error)
+	GetAllParents(search string) ([]response.ParentListResponse, error)
 	UpdateParent(id string, req request.ParentUpdateRequest) (*response.ParentDetailResponse, error)
 	DeleteParent(id string) error
 	LinkUser(parentID string, userID string) error
@@ -159,8 +159,8 @@ func (s *parentService) GetParentByID(id string) (*response.ParentDetailResponse
 }
 
 // GetAllParents mengambil semua data orang tua (ringkas)
-func (s *parentService) GetAllParents() ([]response.ParentListResponse, error) {
-	parents, err := s.parentRepo.FindAll()
+func (s *parentService) GetAllParents(search string) ([]response.ParentListResponse, error) {
+	parents, err := s.parentRepo.FindAll(search)
 	if err != nil {
 		return nil, err
 	}

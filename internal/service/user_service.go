@@ -14,7 +14,7 @@ import (
 type UserService interface {
 	CreateUser(req request.UserCreateRequest) (*response.UserWithRoleResponse, error)
 	GetUserByID(id string) (*response.UserWithRolesResponseAndPermissions, error)
-	GetAllUsers() ([]response.UserWithRoleResponse, error)
+	GetAllUsers(search string) ([]response.UserWithRoleResponse, error)
 	UpdateUser(id string, req request.UserUpdateRequest, currentUserID string, currentUserPermissions []string) (*response.UserWithRoleResponse, error) // Tambahkan parameter
 	DeleteUser(id string, currentUserID string, currentUserPermissions []string) error                                                                  // Tambahkan parameter
 	ChangePassword(id string, currentPassword, newPassword string, currentUserID string, currentUserPermissions []string) error                         // Tambahkan parameter
@@ -130,8 +130,8 @@ func (s *userService) GetUserByID(id string) (*response.UserWithRolesResponseAnd
 	return converter.ToUserWithRolesResponseAndPermissions(user), nil
 }
 
-func (s *userService) GetAllUsers() ([]response.UserWithRoleResponse, error) {
-	users, err := s.userRepo.FindAll()
+func (s *userService) GetAllUsers(search string) ([]response.UserWithRoleResponse, error) {
+	users, err := s.userRepo.FindAll(search)
 	if err != nil {
 		return nil, err
 	}

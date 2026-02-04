@@ -37,7 +37,8 @@ func (h *GuardianHandler) CreateGuardian(c *gin.Context) {
 }
 
 func (h *GuardianHandler) GetAllGuardians(c *gin.Context) {
-	guardians, err := h.guardianService.GetAllGuardians()
+	searchQuery := c.Query("q")
+	guardians, err := h.guardianService.GetAllGuardians(searchQuery)
 	if err != nil {
 		InternalServerError(c, err.Error())
 		return

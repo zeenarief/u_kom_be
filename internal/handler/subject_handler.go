@@ -37,7 +37,8 @@ func (h *SubjectHandler) Create(c *gin.Context) {
 }
 
 func (h *SubjectHandler) FindAll(c *gin.Context) {
-	res, err := h.service.FindAll()
+	searchQuery := c.Query("q")
+	res, err := h.service.FindAll(searchQuery)
 	if err != nil {
 		InternalServerError(c, err.Error())
 		return

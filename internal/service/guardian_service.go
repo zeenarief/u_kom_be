@@ -15,7 +15,7 @@ import (
 type GuardianService interface {
 	CreateGuardian(req request.GuardianCreateRequest) (*response.GuardianDetailResponse, error)
 	GetGuardianByID(id string) (*response.GuardianDetailResponse, error)
-	GetAllGuardians() ([]response.GuardianListResponse, error)
+	GetAllGuardians(search string) ([]response.GuardianListResponse, error)
 	UpdateGuardian(id string, req request.GuardianUpdateRequest) (*response.GuardianDetailResponse, error)
 	DeleteGuardian(id string) error
 	LinkUser(guardianID string, userID string) error
@@ -145,8 +145,8 @@ func (s *guardianService) GetGuardianByID(id string) (*response.GuardianDetailRe
 }
 
 // GetAllGuardians mengambil semua data wali (ringkas)
-func (s *guardianService) GetAllGuardians() ([]response.GuardianListResponse, error) {
-	guardians, err := s.guardianRepo.FindAll()
+func (s *guardianService) GetAllGuardians(search string) ([]response.GuardianListResponse, error) {
+	guardians, err := s.guardianRepo.FindAll(search)
 	if err != nil {
 		return nil, err
 	}

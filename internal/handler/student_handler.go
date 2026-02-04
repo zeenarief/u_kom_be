@@ -39,7 +39,8 @@ func (h *StudentHandler) CreateStudent(c *gin.Context) {
 }
 
 func (h *StudentHandler) GetAllStudents(c *gin.Context) {
-	students, err := h.studentService.GetAllStudents()
+	searchQuery := c.Query("q")
+	students, err := h.studentService.GetAllStudents(searchQuery)
 	if err != nil {
 		InternalServerError(c, err.Error())
 		return
