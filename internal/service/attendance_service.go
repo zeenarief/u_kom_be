@@ -13,6 +13,7 @@ type AttendanceService interface {
 	SubmitAttendance(req request.AttendanceSubmitRequest) (*response.AttendanceSessionDetailResponse, error)
 	GetSessionDetail(id string) (*response.AttendanceSessionDetailResponse, error)
 	GetHistoryByTeacher(teacherID string) ([]response.AttendanceHistoryResponse, error)
+	GetSessionByScheduleDate(scheduleID, dateStr string) (*response.AttendanceSessionDetailResponse, error)
 }
 
 type attendanceService struct {
@@ -30,49 +31,58 @@ func NewAttendanceService(
 	}
 }
 
-// SubmitAttendance menangani input absen baru
 func (s *attendanceService) SubmitAttendance(req request.AttendanceSubmitRequest) (*response.AttendanceSessionDetailResponse, error) {
-	// 1. Parse Tanggal
-	date, err := time.Parse("2006-01-02", req.Date)
+	// PERBAIKAN: Parse menggunakan Local Location server
+	date, err := time.ParseInLocation("2006-01-02", req.Date, time.Local)
 	if err != nil {
-		return nil, errors.New("invalid date format (YYYY-MM-DD)")
+		return nil, errors.New("invalid date format")
 	}
 
-	// 2. Validasi Jadwal
-	// Kita cek dulu apakah jadwalnya ada (dan valid)
-	// (Opsional: Cek apakah TeacherID yang request berhak atas jadwal ini - bisa via middleware/context)
-
-	// 3. Cek Duplikasi (Apakah tanggal ini sudah diabsen?)
-	existing, _ := s.repo.FindSessionByScheduleDate(req.ScheduleID, date)
-	if existing != nil {
-		return nil, errors.New("attendance for this schedule on this date already exists")
-	}
-
-	// 4. Map Request ke Domain
-	session := &domain.AttendanceSession{
-		ScheduleID: req.ScheduleID,
-		Date:       date,
-		Topic:      req.Topic,
-		Notes:      req.Notes,
-		Details:    []domain.AttendanceDetail{},
-	}
-
+	// Siapkan detail baru
+	var newDetails []domain.AttendanceDetail
 	for _, studentInput := range req.Students {
-		detail := domain.AttendanceDetail{
+		newDetails = append(newDetails, domain.AttendanceDetail{
 			StudentID: studentInput.StudentID,
 			Status:    studentInput.Status,
 			Notes:     studentInput.Notes,
+		})
+	}
+
+	// 1. CEK EKSISTENSI (PERBAIKAN UTAMA DISINI)
+	// Jangan gunakan underscore (_), tangkap errornya
+	existingSession, errFind := s.repo.FindSessionByScheduleDate(req.ScheduleID, date)
+
+	// Logic: Jika tidak ada error DAN session ditemukan -> UPDATE
+	if errFind == nil && existingSession != nil && existingSession.ID != "" {
+
+		// === UPDATE MODE ===
+		existingSession.Topic = req.Topic
+		existingSession.Notes = req.Notes
+
+		// Panggil repo Update
+		if err := s.repo.UpdateSession(existingSession, newDetails); err != nil {
+			return nil, err
 		}
-		session.Details = append(session.Details, detail)
-	}
 
-	// 5. Simpan ke DB
-	if err := s.repo.CreateSession(session); err != nil {
-		return nil, err
-	}
+		return s.GetSessionDetail(existingSession.ID)
 
-	// 6. Return Created Data (Reuse logic GetSessionDetail biar konsisten)
-	return s.GetSessionDetail(session.ID)
+	} else {
+		// === CREATE MODE ===
+		// Masuk sini jika record not found (errFind != nil)
+		session := &domain.AttendanceSession{
+			ScheduleID: req.ScheduleID,
+			Date:       date,
+			Topic:      req.Topic,
+			Notes:      req.Notes,
+			Details:    newDetails,
+		}
+
+		if err := s.repo.CreateSession(session); err != nil {
+			return nil, err
+		}
+
+		return s.GetSessionDetail(session.ID)
+	}
 }
 
 // GetSessionDetail mengambil detail sesi + rekap kehadiran
@@ -154,4 +164,19 @@ func safeString(ptr *string) string {
 		return ""
 	}
 	return *ptr
+}
+
+func (s *attendanceService) GetSessionByScheduleDate(scheduleID, dateStr string) (*response.AttendanceSessionDetailResponse, error) {
+	date, err := time.ParseInLocation("2006-01-02", dateStr, time.Local)
+	if err != nil {
+		return nil, err
+	}
+
+	session, err := s.repo.FindSessionByScheduleDate(scheduleID, date)
+	if err != nil || session == nil {
+		return nil, errors.New("not found")
+	}
+
+	// Reuse logic mapping
+	return s.GetSessionDetail(session.ID)
 }

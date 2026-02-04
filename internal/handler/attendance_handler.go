@@ -25,10 +25,13 @@ func (h *AttendanceHandler) Submit(c *gin.Context) {
 
 	res, err := h.service.SubmitAttendance(req)
 	if err != nil {
-		if strings.Contains(err.Error(), "already exists") {
-			BadRequestError(c, "Duplicate Attendance", err.Error())
+		// PERBAIKAN: Cek juga "Duplicate entry" (error standar MySQL)
+		msg := err.Error()
+		if strings.Contains(msg, "already exists") || strings.Contains(msg, "Duplicate entry") {
+			BadRequestError(c, "Absensi untuk jadwal dan tanggal ini sudah ada.", msg)
 			return
 		}
+
 		InternalServerError(c, err.Error())
 		return
 	}
@@ -78,4 +81,30 @@ func (h *AttendanceHandler) GetHistory(c *gin.Context) {
 		return
 	}
 	SuccessResponse(c, "Attendance history retrieved", res)
+}
+
+func (h *AttendanceHandler) CheckSession(c *gin.Context) {
+	scheduleID := c.Query("schedule_id")
+	date := c.Query("date") // YYYY-MM-DD
+
+	if scheduleID == "" || date == "" {
+		BadRequestError(c, "schedule_id and date required", nil)
+		return
+	}
+
+	// Kita reuse logic parsing date di service, tapi karena service kita
+	// belum punya method khusus check, kita bisa buat atau parsing manual disini.
+	// Agar rapi, idealnya ada di service. Tapi untuk cepat, kita parsing disini atau
+	// buat method GetSessionByScheduleDate di service.
+
+	// Mari kita buat method baru di Service (Lihat langkah 4 di bawah)
+	res, err := h.service.GetSessionByScheduleDate(scheduleID, date)
+	if err != nil {
+		// Jika tidak ketemu, return null data, bukan error 404/500
+		// agar frontend tahu "Oh belum ada absen", bukan "Error server"
+		SuccessResponse(c, "Session check", nil)
+		return
+	}
+
+	SuccessResponse(c, "Session found", res)
 }

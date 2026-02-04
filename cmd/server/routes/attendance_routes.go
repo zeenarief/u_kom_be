@@ -31,5 +31,7 @@ func RegisterAttendanceRoutes(router *gin.RouterGroup, h *handler.AttendanceHand
 			// middleware.PermissionMiddleware("attendance.read", authService), // Opsional
 			h.GetHistory,
 		)
+
+		group.GET("/check", h.CheckSession) // GET /api/v1/attendances/check?schedule_id=...&date=...
 	}
 }

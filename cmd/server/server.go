@@ -192,9 +192,9 @@ func setupRouter(cfg *config.Config, authService service.AuthService) *gin.Engin
 	router.Use(middleware.CORSMiddleware())
 
 	// Rate limiting middleware
-	if cfg.RateLimitEnabled {
-		router.Use(middleware.RateLimitMiddleware(cfg))
-	}
+	//if cfg.RateLimitEnabled {
+	//	router.Use(middleware.RateLimitMiddleware(cfg))
+	//}
 
 	return router
 }

@@ -13,7 +13,7 @@ type AttendanceRepository interface {
 	FindSessionByID(id string) (*domain.AttendanceSession, error)
 	GetHistoryByTeacher(teacherID string) ([]domain.AttendanceSession, error)
 	// Update logic jika guru ingin mengedit absen
-	UpdateSession(session *domain.AttendanceSession) error
+	UpdateSession(session *domain.AttendanceSession, newDetails []domain.AttendanceDetail) error
 }
 
 type attendanceRepository struct {
@@ -29,11 +29,18 @@ func (r *attendanceRepository) CreateSession(session *domain.AttendanceSession) 
 	return r.db.Create(session).Error
 }
 
+// UPDATE: Pastikan Preload Details ada di sini
 func (r *attendanceRepository) FindSessionByScheduleDate(scheduleID string, date time.Time) (*domain.AttendanceSession, error) {
 	var session domain.AttendanceSession
+
+	// PERBAIKAN: Gunakan DATE() dan format string tanggal yyyy-mm-dd
+	// Ini memastikan kita membandingkan tanggalnya saja, tanpa peduli jam 00:00 atau 07:00
+	dateString := date.Format("2006-01-02")
+
 	err := r.db.Preload("Details").Preload("Details.Student").
-		Where("schedule_id = ? AND date = ?", scheduleID, date).
+		Where("schedule_id = ? AND DATE(date) = ?", scheduleID, dateString).
 		First(&session).Error
+
 	if err != nil {
 		return nil, err
 	}
@@ -67,8 +74,32 @@ func (r *attendanceRepository) GetHistoryByTeacher(teacherID string) ([]domain.A
 	return sessions, err
 }
 
-func (r *attendanceRepository) UpdateSession(session *domain.AttendanceSession) error {
-	// Logic update (biasanya hapus details lama, insert baru, atau update one-by-one)
-	// Untuk simplifikasi awal, kita gunakan Save session (header) dulu
-	return r.db.Save(session).Error
+// NEW: Update Session dengan Transaksi
+func (r *attendanceRepository) UpdateSession(session *domain.AttendanceSession, newDetails []domain.AttendanceDetail) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		// 1. Update Header (Topic, Notes)
+		if err := tx.Model(session).Updates(domain.AttendanceSession{
+			Topic: session.Topic,
+			Notes: session.Notes,
+		}).Error; err != nil {
+			return err
+		}
+
+		// 2. Hapus Detail Lama (Hard Delete berdasarkan Session ID)
+		if err := tx.Where("attendance_session_id = ?", session.ID).Delete(&domain.AttendanceDetail{}).Error; err != nil {
+			return err
+		}
+
+		// 3. Masukkan Detail Baru
+		// Kita harus set ID session ke detail baru sebelum insert
+		for i := range newDetails {
+			newDetails[i].AttendanceSessionID = session.ID
+		}
+
+		if err := tx.Create(&newDetails).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
