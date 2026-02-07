@@ -47,13 +47,13 @@ func NewGuardianService(
 // CreateGuardian menangani pembuatan data wali baru
 func (s *guardianService) CreateGuardian(req request.GuardianCreateRequest) (*response.GuardianDetailResponse, error) {
 	// 1. Validasi Duplikat (Phone & Email)
-	if req.PhoneNumber != "" { // Phone number wajib ada
-		if existing, _ := s.guardianRepo.FindByPhone(req.PhoneNumber); existing != nil {
+	if req.PhoneNumber != nil && *req.PhoneNumber != "" { // Phone number optional
+		if existing, _ := s.guardianRepo.FindByPhone(*req.PhoneNumber); existing != nil {
 			return nil, apperrors.NewConflictError("phone number already exists")
 		}
 	}
-	if req.Email != "" {
-		if existing, _ := s.guardianRepo.FindByEmail(req.Email); existing != nil {
+	if req.Email != nil && *req.Email != "" {
+		if existing, _ := s.guardianRepo.FindByEmail(*req.Email); existing != nil {
 			return nil, apperrors.NewConflictError("email already exists")
 		}
 	}
@@ -62,9 +62,9 @@ func (s *guardianService) CreateGuardian(req request.GuardianCreateRequest) (*re
 	var encryptedNIK *string
 	var nikHash *string
 
-	if req.NIK != "" {
+	if req.NIK != nil && *req.NIK != "" {
 		// a. Hash & Check Unique
-		hash, err := s.encryptionUtil.Hash(req.NIK)
+		hash, err := s.encryptionUtil.Hash(*req.NIK)
 		if err != nil {
 			return nil, fmt.Errorf("failed to hash nik: %w", err)
 		}
@@ -79,7 +79,7 @@ func (s *guardianService) CreateGuardian(req request.GuardianCreateRequest) (*re
 		nikHash = &hash
 
 		// b. Encrypt
-		encrypted, err := s.encryptionUtil.Encrypt(req.NIK)
+		encrypted, err := s.encryptionUtil.Encrypt(*req.NIK)
 		if err != nil {
 			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
 		}
@@ -190,78 +190,93 @@ func (s *guardianService) UpdateGuardian(id string, req request.GuardianUpdateRe
 	}
 
 	// Validasi duplikat baru
-	if req.PhoneNumber != "" && req.PhoneNumber != guardian.PhoneNumber {
-		if existing, _ := s.guardianRepo.FindByPhone(req.PhoneNumber); existing != nil {
-			return nil, apperrors.NewConflictError("phone number already exists")
+	if req.PhoneNumber != nil {
+		if guardian.PhoneNumber == nil || *req.PhoneNumber != *guardian.PhoneNumber {
+			if *req.PhoneNumber != "" {
+				if existing, _ := s.guardianRepo.FindByPhone(*req.PhoneNumber); existing != nil {
+					return nil, apperrors.NewConflictError("phone number already exists")
+				}
+			}
+			guardian.PhoneNumber = req.PhoneNumber
 		}
-		guardian.PhoneNumber = req.PhoneNumber
 	}
-	if req.Email != "" && req.Email != guardian.Email {
-		if existing, _ := s.guardianRepo.FindByEmail(req.Email); existing != nil {
-			return nil, apperrors.NewConflictError("email already exists")
+
+	if req.Email != nil {
+		if guardian.Email == nil || *req.Email != *guardian.Email {
+			if *req.Email != "" {
+				if existing, _ := s.guardianRepo.FindByEmail(*req.Email); existing != nil {
+					return nil, apperrors.NewConflictError("email already exists")
+				}
+			}
+			guardian.Email = req.Email
 		}
-		guardian.Email = req.Email
 	}
 
 	// Enkripsi NIK jika diperbarui
-	if req.NIK != "" {
-		// Hitung hash baru
-		newHash, err := s.encryptionUtil.Hash(req.NIK)
-		if err != nil {
-			return nil, fmt.Errorf("failed to hash nik: %w", err)
-		}
-
-		// Cek keunikan jika hash berubah atau sebelumnya null
-		isDifferent := guardian.NIKHash == nil || *guardian.NIKHash != newHash
-		if isDifferent {
-			existing, err := s.guardianRepo.FindByNIKHash(newHash)
+	if req.NIK != nil {
+		if *req.NIK != "" {
+			// Hitung hash baru
+			newHash, err := s.encryptionUtil.Hash(*req.NIK)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("failed to hash nik: %w", err)
 			}
-			if existing != nil && existing.ID != id {
-				return nil, apperrors.NewConflictError("nik already exists")
+
+			// Cek keunikan jika hash berubah atau sebelumnya null
+			isDifferent := guardian.NIKHash == nil || *guardian.NIKHash != newHash
+			if isDifferent {
+				existing, err := s.guardianRepo.FindByNIKHash(newHash)
+				if err != nil {
+					return nil, err
+				}
+				if existing != nil && existing.ID != id {
+					return nil, apperrors.NewConflictError("nik already exists")
+				}
 			}
-		}
 
-		guardian.NIKHash = &newHash
+			guardian.NIKHash = &newHash
 
-		// Enkripsi
-		encryptedNIK, err := s.encryptionUtil.Encrypt(req.NIK)
-		if err != nil {
-			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
+			// Enkripsi
+			encryptedNIK, err := s.encryptionUtil.Encrypt(*req.NIK)
+			if err != nil {
+				return nil, fmt.Errorf("failed to encrypt nik: %w", err)
+			}
+			guardian.NIK = &encryptedNIK
+		} else {
+			// Jika explicit empty string, hapus NIK
+			guardian.NIK = nil
+			guardian.NIKHash = nil
 		}
-		guardian.NIK = &encryptedNIK
 	}
 
-	// Update field lainnya (pola `!= ""`)
-	if req.Gender != "" {
+	// Update field lainnya (pola `!= nil`)
+	if req.Gender != nil {
 		guardian.Gender = req.Gender
 	}
-	if req.Address != "" {
+	if req.Address != nil {
 		guardian.Address = req.Address
 	}
-	if req.RT != "" {
+	if req.RT != nil {
 		guardian.RT = req.RT
 	}
-	if req.RW != "" {
+	if req.RW != nil {
 		guardian.RW = req.RW
 	}
-	if req.SubDistrict != "" {
+	if req.SubDistrict != nil {
 		guardian.SubDistrict = req.SubDistrict
 	}
-	if req.District != "" {
+	if req.District != nil {
 		guardian.District = req.District
 	}
-	if req.City != "" {
+	if req.City != nil {
 		guardian.City = req.City
 	}
-	if req.Province != "" {
+	if req.Province != nil {
 		guardian.Province = req.Province
 	}
-	if req.PostalCode != "" {
+	if req.PostalCode != nil {
 		guardian.PostalCode = req.PostalCode
 	}
-	if req.RelationshipToStudent != "" {
+	if req.RelationshipToStudent != nil {
 		guardian.RelationshipToStudent = req.RelationshipToStudent
 	}
 

@@ -29,20 +29,22 @@ func NewGuardianConverter(encryptionUtil utils.EncryptionUtil) GuardianConverter
 // ToGuardianDetailResponse mengubah domain Guardian (terenkripsi) ke response detail (plaintext)
 func (c *guardianConverter) ToGuardianDetailResponse(guardian *domain.Guardian) *response.GuardianDetailResponse {
 	// Dekripsi NIK
-	decryptedNIK := ""
+	var decryptedNIK *string
 	if guardian.NIK != nil {
-		var err error
-		decryptedNIK, err = c.encryptionUtil.Decrypt(*guardian.NIK)
+		decrypted, err := c.encryptionUtil.Decrypt(*guardian.NIK)
 		if err != nil {
 			log.Printf("Failed to decrypt NIK for guardian %s: %v", guardian.ID, err)
-			decryptedNIK = "[DECRYPTION_ERROR]"
+			errStr := "[DECRYPTION_ERROR]"
+			decryptedNIK = &errStr
+		} else {
+			decryptedNIK = &decrypted
 		}
 	}
 
 	return &response.GuardianDetailResponse{
 		ID:                    guardian.ID,
 		FullName:              guardian.FullName,
-		NIK:                   decryptedNIK, // <-- Data plaintext
+		NIK:                   decryptedNIK, // <-- Data plaintext *string
 		Gender:                guardian.Gender,
 		PhoneNumber:           guardian.PhoneNumber,
 		Email:                 guardian.Email,
