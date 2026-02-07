@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"strings"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/service"
@@ -27,11 +26,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 
 	user, err := h.userService.CreateUser(req)
 	if err != nil {
-		if strings.Contains(err.Error(), "already exists") {
-			BadRequestError(c, "Registration failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -43,7 +38,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 
 	user, err := h.userService.GetUserByID(id)
 	if err != nil {
-		NotFoundError(c, "User not found")
+		HandleError(c, err)
 		return
 	}
 
@@ -54,7 +49,7 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 	searchQuery := c.Query("q")
 	users, err := h.userService.GetAllUsers(searchQuery)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -91,8 +86,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 
 	updatedUser, err := h.userService.UpdateUser(id, req, currentUserDomain.ID, currentPermissions)
 	if err != nil {
-		//c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		BadRequestError(c, "Bad request", err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -120,7 +114,7 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 
 	err = h.userService.DeleteUser(id, currentUserDomain.ID, currentPermissions)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -157,7 +151,7 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 
 	err = h.userService.ChangePassword(id, req.CurrentPassword, req.NewPassword, currentUserDomain.ID, currentPermissions)
 	if err != nil {
-		ForbiddenError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -179,7 +173,7 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 
 	user, err := h.userService.GetUserByID(userIDStr)
 	if err != nil {
-		NotFoundError(c, "User not found")
+		HandleError(c, err)
 		return
 	}
 
@@ -215,7 +209,7 @@ func (h *UserHandler) SyncUserRoles(c *gin.Context) {
 
 	err = h.userService.SyncUserRoles(userID, req.Roles, currentUserDomain.ID, currentPermissions)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -251,7 +245,7 @@ func (h *UserHandler) SyncUserPermissions(c *gin.Context) {
 
 	err = h.userService.SyncUserPermissions(userID, req.Permissions, currentUserDomain.ID, currentPermissions)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -263,7 +257,7 @@ func (h *UserHandler) GetUserPermissions(c *gin.Context) {
 
 	userWithPermissions, err := h.userService.GetUserWithRolesAndPermissions(userID)
 	if err != nil {
-		NotFoundError(c, "User not found")
+		HandleError(c, err)
 		return
 	}
 

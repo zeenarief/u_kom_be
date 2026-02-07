@@ -1,8 +1,8 @@
 package service
 
 import (
-	"errors"
 	"time"
+	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/model/response"
@@ -35,7 +35,7 @@ func (s *attendanceService) SubmitAttendance(req request.AttendanceSubmitRequest
 	// PERBAIKAN: Parse menggunakan Local Location server
 	date, err := time.ParseInLocation("2006-01-02", req.Date, time.Local)
 	if err != nil {
-		return nil, errors.New("invalid date format")
+		return nil, apperrors.NewBadRequestError("invalid date format")
 	}
 
 	// Siapkan detail baru
@@ -92,7 +92,7 @@ func (s *attendanceService) GetSessionDetail(id string) (*response.AttendanceSes
 		return nil, err
 	}
 	if session == nil {
-		return nil, errors.New("attendance session not found")
+		return nil, apperrors.NewNotFoundError("attendance session not found")
 	}
 
 	// Mapping ke Response
@@ -174,7 +174,7 @@ func (s *attendanceService) GetSessionByScheduleDate(scheduleID, dateStr string)
 
 	session, err := s.repo.FindSessionByScheduleDate(scheduleID, date)
 	if err != nil || session == nil {
-		return nil, errors.New("not found")
+		return nil, apperrors.NewNotFoundError("not found")
 	}
 
 	// Reuse logic mapping

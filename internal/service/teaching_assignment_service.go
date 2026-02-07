@@ -1,7 +1,7 @@
 package service
 
 import (
-	"errors"
+	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/model/response"
@@ -54,21 +54,21 @@ func (s *teachingAssignmentService) Create(req request.TeachingAssignmentCreateR
 	// 1. Validasi FK
 	c, _ := s.classroomRepo.FindByID(req.ClassroomID)
 	if c == nil {
-		return nil, errors.New("classroom not found")
+		return nil, apperrors.NewNotFoundError("classroom not found")
 	}
 	sub, _ := s.subjectRepo.FindByID(req.SubjectID)
 	if sub == nil {
-		return nil, errors.New("subject not found")
+		return nil, apperrors.NewNotFoundError("subject not found")
 	}
 	emp, _ := s.employeeRepo.FindByID(req.TeacherID)
 	if emp == nil {
-		return nil, errors.New("teacher not found")
+		return nil, apperrors.NewNotFoundError("teacher not found")
 	}
 
 	// 2. Cek Duplikat (Apakah mapel ini sudah ada gurunya di kelas ini?)
 	existing, _ := s.repo.FindOne(req.ClassroomID, req.SubjectID)
 	if existing != nil {
-		return nil, errors.New("this subject already has a teacher in this class")
+		return nil, apperrors.NewConflictError("this subject already has a teacher in this class")
 	}
 
 	// 3. Simpan

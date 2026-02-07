@@ -24,12 +24,7 @@ func (h *SubjectHandler) Create(c *gin.Context) {
 
 	res, err := h.service.Create(req)
 	if err != nil {
-		// Handle specific error
-		if err.Error() == "subject code already exists" {
-			BadRequestError(c, "Data conflict", err.Error())
-			return
-		}
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -40,7 +35,7 @@ func (h *SubjectHandler) FindAll(c *gin.Context) {
 	searchQuery := c.Query("q")
 	res, err := h.service.FindAll(searchQuery)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 	SuccessResponse(c, "Subjects retrieved successfully", res)
@@ -50,7 +45,7 @@ func (h *SubjectHandler) FindByID(c *gin.Context) {
 	id := c.Param("id")
 	res, err := h.service.FindByID(id)
 	if err != nil {
-		NotFoundError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 	SuccessResponse(c, "Subject detail retrieved successfully", res)
@@ -66,11 +61,7 @@ func (h *SubjectHandler) Update(c *gin.Context) {
 
 	res, err := h.service.Update(id, req)
 	if err != nil {
-		if err.Error() == "subject code already exists" {
-			BadRequestError(c, "Data conflict", err.Error())
-			return
-		}
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 	SuccessResponse(c, "Subject updated successfully", res)
@@ -79,7 +70,7 @@ func (h *SubjectHandler) Update(c *gin.Context) {
 func (h *SubjectHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.service.Delete(id); err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 	SuccessResponse(c, "Subject deleted successfully", nil)

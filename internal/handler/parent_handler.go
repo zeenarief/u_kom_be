@@ -25,11 +25,7 @@ func (h *ParentHandler) CreateParent(c *gin.Context) {
 
 	parent, err := h.parentService.CreateParent(req)
 	if err != nil {
-		if strings.Contains(err.Error(), "already exists") {
-			BadRequestError(c, "Parent creation failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -40,7 +36,7 @@ func (h *ParentHandler) GetAllParents(c *gin.Context) {
 	searchQuery := c.Query("q")
 	parents, err := h.parentService.GetAllParents(searchQuery)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -52,11 +48,7 @@ func (h *ParentHandler) GetParentByID(c *gin.Context) {
 
 	parent, err := h.parentService.GetParentByID(id)
 	if err != nil {
-		if err.Error() == "parent not found" {
-			NotFoundError(c, "Parent not found")
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -74,13 +66,7 @@ func (h *ParentHandler) UpdateParent(c *gin.Context) {
 
 	parent, err := h.parentService.UpdateParent(id, req)
 	if err != nil {
-		if err.Error() == "parent not found" {
-			NotFoundError(c, "Parent not found")
-		} else if strings.Contains(err.Error(), "already exists") {
-			BadRequestError(c, "Parent update failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -92,11 +78,7 @@ func (h *ParentHandler) DeleteParent(c *gin.Context) {
 
 	err := h.parentService.DeleteParent(id)
 	if err != nil {
-		if err.Error() == "parent not found" {
-			NotFoundError(c, "Parent not found")
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -136,11 +118,7 @@ func (h *ParentHandler) UnlinkUser(c *gin.Context) {
 
 	err := h.parentService.UnlinkUser(parentID)
 	if err != nil {
-		if err.Error() == "parent not found" {
-			NotFoundError(c, "Parent not found")
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 

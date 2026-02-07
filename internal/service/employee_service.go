@@ -1,8 +1,8 @@
 package service
 
 import (
-	"errors"
 	"fmt"
+	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/converter"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
@@ -49,12 +49,12 @@ func (s *employeeService) CreateEmployee(req request.EmployeeCreateRequest) (*re
 	// 1. Validasi Duplikat (NIP & Phone)
 	if req.NIP != nil && *req.NIP != "" {
 		if existing, _ := s.employeeRepo.FindByNIP(*req.NIP); existing != nil {
-			return nil, errors.New("nip already exists")
+			return nil, apperrors.NewConflictError("nip already exists")
 		}
 	}
 	if req.PhoneNumber != nil && *req.PhoneNumber != "" {
 		if existing, _ := s.employeeRepo.FindByPhone(*req.PhoneNumber); existing != nil {
-			return nil, errors.New("phone number already exists")
+			return nil, apperrors.NewConflictError("phone number already exists")
 		}
 	}
 
@@ -73,7 +73,7 @@ func (s *employeeService) CreateEmployee(req request.EmployeeCreateRequest) (*re
 			return nil, err
 		}
 		if existing != nil {
-			return nil, errors.New("nik already exists")
+			return nil, apperrors.NewConflictError("nik already exists")
 		}
 
 		// b. Enkripsi
@@ -110,7 +110,7 @@ func (s *employeeService) CreateEmployee(req request.EmployeeCreateRequest) (*re
 		return nil, err
 	}
 	if createdEmployee == nil {
-		return nil, errors.New("failed to retrieve created employee")
+		return nil, apperrors.NewInternalError("failed to retrieve created employee")
 	}
 
 	// 6. Konversi ke Response Detail
@@ -138,7 +138,7 @@ func (s *employeeService) GetEmployeeByID(id string) (*response.EmployeeDetailRe
 		return nil, err
 	}
 	if employee == nil {
-		return nil, errors.New("employee not found")
+		return nil, apperrors.NewNotFoundError("employee not found")
 	}
 	// Panggil konverter (akan mendekripsi NIK)
 	resp := s.converter.ToEmployeeDetailResponse(employee)
@@ -175,7 +175,7 @@ func (s *employeeService) UpdateEmployee(id string, req request.EmployeeUpdateRe
 		return nil, err
 	}
 	if employee == nil {
-		return nil, errors.New("employee not found")
+		return nil, apperrors.NewNotFoundError("employee not found")
 	}
 
 	// Update fields jika disediakan
@@ -190,7 +190,7 @@ func (s *employeeService) UpdateEmployee(id string, req request.EmployeeUpdateRe
 	if req.NIP != nil {
 		if (employee.NIP == nil || *req.NIP != *employee.NIP) && *req.NIP != "" {
 			if existing, _ := s.employeeRepo.FindByNIP(*req.NIP); existing != nil {
-				return nil, errors.New("nip already exists")
+				return nil, apperrors.NewConflictError("nip already exists")
 			}
 		}
 		employee.NIP = req.NIP
@@ -200,7 +200,7 @@ func (s *employeeService) UpdateEmployee(id string, req request.EmployeeUpdateRe
 	if req.PhoneNumber != nil {
 		if (employee.PhoneNumber == nil || *req.PhoneNumber != *employee.PhoneNumber) && *req.PhoneNumber != "" {
 			if existing, _ := s.employeeRepo.FindByPhone(*req.PhoneNumber); existing != nil {
-				return nil, errors.New("phone number already exists")
+				return nil, apperrors.NewConflictError("phone number already exists")
 			}
 		}
 		employee.PhoneNumber = req.PhoneNumber
@@ -220,7 +220,7 @@ func (s *employeeService) UpdateEmployee(id string, req request.EmployeeUpdateRe
 			return nil, err
 		}
 		if existing != nil && existing.ID != id {
-			return nil, errors.New("nik already exists")
+			return nil, apperrors.NewConflictError("nik already exists")
 		}
 
 		encryptedNIK, err := s.encryptUtil.Encrypt(req.NIK)
@@ -283,7 +283,7 @@ func (s *employeeService) DeleteEmployee(id string) error {
 		return err
 	}
 	if employee == nil {
-		return errors.New("employee not found")
+		return apperrors.NewNotFoundError("employee not found")
 	}
 
 	// TODO: Tambahkan logika bisnis,
@@ -302,7 +302,7 @@ func (s *employeeService) LinkUser(employeeID string, userID string) error {
 		return err
 	}
 	if employee == nil {
-		return errors.New("employee not found")
+		return apperrors.NewNotFoundError("employee not found")
 	}
 
 	// 2. Cek apakah User ada
@@ -311,13 +311,13 @@ func (s *employeeService) LinkUser(employeeID string, userID string) error {
 		return err
 	}
 	if user == nil {
-		return errors.New("user not found")
+		return apperrors.NewNotFoundError("user not found")
 	}
 
 	// 3. Cek apakah User tersebut sudah ditautkan ke Employee LAIN
 	existingEmployee, _ := s.employeeRepo.FindByUserID(userID)
 	if existingEmployee != nil && existingEmployee.ID != employeeID {
-		return errors.New("this user account is already linked to another employee")
+		return apperrors.NewConflictError("this user account is already linked to another employee")
 	}
 
 	// 4. Tautkan akun
@@ -332,7 +332,7 @@ func (s *employeeService) UnlinkUser(employeeID string) error {
 		return err
 	}
 	if employee == nil {
-		return errors.New("employee not found")
+		return apperrors.NewNotFoundError("employee not found")
 	}
 
 	// 2. Hapus tautan (set user_id ke NULL)

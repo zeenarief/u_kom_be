@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"strings"
+	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/service"
 
@@ -25,14 +25,7 @@ func (h *AttendanceHandler) Submit(c *gin.Context) {
 
 	res, err := h.service.SubmitAttendance(req)
 	if err != nil {
-		// PERBAIKAN: Cek juga "Duplicate entry" (error standar MySQL)
-		msg := err.Error()
-		if strings.Contains(msg, "already exists") || strings.Contains(msg, "Duplicate entry") {
-			BadRequestError(c, "Absensi untuk jadwal dan tanggal ini sudah ada.", msg)
-			return
-		}
-
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -43,7 +36,7 @@ func (h *AttendanceHandler) GetDetail(c *gin.Context) {
 	id := c.Param("id")
 	res, err := h.service.GetSessionDetail(id)
 	if err != nil {
-		NotFoundError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 	SuccessResponse(c, "Attendance detail retrieved", res)
@@ -77,7 +70,7 @@ func (h *AttendanceHandler) GetHistory(c *gin.Context) {
 
 	res, err := h.service.GetHistoryByTeacher(teacherID)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 	SuccessResponse(c, "Attendance history retrieved", res)
@@ -102,7 +95,14 @@ func (h *AttendanceHandler) CheckSession(c *gin.Context) {
 	if err != nil {
 		// Jika tidak ketemu, return null data, bukan error 404/500
 		// agar frontend tahu "Oh belum ada absen", bukan "Error server"
-		SuccessResponse(c, "Session check", nil)
+		// NOTE: logic ini tetap dipertahankan karena behavior API check session
+		if _, ok := err.(*apperrors.AppError); ok {
+			// Jika error NotFound, return success dengan data nil
+			SuccessResponse(c, "Session check", nil)
+			return
+		}
+
+		HandleError(c, err)
 		return
 	}
 

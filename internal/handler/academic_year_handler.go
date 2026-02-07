@@ -24,7 +24,7 @@ func (h *AcademicYearHandler) Create(c *gin.Context) {
 
 	result, err := h.service.Create(req)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -34,7 +34,7 @@ func (h *AcademicYearHandler) Create(c *gin.Context) {
 func (h *AcademicYearHandler) FindAll(c *gin.Context) {
 	result, err := h.service.FindAll()
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -45,7 +45,7 @@ func (h *AcademicYearHandler) FindByID(c *gin.Context) {
 	id := c.Param("id")
 	result, err := h.service.FindByID(id)
 	if err != nil {
-		NotFoundError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -62,7 +62,7 @@ func (h *AcademicYearHandler) Update(c *gin.Context) {
 
 	result, err := h.service.Update(id, req)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -72,7 +72,7 @@ func (h *AcademicYearHandler) Update(c *gin.Context) {
 func (h *AcademicYearHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.service.Delete(id); err != nil {
-		BadRequestError(c, "Failed to delete academic year", err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -82,7 +82,7 @@ func (h *AcademicYearHandler) Delete(c *gin.Context) {
 func (h *AcademicYearHandler) Activate(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.service.Activate(id); err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 

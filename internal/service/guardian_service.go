@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/converter"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
@@ -48,12 +49,12 @@ func (s *guardianService) CreateGuardian(req request.GuardianCreateRequest) (*re
 	// 1. Validasi Duplikat (Phone & Email)
 	if req.PhoneNumber != "" { // Phone number wajib ada
 		if existing, _ := s.guardianRepo.FindByPhone(req.PhoneNumber); existing != nil {
-			return nil, errors.New("phone number already exists")
+			return nil, apperrors.NewConflictError("phone number already exists")
 		}
 	}
 	if req.Email != "" {
 		if existing, _ := s.guardianRepo.FindByEmail(req.Email); existing != nil {
-			return nil, errors.New("email already exists")
+			return nil, apperrors.NewConflictError("email already exists")
 		}
 	}
 
@@ -96,7 +97,7 @@ func (s *guardianService) CreateGuardian(req request.GuardianCreateRequest) (*re
 		return nil, err
 	}
 	if createdGuardian == nil {
-		return nil, errors.New("failed to retrieve created guardian")
+		return nil, apperrors.NewInternalError("failed to retrieve created guardian")
 	}
 
 	// 6. Konversi ke Response Detail
@@ -124,7 +125,7 @@ func (s *guardianService) GetGuardianByID(id string) (*response.GuardianDetailRe
 		return nil, err
 	}
 	if guardian == nil {
-		return nil, errors.New("guardian not found")
+		return nil, apperrors.NewNotFoundError("guardian not found")
 	}
 	// Panggil konverter untuk response detail (dengan dekripsi NIK)
 	resp := s.converter.ToGuardianDetailResponse(guardian)
@@ -161,7 +162,7 @@ func (s *guardianService) UpdateGuardian(id string, req request.GuardianUpdateRe
 		return nil, err
 	}
 	if guardian == nil {
-		return nil, errors.New("guardian not found")
+		return nil, apperrors.NewNotFoundError("guardian not found")
 	}
 
 	// Update fields jika disediakan
@@ -172,13 +173,13 @@ func (s *guardianService) UpdateGuardian(id string, req request.GuardianUpdateRe
 	// Validasi duplikat baru
 	if req.PhoneNumber != "" && req.PhoneNumber != guardian.PhoneNumber {
 		if existing, _ := s.guardianRepo.FindByPhone(req.PhoneNumber); existing != nil {
-			return nil, errors.New("phone number already exists")
+			return nil, apperrors.NewConflictError("phone number already exists")
 		}
 		guardian.PhoneNumber = req.PhoneNumber
 	}
 	if req.Email != "" && req.Email != guardian.Email {
 		if existing, _ := s.guardianRepo.FindByEmail(req.Email); existing != nil {
-			return nil, errors.New("email already exists")
+			return nil, apperrors.NewConflictError("email already exists")
 		}
 		guardian.Email = req.Email
 	}
@@ -259,7 +260,7 @@ func (s *guardianService) DeleteGuardian(id string) error {
 		return err
 	}
 	if guardian == nil {
-		return errors.New("guardian not found")
+		return apperrors.NewNotFoundError("guardian not found")
 	}
 
 	return s.guardianRepo.Delete(id)
@@ -273,7 +274,7 @@ func (s *guardianService) LinkUser(guardianID string, userID string) error {
 		return err
 	}
 	if guardian == nil {
-		return errors.New("guardian not found")
+		return apperrors.NewNotFoundError("guardian not found")
 	}
 
 	// 2. Cek apakah User ada
@@ -282,13 +283,13 @@ func (s *guardianService) LinkUser(guardianID string, userID string) error {
 		return err
 	}
 	if user == nil {
-		return errors.New("user not found")
+		return apperrors.NewNotFoundError("user not found")
 	}
 
 	// 3. Tautkan akun (Kita andalkan UNIQUE constraint di DB untuk error duplikat)
 	if err := s.guardianRepo.SetUserID(guardianID, &userID); err != nil {
 		if strings.Contains(err.Error(), "Duplicate entry") {
-			return errors.New("this user account is already linked to another guardian")
+			return apperrors.NewConflictError("this user account is already linked to another guardian")
 		}
 		return err
 	}

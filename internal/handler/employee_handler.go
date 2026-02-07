@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"strings"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/service"
 
@@ -26,11 +25,7 @@ func (h *EmployeeHandler) CreateEmployee(c *gin.Context) {
 
 	employee, err := h.employeeService.CreateEmployee(req)
 	if err != nil {
-		if strings.Contains(err.Error(), "already exists") {
-			BadRequestError(c, "Employee creation failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -42,7 +37,7 @@ func (h *EmployeeHandler) GetAllEmployees(c *gin.Context) {
 	searchQuery := c.Query("q")
 	employees, err := h.employeeService.GetAllEmployees(searchQuery)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -55,11 +50,7 @@ func (h *EmployeeHandler) GetEmployeeByID(c *gin.Context) {
 
 	employee, err := h.employeeService.GetEmployeeByID(id)
 	if err != nil {
-		if err.Error() == "employee not found" {
-			NotFoundError(c, "Employee not found")
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -78,13 +69,7 @@ func (h *EmployeeHandler) UpdateEmployee(c *gin.Context) {
 
 	employee, err := h.employeeService.UpdateEmployee(id, req)
 	if err != nil {
-		if err.Error() == "employee not found" {
-			NotFoundError(c, "Employee not found")
-		} else if strings.Contains(err.Error(), "already exists") {
-			BadRequestError(c, "Employee update failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -97,11 +82,7 @@ func (h *EmployeeHandler) DeleteEmployee(c *gin.Context) {
 
 	err := h.employeeService.DeleteEmployee(id)
 	if err != nil {
-		if err.Error() == "employee not found" {
-			NotFoundError(c, "Employee not found")
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -125,13 +106,7 @@ func (h *EmployeeHandler) LinkUser(c *gin.Context) {
 
 	err := h.employeeService.LinkUser(employeeID, req.UserID)
 	if err != nil {
-		if strings.Contains(err.Error(), "not found") {
-			NotFoundError(c, err.Error())
-		} else if strings.Contains(err.Error(), "already linked") {
-			BadRequestError(c, "Link failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -144,11 +119,7 @@ func (h *EmployeeHandler) UnlinkUser(c *gin.Context) {
 
 	err := h.employeeService.UnlinkUser(employeeID)
 	if err != nil {
-		if err.Error() == "employee not found" {
-			NotFoundError(c, "Employee not found")
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 

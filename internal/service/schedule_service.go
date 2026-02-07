@@ -1,7 +1,7 @@
 package service
 
 import (
-	"errors"
+	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/model/response"
@@ -56,12 +56,14 @@ func (s *scheduleService) Create(req request.ScheduleCreateRequest) (*response.S
 	// *Catatan: Kita perlu tambahkan FindByID di TeachingAssignmentRepository dulu (lihat bawah)*
 	assignment, err := s.teachingAssignmentRepo.FindByID(req.TeachingAssignmentID)
 	if err != nil || assignment == nil {
-		return nil, errors.New("teaching assignment not found")
+		return nil, apperrors.NewNotFoundError("Teaching assignment not found")
 	}
 
 	// 2. Validasi Logic: EndTime harus > StartTime
 	if req.EndTime <= req.StartTime {
-		return nil, errors.New("end time must be greater than start time")
+		if req.EndTime <= req.StartTime {
+			return nil, apperrors.NewBadRequestError("End time must be greater than start time")
+		}
 	}
 
 	// 3. Cek Bentrok KELAS (Apakah kelas ini sedang belajar mapel lain?)
@@ -70,7 +72,9 @@ func (s *scheduleService) Create(req request.ScheduleCreateRequest) (*response.S
 		return nil, err
 	}
 	if conflictClass {
-		return nil, errors.New("conflict: classroom is occupied at this time")
+		if conflictClass {
+			return nil, apperrors.NewConflictError("Classroom is occupied at this time")
+		}
 	}
 
 	// 4. Cek Bentrok GURU (Apakah guru ini sedang mengajar di kelas lain?)
@@ -79,7 +83,9 @@ func (s *scheduleService) Create(req request.ScheduleCreateRequest) (*response.S
 		return nil, err
 	}
 	if conflictTeacher {
-		return nil, errors.New("conflict: teacher is teaching in another class at this time")
+		if conflictTeacher {
+			return nil, apperrors.NewConflictError("Teacher is teaching in another class at this time")
+		}
 	}
 
 	// 5. Simpan

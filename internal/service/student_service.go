@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/converter"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
@@ -67,7 +68,7 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 	if req.NISN != "" {
 		nisn = &req.NISN
 		if existing, _ := s.studentRepo.FindByNISN(req.NISN); existing != nil {
-			return nil, errors.New("nisn already exists")
+			return nil, apperrors.NewConflictError("nisn already exists")
 		}
 	}
 
@@ -75,7 +76,7 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 	if req.NIM != "" {
 		nim = &req.NIM
 		if existing, _ := s.studentRepo.FindByNIM(req.NIM); existing != nil {
-			return nil, errors.New("nim already exists")
+			return nil, apperrors.NewConflictError("nim already exists")
 		}
 	}
 
@@ -128,7 +129,7 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 		return nil, err
 	}
 	if createdStudent == nil {
-		return nil, errors.New("failed to retrieve created student")
+		return nil, apperrors.NewInternalError("failed to retrieve created student")
 	}
 
 	// 6. Konversi ke Response (menggunakan konverter)
@@ -143,7 +144,7 @@ func (s *studentService) GetStudentByID(id string) (*response.StudentDetailRespo
 		return nil, err
 	}
 	if student == nil {
-		return nil, errors.New("student not found")
+		return nil, apperrors.NewNotFoundError("student not found")
 	}
 
 	// 2. Panggil konverter
@@ -199,7 +200,7 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 		return nil, err
 	}
 	if student == nil {
-		return nil, errors.New("student not found")
+		return nil, apperrors.NewNotFoundError("student not found")
 	}
 
 	// Update fields jika disediakan (meniru RoleService)
@@ -215,7 +216,7 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 		// ada value baru
 		if student.NISN == nil || *student.NISN != req.NISN {
 			if existing, _ := s.studentRepo.FindByNISN(req.NISN); existing != nil {
-				return nil, errors.New("nisn already exists")
+				return nil, apperrors.NewConflictError("nisn already exists")
 			}
 			student.NISN = &req.NISN
 		}
@@ -225,7 +226,7 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 	} else {
 		if student.NIM == nil || *student.NIM != req.NIM {
 			if existing, _ := s.studentRepo.FindByNIM(req.NIM); existing != nil {
-				return nil, errors.New("nim already exists")
+				return nil, apperrors.NewConflictError("nim already exists")
 			}
 			student.NIM = &req.NIM
 		}
@@ -304,7 +305,7 @@ func (s *studentService) DeleteStudent(id string) error {
 		return err
 	}
 	if student == nil {
-		return errors.New("student not found")
+		return apperrors.NewNotFoundError("student not found")
 	}
 
 	// Opsional: Tambahkan logika bisnis
@@ -333,7 +334,7 @@ func (s *studentService) SyncParents(studentID string, req request.StudentSyncPa
 	for _, p := range req.Parents {
 		// Cek duplikat di request
 		if parentIDMap[p.ParentID] {
-			return fmt.Errorf("duplicate parent_id in request: %s", p.ParentID)
+			return apperrors.NewBadRequestError(fmt.Sprintf("duplicate parent_id in request: %s", p.ParentID))
 		}
 		parentIDMap[p.ParentID] = true
 
@@ -343,7 +344,7 @@ func (s *studentService) SyncParents(studentID string, req request.StudentSyncPa
 			return fmt.Errorf("error checking parent: %w", err)
 		}
 		if parent == nil {
-			return fmt.Errorf("parent not found with id: %s", p.ParentID)
+			return apperrors.NewNotFoundError(fmt.Sprintf("parent not found with id: %s", p.ParentID))
 		}
 
 		// Jika valid, siapkan data untuk repository
@@ -377,7 +378,7 @@ func (s *studentService) SetGuardian(studentID string, req request.StudentSetGua
 			return fmt.Errorf("error checking parent: %w", err)
 		}
 		if parent == nil {
-			return fmt.Errorf("parent not found with id: %s", req.GuardianID)
+			return apperrors.NewNotFoundError(fmt.Sprintf("parent not found with id: %s", req.GuardianID))
 		}
 	case "guardian":
 		guardian, err := s.guardianRepo.FindByID(req.GuardianID)
@@ -385,12 +386,12 @@ func (s *studentService) SetGuardian(studentID string, req request.StudentSetGua
 			return fmt.Errorf("error checking guardian: %w", err)
 		}
 		if guardian == nil {
-			return fmt.Errorf("guardian not found with id: %s", req.GuardianID)
+			return apperrors.NewNotFoundError(fmt.Sprintf("guardian not found with id: %s", req.GuardianID))
 		}
 	default:
 		// Sebenarnya sudah ditangani oleh validasi 'oneof' di DTO, tapi
 		// ini adalah pengaman tambahan.
-		return errors.New("invalid guardian_type")
+		return apperrors.NewBadRequestError("invalid guardian_type")
 	}
 
 	// 3. Panggil Repository untuk meng-set datanya
@@ -483,7 +484,7 @@ func (s *studentService) LinkUser(studentID string, userID string) error {
 		return err
 	}
 	if user == nil {
-		return errors.New("user not found")
+		return apperrors.NewNotFoundError("user not found")
 	}
 
 	// 3. Cek apakah User tsb sudah ditautkan ke Student LAIN
@@ -497,7 +498,7 @@ func (s *studentService) LinkUser(studentID string, userID string) error {
 	// 4. Tautkan akun
 	if err := s.studentRepo.SetUserID(studentID, &userID); err != nil {
 		if strings.Contains(err.Error(), "Duplicate entry") {
-			return errors.New("this user account is already linked to another student")
+			return apperrors.NewConflictError("this user account is already linked to another student")
 		}
 		return err
 	}
@@ -652,7 +653,7 @@ func (s *studentService) ExportStudentBiodata(id string) (*bytes.Buffer, error) 
 		return nil, err
 	}
 	if student == nil {
-		return nil, errors.New("student not found")
+		return nil, apperrors.NewNotFoundError("student not found")
 	}
 
 	// 2. Init PDF (Portrait, A4)

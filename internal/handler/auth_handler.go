@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"strings"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/service"
 
@@ -28,11 +27,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 
 	user, err := h.authService.Register(req)
 	if err != nil {
-		if strings.Contains(err.Error(), "already exists") {
-			BadRequestError(c, "Registration failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -48,7 +43,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	authResponse, err := h.authService.Login(req)
 	if err != nil {
-		UnauthorizedError(c, "Invalid credentials")
+		HandleError(c, err)
 		return
 	}
 
@@ -68,8 +63,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 
 	authResponse, err := h.authService.RefreshToken(req.RefreshToken)
 	if err != nil {
-		//c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-		UnauthorizedError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -94,7 +88,7 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	// Panggil service untuk logout
 	err := h.authService.Logout(userIDStr)
 	if err != nil {
-		InternalServerError(c, "Failed to logout: "+err.Error())
+		HandleError(c, err)
 		return
 	}
 

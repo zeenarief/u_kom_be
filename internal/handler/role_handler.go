@@ -24,11 +24,7 @@ func (h *RoleHandler) CreateRole(c *gin.Context) {
 
 	role, err := h.roleService.CreateRole(req)
 	if err != nil {
-		if err.Error() == "role already exists" {
-			BadRequestError(c, "RoleIDs creation failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -50,11 +46,7 @@ func (h *RoleHandler) GetRoleByID(c *gin.Context) {
 
 	role, err := h.roleService.GetRoleByID(id)
 	if err != nil {
-		if err.Error() == "role not found" {
-			NotFoundError(c, "RoleIDs not found")
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -72,13 +64,7 @@ func (h *RoleHandler) UpdateRole(c *gin.Context) {
 
 	role, err := h.roleService.UpdateRole(id, req)
 	if err != nil {
-		if err.Error() == "role not found" {
-			NotFoundError(c, "RoleIDs not found")
-		} else if err.Error() == "role name already exists" {
-			BadRequestError(c, "RoleIDs update failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -90,13 +76,7 @@ func (h *RoleHandler) DeleteRole(c *gin.Context) {
 
 	err := h.roleService.DeleteRole(id)
 	if err != nil {
-		if err.Error() == "role not found" {
-			NotFoundError(c, "RoleIDs not found")
-		} else if err.Error() == "cannot delete default role" {
-			BadRequestError(c, "Cannot delete default role", nil)
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -114,7 +94,7 @@ func (h *RoleHandler) SyncRolePermissions(c *gin.Context) {
 
 	err := h.roleService.SyncRolePermissions(roleID, req.PermissionNames)
 	if err != nil {
-		BadRequestError(c, "Failed to sync permissions", err.Error())
+		HandleError(c, err)
 		return
 	}
 

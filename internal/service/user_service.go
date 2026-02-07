@@ -1,8 +1,8 @@
 package service
 
 import (
-	"errors"
 	"fmt"
+	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/converter"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
@@ -50,7 +50,7 @@ func (s *userService) CreateUser(req request.UserCreateRequest) (*response.UserW
 		return nil, fmt.Errorf("error checking email: %v", err)
 	}
 	if existingUser != nil {
-		return nil, errors.New("email already exists")
+		return nil, apperrors.NewConflictError("email already exists")
 	}
 
 	// Check if username already exists
@@ -59,7 +59,7 @@ func (s *userService) CreateUser(req request.UserCreateRequest) (*response.UserW
 		return nil, fmt.Errorf("error checking username: %v", err)
 	}
 	if existingUser != nil {
-		return nil, errors.New("username already exists")
+		return nil, apperrors.NewConflictError("username already exists")
 	}
 
 	// Validasi Password Kuat
@@ -103,7 +103,7 @@ func (s *userService) CreateUser(req request.UserCreateRequest) (*response.UserW
 		}
 
 		if defaultRole == nil {
-			return nil, errors.New("default role not found")
+			return nil, apperrors.NewInternalError("default role not found")
 		}
 
 		err = s.userRepo.AssignRole(user.ID, defaultRole.ID)
@@ -124,7 +124,7 @@ func (s *userService) CreateUser(req request.UserCreateRequest) (*response.UserW
 func (s *userService) GetUserByID(id string) (*response.UserWithRolesResponseAndPermissions, error) {
 	user, err := s.userRepo.GetUserWithRolesAndPermissions(id)
 	if err != nil {
-		return nil, errors.New("user not found")
+		return nil, apperrors.NewNotFoundError("user not found")
 	}
 
 	return converter.ToUserWithRolesResponseAndPermissions(user), nil
@@ -147,12 +147,12 @@ func (s *userService) GetAllUsers(search string) ([]response.UserWithRoleRespons
 func (s *userService) UpdateUser(id string, req request.UserUpdateRequest, currentUserID string, currentUserPermissions []string) (*response.UserWithRoleResponse, error) {
 	user, err := s.userRepo.FindByID(id)
 	if err != nil {
-		return nil, errors.New("user not found")
+		return nil, apperrors.NewNotFoundError("user not found")
 	}
 
 	// 1. Validasi Basic: User update diri sendiri atau punya akses update others
 	if id != currentUserID && !s.hasPermission(currentUserPermissions, "users.update.others") {
-		return nil, errors.New("unauthorized: you can only update your own profile")
+		return nil, apperrors.NewForbiddenError("unauthorized: you can only update your own profile")
 	}
 
 	// 2. Update Basic Fields
@@ -162,7 +162,7 @@ func (s *userService) UpdateUser(id string, req request.UserUpdateRequest, curre
 	if req.Email != "" && req.Email != user.Email {
 		existingUser, _ := s.userRepo.FindByEmail(req.Email)
 		if existingUser != nil && existingUser.ID != id {
-			return nil, errors.New("email already exists")
+			return nil, apperrors.NewConflictError("email already exists")
 		}
 		user.Email = req.Email
 	}
@@ -172,7 +172,7 @@ func (s *userService) UpdateUser(id string, req request.UserUpdateRequest, curre
 	if req.RoleIDs != nil {
 		// SECURITY CHECK: Hanya user dengan permission 'users.manage_roles' yang boleh ganti role
 		if !s.hasPermission(currentUserPermissions, "users.manage_roles") {
-			return nil, errors.New("unauthorized: insufficient permissions to change roles")
+			return nil, apperrors.NewForbiddenError("unauthorized: insufficient permissions to change roles")
 		}
 
 		// Lakukan Sync Role (Menggunakan ID, bukan Name)
@@ -189,7 +189,7 @@ func (s *userService) UpdateUser(id string, req request.UserUpdateRequest, curre
 		// Jika update orang lain -> Harus punya permission 'users.change_password.others'
 
 		if id != currentUserID && !s.hasPermission(currentUserPermissions, "users.change_password.others") {
-			return nil, errors.New("unauthorized: insufficient permissions to reset password")
+			return nil, apperrors.NewForbiddenError("unauthorized: insufficient permissions to reset password")
 		}
 
 		// Validasi Password Kuat
@@ -223,16 +223,16 @@ func (s *userService) UpdateUser(id string, req request.UserUpdateRequest, curre
 func (s *userService) DeleteUser(id string, currentUserID string, currentUserPermissions []string) error {
 	// Validasi: user tidak bisa menghapus dirinya sendiri dan harus memiliki permission users.delete
 	if id == currentUserID {
-		return errors.New("cannot delete your own account")
+		return apperrors.NewBadRequestError("cannot delete your own account")
 	}
 
 	if !s.hasPermission(currentUserPermissions, "users.delete") {
-		return errors.New("unauthorized: insufficient permissions")
+		return apperrors.NewForbiddenError("unauthorized: insufficient permissions")
 	}
 
 	_, err := s.userRepo.FindByID(id)
 	if err != nil {
-		return errors.New("user not found")
+		return apperrors.NewNotFoundError("user not found")
 	}
 
 	return s.userRepo.Delete(id)
@@ -241,18 +241,18 @@ func (s *userService) DeleteUser(id string, currentUserID string, currentUserPer
 func (s *userService) ChangePassword(id string, currentPassword, newPassword string, currentUserID string, currentUserPermissions []string) error {
 	// Validasi: user hanya bisa mengubah password sendiri kecuali memiliki permission users.change_password.others
 	if id != currentUserID && !s.hasPermission(currentUserPermissions, "users.change_password.others") {
-		return errors.New("unauthorized: you can only change your own password")
+		return apperrors.NewForbiddenError("unauthorized: you can only change your own password")
 	}
 
 	user, err := s.userRepo.FindByID(id)
 	if err != nil {
-		return errors.New("user not found")
+		return apperrors.NewNotFoundError("user not found")
 	}
 
 	// Jika mengubah password orang lain, skip current password verification
 	if id == currentUserID {
 		if !utils.CheckPasswordHash(currentPassword, user.Password) {
-			return errors.New("current password is incorrect")
+			return apperrors.NewUnauthorizedError("current password is incorrect")
 		}
 	}
 
@@ -269,7 +269,7 @@ func (s *userService) ChangePassword(id string, currentPassword, newPassword str
 func (s *userService) GetProfile(userID string) (*response.ProfileResponse, error) {
 	user, err := s.userRepo.FindByID(userID)
 	if err != nil {
-		return nil, errors.New("user not found")
+		return nil, apperrors.NewNotFoundError("user not found")
 	}
 
 	// Logika khusus profile bisa ditambahkan di sini
@@ -289,7 +289,7 @@ func (s *userService) GetProfile(userID string) (*response.ProfileResponse, erro
 
 func (s *userService) SyncUserRoles(userID string, roleNames []string, currentUserID string, currentUserPermissions []string) error {
 	if !s.hasPermission(currentUserPermissions, "users.manage_roles") {
-		return errors.New("unauthorized: insufficient permissions")
+		return apperrors.NewForbiddenError("unauthorized: insufficient permissions")
 	}
 
 	// Convert role names to IDs
@@ -310,7 +310,7 @@ func (s *userService) SyncUserRoles(userID string, roleNames []string, currentUs
 
 func (s *userService) SyncUserPermissions(userID string, permissionNames []string, currentUserID string, currentUserPermissions []string) error {
 	if !s.hasPermission(currentUserPermissions, "users.manage_permissions") {
-		return errors.New("unauthorized: insufficient permissions")
+		return apperrors.NewForbiddenError("unauthorized: insufficient permissions")
 	}
 
 	// Convert permission names to IDs

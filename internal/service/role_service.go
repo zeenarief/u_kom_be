@@ -1,8 +1,8 @@
 package service
 
 import (
-	"errors"
 	"fmt"
+	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/model/response"
@@ -35,7 +35,7 @@ func (s *roleService) CreateRole(req request.RoleCreateRequest) (*response.RoleD
 	// Check if role already exists
 	existingRole, _ := s.roleRepo.FindByName(req.Name)
 	if existingRole != nil {
-		return nil, errors.New("role already exists")
+		return nil, apperrors.NewConflictError("role already exists")
 	}
 
 	role := &domain.Role{
@@ -90,7 +90,7 @@ func (s *roleService) GetRoleByID(id string) (*response.RoleDetailResponse, erro
 		return nil, err
 	}
 	if role == nil {
-		return nil, errors.New("role not found")
+		return nil, apperrors.NewNotFoundError("role not found")
 	}
 	return s.convertToResponse(role), nil
 }
@@ -101,7 +101,7 @@ func (s *roleService) GetRoleByName(name string) (*response.RoleDetailResponse, 
 		return nil, err
 	}
 	if role == nil {
-		return nil, errors.New("role not found")
+		return nil, apperrors.NewNotFoundError("role not found")
 	}
 	return s.convertToResponse(role), nil
 }
@@ -126,14 +126,14 @@ func (s *roleService) UpdateRole(id string, req request.RoleUpdateRequest) (*res
 		return nil, err
 	}
 	if role == nil {
-		return nil, errors.New("role not found")
+		return nil, apperrors.NewNotFoundError("role not found")
 	}
 
 	// Update fields if provided
 	if req.Name != "" {
 		// Check if new name already exists
 		if existingRole, _ := s.roleRepo.FindByName(req.Name); existingRole != nil && existingRole.ID != id {
-			return nil, errors.New("role name already exists")
+			return nil, apperrors.NewConflictError("role name already exists")
 		}
 		role.Name = req.Name
 	}
@@ -173,12 +173,12 @@ func (s *roleService) DeleteRole(id string) error {
 		return err
 	}
 	if role == nil {
-		return errors.New("role not found")
+		return apperrors.NewNotFoundError("role not found")
 	}
 
 	// Optional: Add business logic to prevent deletion of certain roles
 	if role.IsDefault {
-		return errors.New("cannot delete default role")
+		return apperrors.NewForbiddenError("cannot delete default role")
 	}
 
 	return s.roleRepo.Delete(id)

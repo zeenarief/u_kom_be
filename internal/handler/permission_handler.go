@@ -24,11 +24,7 @@ func (h *PermissionHandler) CreatePermission(c *gin.Context) {
 
 	permission, err := h.permissionService.CreatePermission(req)
 	if err != nil {
-		if err.Error() == "permission already exists" {
-			BadRequestError(c, "Permission creation failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -50,11 +46,7 @@ func (h *PermissionHandler) GetPermissionByID(c *gin.Context) {
 
 	permission, err := h.permissionService.GetPermissionByID(id)
 	if err != nil {
-		if err.Error() == "permission not found" {
-			NotFoundError(c, "Permission not found")
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -72,13 +64,7 @@ func (h *PermissionHandler) UpdatePermission(c *gin.Context) {
 
 	permission, err := h.permissionService.UpdatePermission(id, req)
 	if err != nil {
-		if err.Error() == "permission not found" {
-			NotFoundError(c, "Permission not found")
-		} else if err.Error() == "permission name already exists" {
-			BadRequestError(c, "Permission update failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -90,11 +76,7 @@ func (h *PermissionHandler) DeletePermission(c *gin.Context) {
 
 	err := h.permissionService.DeletePermission(id)
 	if err != nil {
-		if err.Error() == "permission not found" {
-			NotFoundError(c, "Permission not found")
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 

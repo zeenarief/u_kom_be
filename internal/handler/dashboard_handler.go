@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
 	"u_kom_be/internal/service"
+
+	"github.com/gin-gonic/gin"
 )
 
 type DashboardHandler struct {
@@ -16,7 +17,7 @@ func NewDashboardHandler(dashboardService service.DashboardService) *DashboardHa
 func (h *DashboardHandler) GetStats(c *gin.Context) {
 	stats, err := h.dashboardService.GetStats()
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 	SuccessResponse(c, "Dashboard stats retrieved", stats)

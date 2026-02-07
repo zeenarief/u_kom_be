@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"strings"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/service"
 
@@ -25,11 +24,7 @@ func (h *GuardianHandler) CreateGuardian(c *gin.Context) {
 
 	guardian, err := h.guardianService.CreateGuardian(req)
 	if err != nil {
-		if strings.Contains(err.Error(), "already exists") {
-			BadRequestError(c, "Guardian creation failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -40,7 +35,7 @@ func (h *GuardianHandler) GetAllGuardians(c *gin.Context) {
 	searchQuery := c.Query("q")
 	guardians, err := h.guardianService.GetAllGuardians(searchQuery)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -52,11 +47,7 @@ func (h *GuardianHandler) GetGuardianByID(c *gin.Context) {
 
 	guardian, err := h.guardianService.GetGuardianByID(id)
 	if err != nil {
-		if err.Error() == "guardian not found" {
-			NotFoundError(c, "Guardian not found")
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -74,13 +65,7 @@ func (h *GuardianHandler) UpdateGuardian(c *gin.Context) {
 
 	guardian, err := h.guardianService.UpdateGuardian(id, req)
 	if err != nil {
-		if err.Error() == "guardian not found" {
-			NotFoundError(c, "Guardian not found")
-		} else if strings.Contains(err.Error(), "already exists") {
-			BadRequestError(c, "Guardian update failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -92,11 +77,7 @@ func (h *GuardianHandler) DeleteGuardian(c *gin.Context) {
 
 	err := h.guardianService.DeleteGuardian(id)
 	if err != nil {
-		if err.Error() == "guardian not found" {
-			NotFoundError(c, "Guardian not found")
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -117,13 +98,7 @@ func (h *GuardianHandler) LinkUser(c *gin.Context) {
 
 	err := h.guardianService.LinkUser(guardianID, req.UserID)
 	if err != nil {
-		if strings.Contains(err.Error(), "not found") {
-			NotFoundError(c, err.Error())
-		} else if strings.Contains(err.Error(), "already linked") {
-			BadRequestError(c, "Link failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -136,11 +111,7 @@ func (h *GuardianHandler) UnlinkUser(c *gin.Context) {
 
 	err := h.guardianService.UnlinkUser(guardianID)
 	if err != nil {
-		if err.Error() == "guardian not found" {
-			NotFoundError(c, "Guardian not found")
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 

@@ -1,9 +1,9 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"time"
+	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/converter"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
@@ -49,7 +49,7 @@ func (s *authService) Register(req request.UserCreateRequest) (*response.UserWit
 		return nil, fmt.Errorf("error checking email: %v", err)
 	}
 	if existingUser != nil {
-		return nil, errors.New("email already exists")
+		return nil, apperrors.NewConflictError("email already exists")
 	}
 
 	// 2. Validasi Duplikat Username
@@ -58,7 +58,7 @@ func (s *authService) Register(req request.UserCreateRequest) (*response.UserWit
 		return nil, fmt.Errorf("error checking username: %v", err)
 	}
 	if existingUser != nil {
-		return nil, errors.New("username already exists")
+		return nil, apperrors.NewConflictError("username already exists")
 	}
 
 	// 3. Validasi Kekuatan Password
@@ -96,7 +96,7 @@ func (s *authService) Register(req request.UserCreateRequest) (*response.UserWit
 	}
 	if defaultRole == nil {
 		// Fallback error jika belum di-seed
-		return nil, errors.New("registration failed: default role not configured")
+		return nil, apperrors.NewInternalError("registration failed: default role not configured")
 	}
 
 	err = s.userRepo.AssignRole(user.ID, defaultRole.ID)
@@ -120,23 +120,23 @@ func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, e
 	// Coba sebagai email dulu
 	user, err = s.userRepo.FindByEmailWithRelations(req.Login)
 	if err != nil {
-		return nil, errors.New("invalid login or password")
+		return nil, apperrors.NewUnauthorizedError("invalid login or password")
 	}
 
 	// Jika tidak ditemukan sebagai email, coba sebagai username
 	if user == nil {
 		user, err = s.userRepo.FindByUsernameWithRelations(req.Login)
 		if err != nil {
-			return nil, errors.New("invalid login or password")
+			return nil, apperrors.NewUnauthorizedError("invalid login or password")
 		}
 		if user == nil {
-			return nil, errors.New("invalid login or password")
+			return nil, apperrors.NewUnauthorizedError("invalid login or password")
 		}
 	}
 
 	// Check password
 	if !utils.CheckPasswordHash(req.Password, user.Password) {
-		return nil, errors.New("invalid login or password")
+		return nil, apperrors.NewUnauthorizedError("invalid login or password")
 	}
 
 	// Generate tokens
@@ -176,13 +176,13 @@ func (s *authService) RefreshToken(refreshToken string) (*response.AuthResponse,
 	// Validate refresh token
 	userID, err := s.validateRefreshToken(refreshToken)
 	if err != nil {
-		return nil, errors.New("invalid refresh token")
+		return nil, apperrors.NewUnauthorizedError("invalid refresh token")
 	}
 
 	// Find user
 	user, err := s.userRepo.FindByID(userID)
 	if err != nil {
-		return nil, errors.New("user not found")
+		return nil, apperrors.NewNotFoundError("user not found")
 	}
 
 	// Generate new tokens
@@ -230,34 +230,34 @@ func (s *authService) ValidateToken(tokenString string) (string, error) {
 	})
 
 	if err != nil || !token.Valid {
-		return "", errors.New("invalid token")
+		return "", apperrors.NewUnauthorizedError("invalid token")
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || claims["type"] != "access" {
-		return "", errors.New("invalid token type")
+		return "", apperrors.NewUnauthorizedError("invalid token type")
 	}
 
 	userID, ok := claims["user_id"].(string)
 	if !ok {
-		return "", errors.New("invalid user ID in token")
+		return "", apperrors.NewUnauthorizedError("invalid user ID in token")
 	}
 
 	// ✅ Check if user has logged out (token hash is empty)
 	currentTokenHash, err := s.userRepo.GetTokenHash(userID)
 	if err != nil {
-		return "", errors.New("user not found")
+		return "", apperrors.NewNotFoundError("user not found")
 	}
 
 	// Jika token hash kosong, berarti user sudah logout
 	if currentTokenHash == nil {
-		return "", errors.New("token revoked - user logged out")
+		return "", apperrors.NewUnauthorizedError("token revoked - user logged out")
 	}
 
 	// Hash the incoming token and compare with stored hash
 	incomingTokenHash := utils.HashToken(tokenString)
 	if incomingTokenHash != *currentTokenHash {
-		return "", errors.New("token revoked - new login detected")
+		return "", apperrors.NewUnauthorizedError("token revoked - new login detected")
 	}
 
 	return userID, nil
@@ -298,17 +298,17 @@ func (s *authService) validateRefreshToken(tokenString string) (string, error) {
 	})
 
 	if err != nil || !token.Valid {
-		return "", errors.New("invalid token")
+		return "", apperrors.NewUnauthorizedError("invalid token")
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || claims["type"] != "refresh" {
-		return "", errors.New("invalid token type")
+		return "", apperrors.NewUnauthorizedError("invalid token type")
 	}
 
 	userID, ok := claims["user_id"].(string)
 	if !ok {
-		return "", errors.New("invalid user ID in token")
+		return "", apperrors.NewUnauthorizedError("invalid user ID in token")
 	}
 
 	return userID, nil

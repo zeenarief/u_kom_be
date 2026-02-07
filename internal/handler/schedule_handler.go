@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"strings"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/service"
 
@@ -25,11 +24,7 @@ func (h *ScheduleHandler) Create(c *gin.Context) {
 
 	res, err := h.service.Create(req)
 	if err != nil {
-		if strings.Contains(err.Error(), "conflict") {
-			BadRequestError(c, "Schedule Conflict", err.Error())
-			return
-		}
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 	CreatedResponse(c, "Schedule created successfully", res)
@@ -43,7 +38,7 @@ func (h *ScheduleHandler) GetByClassroom(c *gin.Context) {
 	}
 	res, err := h.service.GetByClassroom(classID)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 	SuccessResponse(c, "Schedules retrieved", res)
@@ -57,16 +52,16 @@ func (h *ScheduleHandler) GetByTeacher(c *gin.Context) {
 	}
 	res, err := h.service.GetByTeacher(teacherID)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 	SuccessResponse(c, "Schedules retrieved", res)
 }
 
 func (h *ScheduleHandler) Delete(c *gin.Context) {
-	id := c.Param("id")
-	if err := h.service.Delete(id); err != nil {
-		InternalServerError(c, err.Error())
+	// 	id := c.Param("id")
+	if err := h.service.Delete(c.Param("id")); err != nil {
+		HandleError(c, err)
 		return
 	}
 	SuccessResponse(c, "Schedule removed", nil)

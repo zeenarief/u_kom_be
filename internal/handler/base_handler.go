@@ -2,10 +2,35 @@ package handler
 
 import (
 	"net/http"
+	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/model/response"
 
 	"github.com/gin-gonic/gin"
 )
+
+// HandleError maps AppError types to HTTP responses
+func HandleError(c *gin.Context, err error) {
+	if appErr, ok := err.(*apperrors.AppError); ok {
+		switch appErr.Type {
+		case apperrors.NotFound:
+			NotFoundError(c, appErr.Message)
+		case apperrors.Conflict:
+			ErrorResponse(c, http.StatusConflict, appErr.Message, response.SimpleError{Message: appErr.Message})
+		case apperrors.BadRequest:
+			BadRequestError(c, appErr.Message, response.SimpleError{Message: appErr.Message})
+		case apperrors.Unauthorized:
+			UnauthorizedError(c, appErr.Message)
+		case apperrors.Forbidden:
+			ForbiddenError(c, appErr.Message)
+		default:
+			InternalServerError(c, appErr.Message)
+		}
+		return
+	}
+
+	// Default to 500 for unknown errors
+	InternalServerError(c, err.Error())
+}
 
 // SuccessResponse sends a standardized success response
 func SuccessResponse(c *gin.Context, message string, data interface{}) {

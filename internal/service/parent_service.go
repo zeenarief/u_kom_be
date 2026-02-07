@@ -1,9 +1,9 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"strings"
+	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/converter"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
@@ -48,12 +48,12 @@ func (s *parentService) CreateParent(req request.ParentCreateRequest) (*response
 	// 1. Validasi Duplikat (Phone & Email)
 	if req.PhoneNumber != "" {
 		if existing, _ := s.parentRepo.FindByPhone(req.PhoneNumber); existing != nil {
-			return nil, errors.New("phone number already exists")
+			return nil, apperrors.NewConflictError("phone number already exists")
 		}
 	}
 	if req.Email != "" {
 		if existing, _ := s.parentRepo.FindByEmail(req.Email); existing != nil {
-			return nil, errors.New("email already exists")
+			return nil, apperrors.NewConflictError("email already exists")
 		}
 	}
 
@@ -107,7 +107,7 @@ func (s *parentService) CreateParent(req request.ParentCreateRequest) (*response
 		return nil, err
 	}
 	if createdParent == nil {
-		return nil, errors.New("failed to retrieve created parent")
+		return nil, apperrors.NewInternalError("failed to retrieve created parent")
 	}
 
 	// 6. Konversi ke Response Detail
@@ -136,7 +136,7 @@ func (s *parentService) GetParentByID(id string) (*response.ParentDetailResponse
 		return nil, err
 	}
 	if parent == nil {
-		return nil, errors.New("parent not found")
+		return nil, apperrors.NewNotFoundError("parent not found")
 	}
 
 	// 2. Konversi Parent dasar
@@ -175,7 +175,7 @@ func (s *parentService) UpdateParent(id string, req request.ParentUpdateRequest)
 		return nil, err
 	}
 	if parent == nil {
-		return nil, errors.New("parent not found")
+		return nil, apperrors.NewNotFoundError("parent not found")
 	}
 
 	// Update fields jika disediakan
@@ -186,13 +186,13 @@ func (s *parentService) UpdateParent(id string, req request.ParentUpdateRequest)
 	// Validasi duplikat baru
 	if req.PhoneNumber != "" && req.PhoneNumber != parent.PhoneNumber {
 		if existing, _ := s.parentRepo.FindByPhone(req.PhoneNumber); existing != nil {
-			return nil, errors.New("phone number already exists")
+			return nil, apperrors.NewConflictError("phone number already exists")
 		}
 		parent.PhoneNumber = req.PhoneNumber
 	}
 	if req.Email != "" && req.Email != parent.Email {
 		if existing, _ := s.parentRepo.FindByEmail(req.Email); existing != nil {
-			return nil, errors.New("email already exists")
+			return nil, apperrors.NewConflictError("email already exists")
 		}
 		parent.Email = req.Email
 	}
@@ -291,7 +291,7 @@ func (s *parentService) DeleteParent(id string) error {
 		return err
 	}
 	if parent == nil {
-		return errors.New("parent not found")
+		return apperrors.NewNotFoundError("parent not found")
 	}
 
 	return s.parentRepo.Delete(id)
@@ -305,7 +305,7 @@ func (s *parentService) LinkUser(parentID string, userID string) error {
 		return err
 	}
 	if parent == nil {
-		return errors.New("parent not found")
+		return apperrors.NewNotFoundError("parent not found")
 	}
 
 	// 2. Cek apakah User ada
@@ -314,13 +314,13 @@ func (s *parentService) LinkUser(parentID string, userID string) error {
 		return err
 	}
 	if user == nil {
-		return errors.New("user not found")
+		return apperrors.NewNotFoundError("user not found")
 	}
 
 	// 3. Tautkan akun (Kita andalkan UNIQUE constraint di DB untuk error duplikat)
 	if err := s.parentRepo.SetUserID(parentID, &userID); err != nil {
 		if strings.Contains(err.Error(), "Duplicate entry") {
-			return errors.New("this user account is already linked to another parent")
+			return apperrors.NewConflictError("this user account is already linked to another parent")
 		}
 		return err
 	}
@@ -335,7 +335,7 @@ func (s *parentService) UnlinkUser(parentID string) error {
 		return err
 	}
 	if parent == nil {
-		return errors.New("parent not found")
+		return apperrors.NewNotFoundError("parent not found")
 	}
 
 	// 2. Hapus tautan (set user_id ke NULL)

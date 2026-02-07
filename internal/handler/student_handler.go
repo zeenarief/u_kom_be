@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	"strings"
 	"time"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/service"
@@ -27,11 +26,7 @@ func (h *StudentHandler) CreateStudent(c *gin.Context) {
 
 	student, err := h.studentService.CreateStudent(req)
 	if err != nil {
-		if strings.Contains(err.Error(), "already exists") {
-			BadRequestError(c, "Student creation failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -42,7 +37,7 @@ func (h *StudentHandler) GetAllStudents(c *gin.Context) {
 	searchQuery := c.Query("q")
 	students, err := h.studentService.GetAllStudents(searchQuery)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -54,11 +49,7 @@ func (h *StudentHandler) GetStudentByID(c *gin.Context) {
 
 	student, err := h.studentService.GetStudentByID(id)
 	if err != nil {
-		if err.Error() == "student not found" {
-			NotFoundError(c, "Student not found")
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -76,13 +67,7 @@ func (h *StudentHandler) UpdateStudent(c *gin.Context) {
 
 	student, err := h.studentService.UpdateStudent(id, req)
 	if err != nil {
-		if err.Error() == "student not found" {
-			NotFoundError(c, "Student not found")
-		} else if strings.Contains(err.Error(), "already exists") {
-			BadRequestError(c, "Student update failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -94,11 +79,7 @@ func (h *StudentHandler) DeleteStudent(c *gin.Context) {
 
 	err := h.studentService.DeleteStudent(id)
 	if err != nil {
-		if err.Error() == "student not found" {
-			NotFoundError(c, "Student not found")
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -118,16 +99,7 @@ func (h *StudentHandler) SyncParents(c *gin.Context) {
 	// Panggil service
 	err := h.studentService.SyncParents(id, req)
 	if err != nil {
-		// Tangani error spesifik dari service
-		if strings.Contains(err.Error(), "student not found") {
-			NotFoundError(c, err.Error())
-		} else if strings.Contains(err.Error(), "parent not found") {
-			BadRequestError(c, "Invalid parent ID", err.Error())
-		} else if strings.Contains(err.Error(), "duplicate parent_id") {
-			BadRequestError(c, "Invalid request", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -148,14 +120,7 @@ func (h *StudentHandler) SetGuardian(c *gin.Context) {
 	// Panggil service
 	err := h.studentService.SetGuardian(id, req)
 	if err != nil {
-		// Tangani error spesifik dari service
-		if strings.Contains(err.Error(), "student not found") {
-			NotFoundError(c, err.Error())
-		} else if strings.Contains(err.Error(), "parent not found") || strings.Contains(err.Error(), "guardian not found") {
-			BadRequestError(c, "Invalid guardian_id", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -169,11 +134,7 @@ func (h *StudentHandler) RemoveGuardian(c *gin.Context) {
 	// Panggil service
 	err := h.studentService.RemoveGuardian(id)
 	if err != nil {
-		if strings.Contains(err.Error(), "student not found") {
-			NotFoundError(c, err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -194,13 +155,7 @@ func (h *StudentHandler) LinkUser(c *gin.Context) {
 
 	err := h.studentService.LinkUser(studentID, req.UserID)
 	if err != nil {
-		if strings.Contains(err.Error(), "not found") {
-			NotFoundError(c, err.Error())
-		} else if strings.Contains(err.Error(), "already linked") {
-			BadRequestError(c, "Link failed", err.Error())
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -213,11 +168,7 @@ func (h *StudentHandler) UnlinkUser(c *gin.Context) {
 
 	err := h.studentService.UnlinkUser(studentID)
 	if err != nil {
-		if err.Error() == "student not found" {
-			NotFoundError(c, "Student not found")
-		} else {
-			InternalServerError(c, err.Error())
-		}
+		HandleError(c, err)
 		return
 	}
 
@@ -269,11 +220,7 @@ func (h *StudentHandler) ExportStudentBiodata(c *gin.Context) {
 
 	buffer, err := h.studentService.ExportStudentBiodata(id)
 	if err != nil {
-		if err.Error() == "student not found" {
-			NotFoundError(c, "Student not found")
-		} else {
-			InternalServerError(c, "Failed to generate PDF")
-		}
+		HandleError(c, err)
 		return
 	}
 

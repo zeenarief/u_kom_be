@@ -24,7 +24,7 @@ func (h *ClassroomHandler) Create(c *gin.Context) {
 
 	res, err := h.service.Create(req)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
@@ -37,7 +37,7 @@ func (h *ClassroomHandler) FindAll(c *gin.Context) {
 
 	res, err := h.service.FindAll(ayID)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 	SuccessResponse(c, "Classrooms retrieved successfully", res)
@@ -47,7 +47,7 @@ func (h *ClassroomHandler) FindByID(c *gin.Context) {
 	id := c.Param("id")
 	res, err := h.service.FindByID(id)
 	if err != nil {
-		NotFoundError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 	SuccessResponse(c, "Classroom detail retrieved successfully", res)
@@ -63,7 +63,7 @@ func (h *ClassroomHandler) Update(c *gin.Context) {
 
 	res, err := h.service.Update(id, req)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 	SuccessResponse(c, "Classroom updated successfully", res)
@@ -72,7 +72,7 @@ func (h *ClassroomHandler) Update(c *gin.Context) {
 func (h *ClassroomHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.service.Delete(id); err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 	SuccessResponse(c, "Classroom deleted successfully", nil)
@@ -87,7 +87,7 @@ func (h *ClassroomHandler) AddStudents(c *gin.Context) {
 	}
 
 	if err := h.service.AddStudents(id, req); err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 	SuccessResponse(c, "Students added to classroom successfully", nil)
@@ -98,7 +98,7 @@ func (h *ClassroomHandler) RemoveStudent(c *gin.Context) {
 	studentID := c.Param("studentID")
 
 	if err := h.service.RemoveStudent(id, studentID); err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 	SuccessResponse(c, "Student removed from classroom successfully", nil)

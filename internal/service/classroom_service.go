@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/model/response"
@@ -81,14 +82,14 @@ func (s *classroomService) Create(req request.ClassroomCreateRequest) (*response
 	// 1. Validasi Academic Year
 	ay, err := s.academicYearRepo.FindByID(req.AcademicYearID)
 	if err != nil || ay == nil {
-		return nil, errors.New("academic year not found")
+		return nil, apperrors.NewNotFoundError("academic year not found")
 	}
 
 	// 2. Validasi Employee (Jika ada)
 	if req.HomeroomTeacherID != nil {
 		emp, err := s.employeeRepo.FindByID(*req.HomeroomTeacherID)
 		if err != nil || emp == nil {
-			return nil, errors.New("homeroom teacher not found")
+			return nil, apperrors.NewNotFoundError("homeroom teacher not found")
 		}
 	}
 
@@ -132,7 +133,7 @@ func (s *classroomService) FindByID(id string) (*response.ClassroomDetailRespons
 		return nil, err
 	}
 	if c == nil {
-		return nil, errors.New("classroom not found")
+		return nil, apperrors.NewNotFoundError("classroom not found")
 	}
 
 	baseRes := s.toResponse(c)
@@ -168,7 +169,7 @@ func (s *classroomService) Update(id string, req request.ClassroomUpdateRequest)
 		return nil, err
 	}
 	if c == nil {
-		return nil, errors.New("classroom not found")
+		return nil, apperrors.NewNotFoundError("classroom not found")
 	}
 
 	if req.Name != "" {
@@ -188,7 +189,7 @@ func (s *classroomService) Update(id string, req request.ClassroomUpdateRequest)
 		if *req.HomeroomTeacherID != "" {
 			emp, err := s.employeeRepo.FindByID(*req.HomeroomTeacherID)
 			if err != nil || emp == nil {
-				return nil, errors.New("homeroom teacher not found")
+				return nil, apperrors.NewNotFoundError("homeroom teacher not found")
 			}
 		}
 

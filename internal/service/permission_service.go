@@ -1,7 +1,7 @@
 package service
 
 import (
-	"errors"
+	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/model/response"
@@ -29,7 +29,7 @@ func (s *permissionService) CreatePermission(req request.PermissionCreateRequest
 	// Check if permission already exists
 	existingPerm, _ := s.permissionRepo.FindByName(req.Name)
 	if existingPerm != nil {
-		return nil, errors.New("permission already exists")
+		return nil, apperrors.NewConflictError("permission already exists")
 	}
 
 	permission := &domain.Permission{
@@ -50,7 +50,7 @@ func (s *permissionService) GetPermissionByID(id string) (*response.PermissionRe
 		return nil, err
 	}
 	if permission == nil {
-		return nil, errors.New("permission not found")
+		return nil, apperrors.NewNotFoundError("permission not found")
 	}
 	return s.convertToResponse(permission), nil
 }
@@ -61,7 +61,7 @@ func (s *permissionService) GetPermissionByName(name string) (*response.Permissi
 		return nil, err
 	}
 	if permission == nil {
-		return nil, errors.New("permission not found")
+		return nil, apperrors.NewNotFoundError("permission not found")
 	}
 	return s.convertToResponse(permission), nil
 }
@@ -86,13 +86,13 @@ func (s *permissionService) UpdatePermission(id string, req request.PermissionUp
 		return nil, err
 	}
 	if permission == nil {
-		return nil, errors.New("permission not found")
+		return nil, apperrors.NewNotFoundError("permission not found")
 	}
 
 	if req.Name != "" {
 		// Check if new name already exists
 		if existingPerm, _ := s.permissionRepo.FindByName(req.Name); existingPerm != nil && existingPerm.ID != id {
-			return nil, errors.New("permission name already exists")
+			return nil, apperrors.NewConflictError("permission name already exists")
 		}
 		permission.Name = req.Name
 	}
@@ -115,7 +115,7 @@ func (s *permissionService) DeletePermission(id string) error {
 		return err
 	}
 	if permission == nil {
-		return errors.New("permission not found")
+		return apperrors.NewNotFoundError("permission not found")
 	}
 
 	return s.permissionRepo.Delete(id)

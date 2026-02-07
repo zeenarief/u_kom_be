@@ -1,7 +1,7 @@
 package service
 
 import (
-	"errors"
+	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/model/response"
@@ -40,7 +40,7 @@ func (s *subjectService) Create(req request.SubjectCreateRequest) (*response.Sub
 	// Validasi Duplikat Kode
 	existing, _ := s.repo.FindByCode(req.Code)
 	if existing != nil {
-		return nil, errors.New("subject code already exists")
+		return nil, apperrors.NewConflictError("subject code already exists")
 	}
 
 	subject := &domain.Subject{
@@ -76,7 +76,7 @@ func (s *subjectService) FindByID(id string) (*response.SubjectResponse, error) 
 		return nil, err
 	}
 	if sub == nil {
-		return nil, errors.New("subject not found")
+		return nil, apperrors.NewNotFoundError("subject not found")
 	}
 	return s.toResponse(sub), nil
 }
@@ -87,14 +87,14 @@ func (s *subjectService) Update(id string, req request.SubjectUpdateRequest) (*r
 		return nil, err
 	}
 	if sub == nil {
-		return nil, errors.New("subject not found")
+		return nil, apperrors.NewNotFoundError("subject not found")
 	}
 
 	// Validasi Code jika berubah
 	if req.Code != "" && req.Code != sub.Code {
 		existing, _ := s.repo.FindByCode(req.Code)
 		if existing != nil {
-			return nil, errors.New("subject code already exists")
+			return nil, apperrors.NewConflictError("subject code already exists")
 		}
 		sub.Code = req.Code
 	}
