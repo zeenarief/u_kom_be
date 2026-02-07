@@ -29,7 +29,7 @@ func NewScheduleService(
 
 // Helper: Convert int day to string indonesian
 func getDayName(day int) string {
-	days := []string{"", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"}
+	days := []string{"", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Ahad"}
 	if day >= 1 && day <= 7 {
 		return days[day]
 	}

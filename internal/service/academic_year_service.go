@@ -46,12 +46,16 @@ func (s *academicYearService) Create(req request.AcademicYearCreateRequest) (*re
 
 	startDate, err := time.Parse(layout, req.StartDate)
 	if err != nil {
-		return nil, apperrors.NewBadRequestError("invalid start_date format (expected YYYY-MM-DD)")
+		return nil, apperrors.NewBadRequestError("Invalid start_date format (expected YYYY-MM-DD)")
 	}
 
 	endDate, err := time.Parse(layout, req.EndDate)
 	if err != nil {
-		return nil, apperrors.NewBadRequestError("invalid end_date format (expected YYYY-MM-DD)")
+		return nil, apperrors.NewBadRequestError("Invalid end_date format (expected YYYY-MM-DD)")
+	}
+
+	if startDate.After(endDate) {
+		return nil, apperrors.NewBadRequestError("Start date must be before end date")
 	}
 
 	academicYear := &domain.AcademicYear{
@@ -87,7 +91,7 @@ func (s *academicYearService) FindByID(id string) (*response.AcademicYearRespons
 		return nil, err
 	}
 	if ay == nil {
-		return nil, apperrors.NewNotFoundError("academic year not found")
+		return nil, apperrors.NewNotFoundError("Academic year not found")
 	}
 	return s.toResponse(ay), nil
 }
@@ -98,7 +102,7 @@ func (s *academicYearService) Update(id string, req request.AcademicYearUpdateRe
 		return nil, err
 	}
 	if ay == nil {
-		return nil, apperrors.NewNotFoundError("academic year not found")
+		return nil, apperrors.NewNotFoundError("Academic year not found")
 	}
 
 	layout := "2006-01-02"
@@ -111,7 +115,7 @@ func (s *academicYearService) Update(id string, req request.AcademicYearUpdateRe
 	if req.StartDate != "" {
 		parsedStart, err := time.Parse(layout, req.StartDate)
 		if err != nil {
-			return nil, apperrors.NewBadRequestError("invalid start_date format")
+			return nil, apperrors.NewBadRequestError("Invalid start_date format")
 		}
 		ay.StartDate = parsedStart
 	}
@@ -119,7 +123,7 @@ func (s *academicYearService) Update(id string, req request.AcademicYearUpdateRe
 	if req.EndDate != "" {
 		parsedEnd, err := time.Parse(layout, req.EndDate)
 		if err != nil {
-			return nil, apperrors.NewBadRequestError("invalid end_date format")
+			return nil, apperrors.NewBadRequestError("Invalid end_date format")
 		}
 		ay.EndDate = parsedEnd
 	}
@@ -137,12 +141,12 @@ func (s *academicYearService) Delete(id string) error {
 		return err
 	}
 	if ay == nil {
-		return apperrors.NewNotFoundError("academic year not found")
+		return apperrors.NewNotFoundError("Academic year not found")
 	}
 
 	// Opsional: Cegah hapus jika status ACTIVE
 	if ay.Status == "ACTIVE" {
-		return apperrors.NewBadRequestError("cannot delete active academic year")
+		return apperrors.NewBadRequestError("Cannot delete active academic year")
 	}
 
 	return s.repo.Delete(id)
@@ -155,7 +159,7 @@ func (s *academicYearService) Activate(id string) error {
 		return err
 	}
 	if ay == nil {
-		return apperrors.NewNotFoundError("academic year not found")
+		return apperrors.NewNotFoundError("Academic year not found")
 	}
 
 	// 2. Mulai Transaction
