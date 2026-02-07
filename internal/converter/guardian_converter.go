@@ -30,9 +30,9 @@ func NewGuardianConverter(encryptionUtil utils.EncryptionUtil) GuardianConverter
 func (c *guardianConverter) ToGuardianDetailResponse(guardian *domain.Guardian) *response.GuardianDetailResponse {
 	// Dekripsi NIK
 	decryptedNIK := ""
-	if guardian.NIK != "" {
+	if guardian.NIK != nil {
 		var err error
-		decryptedNIK, err = c.encryptionUtil.Decrypt(guardian.NIK)
+		decryptedNIK, err = c.encryptionUtil.Decrypt(*guardian.NIK)
 		if err != nil {
 			log.Printf("Failed to decrypt NIK for guardian %s: %v", guardian.ID, err)
 			decryptedNIK = "[DECRYPTION_ERROR]"

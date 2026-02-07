@@ -67,6 +67,18 @@ func AutoMigrateForDev(db *gorm.DB) error {
 		&domain.User{},
 		&domain.Role{},
 		&domain.Permission{},
+		// &domain.AcademicYear{},
+		// &domain.AttendanceSession{},
+		// &domain.AttendanceDetail{},
+		// &domain.Classroom{},
+
+		// &domain.Guardian{},
+		// &domain.Parent{},
+		// &domain.Schedule{},
+		&domain.Student{},
+		&domain.StudentParent{},
+		// &domain.Subject{},
+		// &domain.TeachingAssignment{},
 	)
 
 	if err != nil {

@@ -4,6 +4,7 @@ CREATE TABLE students (
 
                           no_kk TEXT,
                           nik TEXT,
+                          nik_hash VARCHAR(64) UNIQUE,
 
                           nisn VARCHAR(20) UNIQUE,
                           nim VARCHAR(20) UNIQUE,

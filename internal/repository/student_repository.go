@@ -19,6 +19,7 @@ type StudentRepository interface {
 	SyncParents(studentID string, parents []domain.StudentParent) error
 	SetGuardian(studentID string, guardianID *string, guardianType *string) error
 	SetUserID(studentID string, userID *string) error
+	FindByNIKHash(hash string) (*domain.Student, error)
 }
 
 type studentRepository struct {
@@ -152,4 +153,16 @@ func (r *studentRepository) SetGuardian(studentID string, guardianID *string, gu
 func (r *studentRepository) SetUserID(studentID string, userID *string) error {
 	// GORM akan otomatis meng-set ke NULL jika userID adalah nil
 	return r.db.Model(&domain.Student{}).Where("id = ?", studentID).Update("user_id", userID).Error
+}
+
+func (r *studentRepository) FindByNIKHash(hash string) (*domain.Student, error) {
+	var student domain.Student
+	err := r.db.First(&student, "nik_hash = ?", hash).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil // Not found
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &student, nil
 }

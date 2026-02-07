@@ -58,20 +58,39 @@ func (s *guardianService) CreateGuardian(req request.GuardianCreateRequest) (*re
 		}
 	}
 
-	// 2. Enkripsi NIK
-	encryptedNIK := ""
+	// 2. Enkripsi NIK & Hash
+	var encryptedNIK *string
+	var nikHash *string
+
 	if req.NIK != "" {
-		var err error
-		encryptedNIK, err = s.encryptionUtil.Encrypt(req.NIK)
+		// a. Hash & Check Unique
+		hash, err := s.encryptionUtil.Hash(req.NIK)
+		if err != nil {
+			return nil, fmt.Errorf("failed to hash nik: %w", err)
+		}
+
+		existing, err := s.guardianRepo.FindByNIKHash(hash)
+		if err != nil {
+			return nil, err
+		}
+		if existing != nil {
+			return nil, apperrors.NewConflictError("nik already exists")
+		}
+		nikHash = &hash
+
+		// b. Encrypt
+		encrypted, err := s.encryptionUtil.Encrypt(req.NIK)
 		if err != nil {
 			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
 		}
+		encryptedNIK = &encrypted
 	}
 
 	// 3. Buat Domain Object
 	guardian := &domain.Guardian{
 		FullName:              req.FullName,
 		NIK:                   encryptedNIK, // <-- Simpan data terenkripsi
+		NIKHash:               nikHash,      // <-- Simpan hash
 		Gender:                req.Gender,
 		PhoneNumber:           req.PhoneNumber,
 		Email:                 req.Email,
@@ -186,11 +205,32 @@ func (s *guardianService) UpdateGuardian(id string, req request.GuardianUpdateRe
 
 	// Enkripsi NIK jika diperbarui
 	if req.NIK != "" {
+		// Hitung hash baru
+		newHash, err := s.encryptionUtil.Hash(req.NIK)
+		if err != nil {
+			return nil, fmt.Errorf("failed to hash nik: %w", err)
+		}
+
+		// Cek keunikan jika hash berubah atau sebelumnya null
+		isDifferent := guardian.NIKHash == nil || *guardian.NIKHash != newHash
+		if isDifferent {
+			existing, err := s.guardianRepo.FindByNIKHash(newHash)
+			if err != nil {
+				return nil, err
+			}
+			if existing != nil && existing.ID != id {
+				return nil, apperrors.NewConflictError("nik already exists")
+			}
+		}
+
+		guardian.NIKHash = &newHash
+
+		// Enkripsi
 		encryptedNIK, err := s.encryptionUtil.Encrypt(req.NIK)
 		if err != nil {
 			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
 		}
-		guardian.NIK = encryptedNIK
+		guardian.NIK = &encryptedNIK
 	}
 
 	// Update field lainnya (pola `!= ""`)

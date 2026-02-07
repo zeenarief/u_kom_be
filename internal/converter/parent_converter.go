@@ -30,9 +30,9 @@ func NewParentConverter(encryptionUtil utils.EncryptionUtil) ParentConverterInte
 func (c *parentConverter) ToParentDetailResponse(parent *domain.Parent) *response.ParentDetailResponse {
 	// Dekripsi NIK
 	decryptedNIK := ""
-	if parent.NIK != "" {
+	if parent.NIK != nil {
 		var err error
-		decryptedNIK, err = c.encryptionUtil.Decrypt(parent.NIK)
+		decryptedNIK, err = c.encryptionUtil.Decrypt(*parent.NIK)
 		if err != nil {
 			log.Printf("Failed to decrypt NIK for parent %s: %v", parent.ID, err)
 			decryptedNIK = "[DECRYPTION_ERROR]"

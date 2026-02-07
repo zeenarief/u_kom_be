@@ -16,6 +16,7 @@ type ParentRepository interface {
 	Update(parent *domain.Parent) error
 	Delete(id string) error
 	SetUserID(parentID string, userID *string) error
+	FindByNIKHash(hash string) (*domain.Parent, error)
 }
 
 type parentRepository struct {
@@ -92,4 +93,16 @@ func (r *parentRepository) Delete(id string) error {
 func (r *parentRepository) SetUserID(parentID string, userID *string) error {
 	// GORM akan otomatis meng-set ke NULL jika userID adalah nil
 	return r.db.Model(&domain.Parent{}).Where("id = ?", parentID).Update("user_id", userID).Error
+}
+
+func (r *parentRepository) FindByNIKHash(hash string) (*domain.Parent, error) {
+	var parent domain.Parent
+	err := r.db.First(&parent, "nik_hash = ?", hash).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil // Not found
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &parent, nil
 }

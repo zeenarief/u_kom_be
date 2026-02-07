@@ -10,8 +10,9 @@ import (
 type Student struct {
 	ID           string     `gorm:"primaryKey;type:char(36)" json:"id"`
 	FullName     string     `gorm:"type:varchar(100);not null" json:"full_name"`
-	NoKK         string     `gorm:"type:text" json:"no_kk,omitempty"` // akan dienkripsi
-	NIK          string     `gorm:"type:text" json:"nik,omitempty"`   // akan dienkripsi
+	NoKK         string     `gorm:"type:text" json:"no_kk,omitempty"`      // akan dienkripsi
+	NIK          *string    `gorm:"type:text" json:"nik,omitempty"`        // akan dienkripsi
+	NIKHash      *string    `gorm:"type:varchar(64);uniqueIndex" json:"-"` // Blind Index for Unique Check
 	NISN         *string    `gorm:"type:varchar(20);uniqueIndex" json:"nisn"`
 	NIM          *string    `gorm:"type:varchar(20);uniqueIndex" json:"nim"`
 	Gender       string     `gorm:"type:varchar(10)" json:"gender"`

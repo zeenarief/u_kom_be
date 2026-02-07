@@ -13,6 +13,7 @@ CREATE TABLE employees (
 
     -- Data sensitif (akan dienkripsi)
                            nik TEXT,
+                           nik_hash VARCHAR(64) UNIQUE,
 
     -- Info dasar & Kontak
                            gender VARCHAR(10), -- 'male', 'female'

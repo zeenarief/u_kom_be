@@ -35,9 +35,9 @@ func NewStudentConverter(
 func (c *studentConverter) ToStudentDetailResponse(student *domain.Student) *response.StudentDetailResponse {
 	// Dekripsi NIK
 	decryptedNIK := ""
-	if student.NIK != "" {
+	if student.NIK != nil {
 		var err error
-		decryptedNIK, err = c.encryptionUtil.Decrypt(student.NIK)
+		decryptedNIK, err = c.encryptionUtil.Decrypt(*student.NIK)
 		if err != nil {
 			log.Printf("Failed to decrypt NIK for student %s: %v", student.ID, err)
 			decryptedNIK = "[DECRYPTION_ERROR]"

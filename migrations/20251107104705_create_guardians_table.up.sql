@@ -4,6 +4,7 @@ CREATE TABLE guardians (
 
     -- Data sensitif, akan dienkripsi
                            nik TEXT,
+                           nik_hash VARCHAR(64) UNIQUE,
 
     -- Info dasar
                            gender VARCHAR(10), -- 'male' atau 'female'

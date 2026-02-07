@@ -10,7 +10,8 @@ import (
 type Parent struct {
 	ID             string    `gorm:"primaryKey;type:char(36)" json:"id"`
 	FullName       string    `gorm:"type:varchar(100);not null" json:"full_name"`
-	NIK            string    `gorm:"type:text" json:"nik,omitempty"` // Akan dienkripsi
+	NIK            *string   `gorm:"type:text" json:"nik,omitempty"`        // Akan dienkripsi
+	NIKHash        *string   `gorm:"type:varchar(64);uniqueIndex" json:"-"` // Blind Index for Unique Check
 	Gender         string    `gorm:"type:varchar(10)" json:"gender"`
 	PlaceOfBirth   string    `gorm:"type:varchar(100)" json:"place_of_birth"`
 	DateOfBirth    time.Time `gorm:"type:date" json:"date_of_birth"`

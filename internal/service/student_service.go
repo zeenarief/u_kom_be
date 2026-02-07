@@ -80,15 +80,34 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 		}
 	}
 
-	// 2. Enkripsi Data Sensitif
-	encryptedNIK := ""
+	// 2. Enkripsi Data Sensitif & Hash NIK
+	var encryptedNIK *string
+	var nikHash *string
+
 	if req.NIK != "" {
-		var err error
-		encryptedNIK, err = s.encryptionUtil.Encrypt(req.NIK)
+		// a. Hash & Check Unique
+		hash, err := s.encryptionUtil.Hash(req.NIK)
+		if err != nil {
+			return nil, fmt.Errorf("failed to hash nik: %w", err)
+		}
+
+		existing, err := s.studentRepo.FindByNIKHash(hash)
+		if err != nil {
+			return nil, err
+		}
+		if existing != nil {
+			return nil, apperrors.NewConflictError("nik already exists")
+		}
+		nikHash = &hash
+
+		// b. Encrypt
+		encrypted, err := s.encryptionUtil.Encrypt(req.NIK)
 		if err != nil {
 			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
 		}
+		encryptedNIK = &encrypted
 	}
+
 	encryptedNoKK := ""
 	if req.NoKK != "" {
 		var err error
@@ -103,6 +122,7 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 		FullName:     req.FullName,
 		NoKK:         encryptedNoKK,
 		NIK:          encryptedNIK,
+		NIKHash:      nikHash,
 		NISN:         nisn,
 		NIM:          nim,
 		Gender:       req.Gender,
@@ -233,12 +253,36 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 	}
 
 	// Enkripsi field yang diperbarui
+	// Enkripsi field yang diperbarui
 	if req.NIK != "" {
+		// Cek apakah NIK berubah atau datanya belum ada (meski user kirim NIK sama, kita proses saja)
+		// Optimalisasi: cek hash dulu? Tapi request raw string, di DB terenkripsi/hash.
+		// Kita hitung hash dari request.
+		newHash, err := s.encryptionUtil.Hash(req.NIK)
+		if err != nil {
+			return nil, fmt.Errorf("failed to hash nik: %w", err)
+		}
+
+		// Cek keunikan jika hash berubah atau sebelumnya null
+		isDifferent := student.NIKHash == nil || *student.NIKHash != newHash
+		if isDifferent {
+			existing, err := s.studentRepo.FindByNIKHash(newHash)
+			if err != nil {
+				return nil, err
+			}
+			if existing != nil && existing.ID != id {
+				return nil, apperrors.NewConflictError("nik already exists")
+			}
+		}
+
+		student.NIKHash = &newHash
+
+		// Enkripsi
 		encryptedNIK, err := s.encryptionUtil.Encrypt(req.NIK)
 		if err != nil {
 			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
 		}
-		student.NIK = encryptedNIK
+		student.NIK = &encryptedNIK
 	}
 	if req.NoKK != "" {
 		encryptedNoKK, err := s.encryptionUtil.Encrypt(req.NoKK)

@@ -9,7 +9,7 @@ import (
 
 type Role struct {
 	ID          string       `gorm:"primaryKey;type:char(36)" json:"id"`
-	Name        string       `gorm:"uniqueIndex;not null" json:"name"`
+	Name        string       `gorm:"type:varchar(50);uniqueIndex;not null" json:"name"`
 	Description string       `json:"description"`
 	IsDefault   bool         `gorm:"default:false" json:"is_default"`
 	Permissions []Permission `gorm:"many2many:role_permission;" json:"permissions,omitempty"`

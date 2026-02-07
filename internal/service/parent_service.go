@@ -57,20 +57,39 @@ func (s *parentService) CreateParent(req request.ParentCreateRequest) (*response
 		}
 	}
 
-	// 2. Enkripsi NIK
-	encryptedNIK := ""
+	// 2. Enkripsi NIK & Hash
+	var encryptedNIK *string
+	var nikHash *string
+
 	if req.NIK != "" {
-		var err error
-		encryptedNIK, err = s.encryptionUtil.Encrypt(req.NIK)
+		// a. Hash & Check Unique
+		hash, err := s.encryptionUtil.Hash(req.NIK)
+		if err != nil {
+			return nil, fmt.Errorf("failed to hash nik: %w", err)
+		}
+
+		existing, err := s.parentRepo.FindByNIKHash(hash)
+		if err != nil {
+			return nil, err
+		}
+		if existing != nil {
+			return nil, apperrors.NewConflictError("nik already exists")
+		}
+		nikHash = &hash
+
+		// b. Encrypt
+		encrypted, err := s.encryptionUtil.Encrypt(req.NIK)
 		if err != nil {
 			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
 		}
+		encryptedNIK = &encrypted
 	}
 
 	// 3. Buat Domain Object
 	parent := &domain.Parent{
 		FullName:       req.FullName,
-		NIK:            encryptedNIK, // <-- Simpan data terenkripsi
+		NIK:            encryptedNIK, // <-- Simpan data terenkripsi (pointer)
+		NIKHash:        nikHash,      // <-- Simpan hash (pointer)
 		Gender:         req.Gender,
 		PlaceOfBirth:   req.PlaceOfBirth,
 		DateOfBirth:    req.DateOfBirth,
@@ -199,11 +218,32 @@ func (s *parentService) UpdateParent(id string, req request.ParentUpdateRequest)
 
 	// Enkripsi NIK jika diperbarui
 	if req.NIK != "" {
+		// Hitung hash baru
+		newHash, err := s.encryptionUtil.Hash(req.NIK)
+		if err != nil {
+			return nil, fmt.Errorf("failed to hash nik: %w", err)
+		}
+
+		// Cek keunikan jika hash berubah atau sebelumnya null
+		isDifferent := parent.NIKHash == nil || *parent.NIKHash != newHash
+		if isDifferent {
+			existing, err := s.parentRepo.FindByNIKHash(newHash)
+			if err != nil {
+				return nil, err
+			}
+			if existing != nil && existing.ID != id {
+				return nil, apperrors.NewConflictError("nik already exists")
+			}
+		}
+
+		parent.NIKHash = &newHash
+
+		// Enkripsi
 		encryptedNIK, err := s.encryptionUtil.Encrypt(req.NIK)
 		if err != nil {
 			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
 		}
-		parent.NIK = encryptedNIK
+		parent.NIK = &encryptedNIK
 	}
 
 	// Update field lainnya (pola `!= ""`)

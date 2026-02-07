@@ -16,6 +16,7 @@ type GuardianRepository interface {
 	Update(guardian *domain.Guardian) error
 	Delete(id string) error
 	SetUserID(guardianID string, userID *string) error
+	FindByNIKHash(hash string) (*domain.Guardian, error)
 }
 
 type guardianRepository struct {
@@ -91,4 +92,16 @@ func (r *guardianRepository) Delete(id string) error {
 func (r *guardianRepository) SetUserID(guardianID string, userID *string) error {
 	// GORM akan otomatis meng-set ke NULL jika userID adalah nil
 	return r.db.Model(&domain.Guardian{}).Where("id = ?", guardianID).Update("user_id", userID).Error
+}
+
+func (r *guardianRepository) FindByNIKHash(hash string) (*domain.Guardian, error) {
+	var guardian domain.Guardian
+	err := r.db.First(&guardian, "nik_hash = ?", hash).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil // Not found
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &guardian, nil
 }

@@ -4,6 +4,7 @@ CREATE TABLE parents (
 
     -- Data sensitif, akan dienkripsi
                          nik TEXT,
+                         nik_hash VARCHAR(64) UNIQUE,
 
     -- Data demografi dasar
                          gender VARCHAR(10), -- 'male' atau 'female'
