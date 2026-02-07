@@ -48,12 +48,12 @@ func (s *parentService) CreateParent(req request.ParentCreateRequest) (*response
 	// 1. Validasi Duplikat (Phone & Email) - jika ada
 	if req.PhoneNumber != nil && *req.PhoneNumber != "" {
 		if existing, _ := s.parentRepo.FindByPhone(*req.PhoneNumber); existing != nil {
-			return nil, apperrors.NewConflictError("phone number already exists")
+			return nil, apperrors.NewConflictError("Phone number already exists")
 		}
 	}
 	if req.Email != nil && *req.Email != "" {
 		if existing, _ := s.parentRepo.FindByEmail(*req.Email); existing != nil {
-			return nil, apperrors.NewConflictError("email already exists")
+			return nil, apperrors.NewConflictError("Email already exists")
 		}
 	}
 
@@ -65,7 +65,7 @@ func (s *parentService) CreateParent(req request.ParentCreateRequest) (*response
 		// a. Hash & Check Unique
 		hash, err := s.encryptionUtil.Hash(*req.NIK)
 		if err != nil {
-			return nil, fmt.Errorf("failed to hash nik: %w", err)
+			return nil, fmt.Errorf("Failed to hash NIK: %w", err)
 		}
 
 		existing, err := s.parentRepo.FindByNIKHash(hash)
@@ -73,14 +73,14 @@ func (s *parentService) CreateParent(req request.ParentCreateRequest) (*response
 			return nil, err
 		}
 		if existing != nil {
-			return nil, apperrors.NewConflictError("nik already exists")
+			return nil, apperrors.NewConflictError("NIK already exists")
 		}
 		nikHash = &hash
 
 		// b. Encrypt
 		encrypted, err := s.encryptionUtil.Encrypt(*req.NIK)
 		if err != nil {
-			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
+			return nil, fmt.Errorf("Failed to encrypt NIK: %w", err)
 		}
 		encryptedNIK = &encrypted
 	}
@@ -127,7 +127,7 @@ func (s *parentService) CreateParent(req request.ParentCreateRequest) (*response
 		return nil, err
 	}
 	if createdParent == nil {
-		return nil, apperrors.NewInternalError("failed to retrieve created parent")
+		return nil, apperrors.NewInternalError("Failed to retrieve created parent")
 	}
 
 	// 6. Konversi ke Response Detail
@@ -156,7 +156,7 @@ func (s *parentService) GetParentByID(id string) (*response.ParentDetailResponse
 		return nil, err
 	}
 	if parent == nil {
-		return nil, apperrors.NewNotFoundError("parent not found")
+		return nil, apperrors.NewNotFoundError("Parent not found")
 	}
 
 	// 2. Konversi Parent dasar
@@ -195,7 +195,7 @@ func (s *parentService) UpdateParent(id string, req request.ParentUpdateRequest)
 		return nil, err
 	}
 	if parent == nil {
-		return nil, apperrors.NewNotFoundError("parent not found")
+		return nil, apperrors.NewNotFoundError("Parent not found")
 	}
 
 	// Update fields jika disediakan
@@ -208,7 +208,7 @@ func (s *parentService) UpdateParent(id string, req request.ParentUpdateRequest)
 		if parent.PhoneNumber == nil || *req.PhoneNumber != *parent.PhoneNumber {
 			if *req.PhoneNumber != "" { // Hanya cek jika tidak kosong
 				if existing, _ := s.parentRepo.FindByPhone(*req.PhoneNumber); existing != nil {
-					return nil, apperrors.NewConflictError("phone number already exists")
+					return nil, apperrors.NewConflictError("Phone number already exists")
 				}
 			}
 			parent.PhoneNumber = req.PhoneNumber
@@ -219,7 +219,7 @@ func (s *parentService) UpdateParent(id string, req request.ParentUpdateRequest)
 		if parent.Email == nil || *req.Email != *parent.Email {
 			if *req.Email != "" {
 				if existing, _ := s.parentRepo.FindByEmail(*req.Email); existing != nil {
-					return nil, apperrors.NewConflictError("email already exists")
+					return nil, apperrors.NewConflictError("Email already exists")
 				}
 			}
 			parent.Email = req.Email
@@ -235,7 +235,7 @@ func (s *parentService) UpdateParent(id string, req request.ParentUpdateRequest)
 			// Hitung hash baru
 			newHash, err := s.encryptionUtil.Hash(*req.NIK)
 			if err != nil {
-				return nil, fmt.Errorf("failed to hash nik: %w", err)
+				return nil, fmt.Errorf("Failed to hash NIK: %w", err)
 			}
 
 			// Cek keunikan jika hash berubah atau sebelumnya null
@@ -246,7 +246,7 @@ func (s *parentService) UpdateParent(id string, req request.ParentUpdateRequest)
 					return nil, err
 				}
 				if existing != nil && existing.ID != id {
-					return nil, apperrors.NewConflictError("nik already exists")
+					return nil, apperrors.NewConflictError("NIK already exists")
 				}
 			}
 
@@ -255,7 +255,7 @@ func (s *parentService) UpdateParent(id string, req request.ParentUpdateRequest)
 			// Enkripsi
 			encryptedNIK, err := s.encryptionUtil.Encrypt(*req.NIK)
 			if err != nil {
-				return nil, fmt.Errorf("failed to encrypt nik: %w", err)
+				return nil, fmt.Errorf("Failed to encrypt NIK: %w", err)
 			}
 			parent.NIK = &encryptedNIK
 		} else {
@@ -350,7 +350,7 @@ func (s *parentService) DeleteParent(id string) error {
 		return err
 	}
 	if parent == nil {
-		return apperrors.NewNotFoundError("parent not found")
+		return apperrors.NewNotFoundError("Parent not found")
 	}
 
 	return s.parentRepo.Delete(id)
@@ -364,7 +364,7 @@ func (s *parentService) LinkUser(parentID string, userID string) error {
 		return err
 	}
 	if parent == nil {
-		return apperrors.NewNotFoundError("parent not found")
+		return apperrors.NewNotFoundError("Parent not found")
 	}
 
 	// 2. Cek apakah User ada
@@ -373,13 +373,13 @@ func (s *parentService) LinkUser(parentID string, userID string) error {
 		return err
 	}
 	if user == nil {
-		return apperrors.NewNotFoundError("user not found")
+		return apperrors.NewNotFoundError("User not found")
 	}
 
 	// 3. Tautkan akun (Kita andalkan UNIQUE constraint di DB untuk error duplikat)
 	if err := s.parentRepo.SetUserID(parentID, &userID); err != nil {
 		if strings.Contains(err.Error(), "Duplicate entry") {
-			return apperrors.NewConflictError("this user account is already linked to another parent")
+			return apperrors.NewConflictError("This user account is already linked to another parent")
 		}
 		return err
 	}
@@ -394,7 +394,7 @@ func (s *parentService) UnlinkUser(parentID string) error {
 		return err
 	}
 	if parent == nil {
-		return apperrors.NewNotFoundError("parent not found")
+		return apperrors.NewNotFoundError("Parent not found")
 	}
 
 	// 2. Hapus tautan (set user_id ke NULL)

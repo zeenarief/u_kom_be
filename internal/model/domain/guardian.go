@@ -13,7 +13,7 @@ type Guardian struct {
 	NIK                   *string   `gorm:"type:text" json:"nik,omitempty"`        // Akan dienkripsi
 	NIKHash               *string   `gorm:"type:varchar(64);uniqueIndex" json:"-"` // Blind Index for Unique Check
 	Gender                *string   `gorm:"type:varchar(10)" json:"gender"`
-	PhoneNumber           *string   `gorm:"type:varchar(20);uniqueIndex" json:"phone_number"`
+	PhoneNumber           *string   `gorm:"type:varchar(20);not null;uniqueIndex" json:"phone_number"`
 	Email                 *string   `gorm:"type:varchar(100);uniqueIndex" json:"email"`
 	Address               *string   `gorm:"type:text" json:"address"`
 	RT                    *string   `gorm:"type:varchar(3)" json:"rt"`

@@ -68,7 +68,7 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 	if req.NISN != "" {
 		nisn = &req.NISN
 		if existing, _ := s.studentRepo.FindByNISN(req.NISN); existing != nil {
-			return nil, apperrors.NewConflictError("nisn already exists")
+			return nil, apperrors.NewConflictError("NISN already exists")
 		}
 	}
 
@@ -76,7 +76,7 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 	if req.NIM != "" {
 		nim = &req.NIM
 		if existing, _ := s.studentRepo.FindByNIM(req.NIM); existing != nil {
-			return nil, apperrors.NewConflictError("nim already exists")
+			return nil, apperrors.NewConflictError("NIM already exists")
 		}
 	}
 
@@ -88,7 +88,7 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 		// a. Hash & Check Unique
 		hash, err := s.encryptionUtil.Hash(req.NIK)
 		if err != nil {
-			return nil, fmt.Errorf("failed to hash nik: %w", err)
+			return nil, fmt.Errorf("Failed to hash NIK: %w", err)
 		}
 
 		existing, err := s.studentRepo.FindByNIKHash(hash)
@@ -96,14 +96,14 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 			return nil, err
 		}
 		if existing != nil {
-			return nil, apperrors.NewConflictError("nik already exists")
+			return nil, apperrors.NewConflictError("NIK already exists")
 		}
 		nikHash = &hash
 
 		// b. Encrypt
 		encrypted, err := s.encryptionUtil.Encrypt(req.NIK)
 		if err != nil {
-			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
+			return nil, fmt.Errorf("Failed to encrypt NIK: %w", err)
 		}
 		encryptedNIK = &encrypted
 	}
@@ -113,7 +113,7 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 		var err error
 		encryptedNoKK, err = s.encryptionUtil.Encrypt(req.NoKK)
 		if err != nil {
-			return nil, fmt.Errorf("failed to encrypt no_kk: %w", err)
+			return nil, fmt.Errorf("Failed to encrypt NoKK: %w", err)
 		}
 	}
 
@@ -149,7 +149,7 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 		return nil, err
 	}
 	if createdStudent == nil {
-		return nil, apperrors.NewInternalError("failed to retrieve created student")
+		return nil, apperrors.NewInternalError("Failed to retrieve created student")
 	}
 
 	// 6. Konversi ke Response (menggunakan konverter)
@@ -164,7 +164,7 @@ func (s *studentService) GetStudentByID(id string) (*response.StudentDetailRespo
 		return nil, err
 	}
 	if student == nil {
-		return nil, apperrors.NewNotFoundError("student not found")
+		return nil, apperrors.NewNotFoundError("Student not found")
 	}
 
 	// 2. Panggil konverter
@@ -193,7 +193,7 @@ func (s *studentService) GetStudentByID(id string) (*response.StudentDetailRespo
 		if err != nil {
 			// Log error tapi jangan gagalkan request? Tergantung kebutuhan.
 			// Untuk sekarang, kita gagalkan jika data wali korup.
-			return nil, fmt.Errorf("failed to fetch guardian info: %w", err)
+			return nil, fmt.Errorf("Failed to fetch guardian info: %w", err)
 		}
 		// Lampirkan data wali ke DTO
 		responseDTO.Guardian = guardianInfo
@@ -220,7 +220,7 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 		return nil, err
 	}
 	if student == nil {
-		return nil, apperrors.NewNotFoundError("student not found")
+		return nil, apperrors.NewNotFoundError("Student not found")
 	}
 
 	// Update fields jika disediakan (meniru RoleService)
@@ -236,7 +236,7 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 		// ada value baru
 		if student.NISN == nil || *student.NISN != req.NISN {
 			if existing, _ := s.studentRepo.FindByNISN(req.NISN); existing != nil {
-				return nil, apperrors.NewConflictError("nisn already exists")
+				return nil, apperrors.NewConflictError("NISN already exists")
 			}
 			student.NISN = &req.NISN
 		}
@@ -246,7 +246,7 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 	} else {
 		if student.NIM == nil || *student.NIM != req.NIM {
 			if existing, _ := s.studentRepo.FindByNIM(req.NIM); existing != nil {
-				return nil, apperrors.NewConflictError("nim already exists")
+				return nil, apperrors.NewConflictError("NIM already exists")
 			}
 			student.NIM = &req.NIM
 		}
@@ -260,7 +260,7 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 		// Kita hitung hash dari request.
 		newHash, err := s.encryptionUtil.Hash(req.NIK)
 		if err != nil {
-			return nil, fmt.Errorf("failed to hash nik: %w", err)
+			return nil, fmt.Errorf("Failed to hash NIK: %w", err)
 		}
 
 		// Cek keunikan jika hash berubah atau sebelumnya null
@@ -271,7 +271,7 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 				return nil, err
 			}
 			if existing != nil && existing.ID != id {
-				return nil, apperrors.NewConflictError("nik already exists")
+				return nil, apperrors.NewConflictError("NIK already exists")
 			}
 		}
 
@@ -280,14 +280,14 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 		// Enkripsi
 		encryptedNIK, err := s.encryptionUtil.Encrypt(req.NIK)
 		if err != nil {
-			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
+			return nil, fmt.Errorf("Failed to encrypt NIK: %w", err)
 		}
 		student.NIK = &encryptedNIK
 	}
 	if req.NoKK != "" {
 		encryptedNoKK, err := s.encryptionUtil.Encrypt(req.NoKK)
 		if err != nil {
-			return nil, fmt.Errorf("failed to encrypt no_kk: %w", err)
+			return nil, fmt.Errorf("Failed to encrypt NoKK: %w", err)
 		}
 		student.NoKK = encryptedNoKK
 	}
@@ -349,7 +349,7 @@ func (s *studentService) DeleteStudent(id string) error {
 		return err
 	}
 	if student == nil {
-		return apperrors.NewNotFoundError("student not found")
+		return apperrors.NewNotFoundError("Student not found")
 	}
 
 	// Opsional: Tambahkan logika bisnis
@@ -368,7 +368,7 @@ func (s *studentService) SyncParents(studentID string, req request.StudentSyncPa
 		return err
 	}
 	if student == nil {
-		return errors.New("student not found")
+		return errors.New("Student not found")
 	}
 
 	var parentRelations []domain.StudentParent
@@ -385,10 +385,10 @@ func (s *studentService) SyncParents(studentID string, req request.StudentSyncPa
 		// Cek apakah parent_id ada di database
 		parent, err := s.parentRepo.FindByID(p.ParentID)
 		if err != nil {
-			return fmt.Errorf("error checking parent: %w", err)
+			return fmt.Errorf("Error checking parent: %w", err)
 		}
 		if parent == nil {
-			return apperrors.NewNotFoundError(fmt.Sprintf("parent not found with id: %s", p.ParentID))
+			return apperrors.NewNotFoundError(fmt.Sprintf("Parent not found with id: %s", p.ParentID))
 		}
 
 		// Jika valid, siapkan data untuk repository
@@ -411,7 +411,7 @@ func (s *studentService) SetGuardian(studentID string, req request.StudentSetGua
 		return err
 	}
 	if student == nil {
-		return errors.New("student not found")
+		return errors.New("Student not found")
 	}
 
 	// 2. Validasi apakah guardian_id yang diberikan ada di tabel yang benar
@@ -419,18 +419,18 @@ func (s *studentService) SetGuardian(studentID string, req request.StudentSetGua
 	case "parent":
 		parent, err := s.parentRepo.FindByID(req.GuardianID)
 		if err != nil {
-			return fmt.Errorf("error checking parent: %w", err)
+			return fmt.Errorf("Error checking parent: %w", err)
 		}
 		if parent == nil {
-			return apperrors.NewNotFoundError(fmt.Sprintf("parent not found with id: %s", req.GuardianID))
+			return apperrors.NewNotFoundError(fmt.Sprintf("Parent not found with id: %s", req.GuardianID))
 		}
 	case "guardian":
 		guardian, err := s.guardianRepo.FindByID(req.GuardianID)
 		if err != nil {
-			return fmt.Errorf("error checking guardian: %w", err)
+			return fmt.Errorf("Error checking guardian: %w", err)
 		}
 		if guardian == nil {
-			return apperrors.NewNotFoundError(fmt.Sprintf("guardian not found with id: %s", req.GuardianID))
+			return apperrors.NewNotFoundError(fmt.Sprintf("Guardian not found with id: %s", req.GuardianID))
 		}
 	default:
 		// Sebenarnya sudah ditangani oleh validasi 'oneof' di DTO, tapi
@@ -451,7 +451,7 @@ func (s *studentService) RemoveGuardian(studentID string) error {
 		return err
 	}
 	if student == nil {
-		return errors.New("student not found")
+		return errors.New("Student not found")
 	}
 
 	// 2. Panggil repository dengan nil untuk menghapus
@@ -475,7 +475,7 @@ func (s *studentService) fetchGuardianInfo(guardianID *string, guardianType *str
 			return nil, err
 		}
 		if parent == nil {
-			return nil, fmt.Errorf("data integrity error: parent guardian with id %s not found", id)
+			return nil, fmt.Errorf("Data integrity error: Parent guardian with id %s not found", id)
 		}
 
 		// Petakan domain.Parent ke response.GuardianInfoResponse
@@ -494,7 +494,7 @@ func (s *studentService) fetchGuardianInfo(guardianID *string, guardianType *str
 			return nil, err
 		}
 		if guardian == nil {
-			return nil, fmt.Errorf("data integrity error: guardian with id %s not found", id)
+			return nil, fmt.Errorf("Data integrity error: Guardian with id %s not found", id)
 		}
 
 		// Petakan domain.Guardian ke response.GuardianInfoResponse
@@ -514,7 +514,7 @@ func (s *studentService) fetchGuardianInfo(guardianID *string, guardianType *str
 		}, nil
 	}
 
-	return nil, fmt.Errorf("unknown guardian_type: %s", tipe)
+	return nil, fmt.Errorf("Unknown guardian_type: %s", tipe)
 }
 
 // LinkUser menautkan profil Student ke akun User
@@ -525,7 +525,7 @@ func (s *studentService) LinkUser(studentID string, userID string) error {
 		return err
 	}
 	if student == nil {
-		return errors.New("student not found")
+		return errors.New("Student not found")
 	}
 
 	// 2. Cek apakah User ada
@@ -534,7 +534,7 @@ func (s *studentService) LinkUser(studentID string, userID string) error {
 		return err
 	}
 	if user == nil {
-		return apperrors.NewNotFoundError("user not found")
+		return apperrors.NewNotFoundError("User not found")
 	}
 
 	// 3. Cek apakah User tsb sudah ditautkan ke Student LAIN
@@ -563,7 +563,7 @@ func (s *studentService) UnlinkUser(studentID string) error {
 		return err
 	}
 	if student == nil {
-		return errors.New("student not found")
+		return errors.New("Student not found")
 	}
 
 	// 2. Hapus tautan (set user_id ke NULL)

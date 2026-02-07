@@ -49,12 +49,12 @@ func (s *guardianService) CreateGuardian(req request.GuardianCreateRequest) (*re
 	// 1. Validasi Duplikat (Phone & Email)
 	if req.PhoneNumber != nil && *req.PhoneNumber != "" { // Phone number optional
 		if existing, _ := s.guardianRepo.FindByPhone(*req.PhoneNumber); existing != nil {
-			return nil, apperrors.NewConflictError("phone number already exists")
+			return nil, apperrors.NewConflictError("Phone number already exists")
 		}
 	}
 	if req.Email != nil && *req.Email != "" {
 		if existing, _ := s.guardianRepo.FindByEmail(*req.Email); existing != nil {
-			return nil, apperrors.NewConflictError("email already exists")
+			return nil, apperrors.NewConflictError("Email already exists")
 		}
 	}
 
@@ -66,7 +66,7 @@ func (s *guardianService) CreateGuardian(req request.GuardianCreateRequest) (*re
 		// a. Hash & Check Unique
 		hash, err := s.encryptionUtil.Hash(*req.NIK)
 		if err != nil {
-			return nil, fmt.Errorf("failed to hash nik: %w", err)
+			return nil, fmt.Errorf("Failed to hash NIK: %w", err)
 		}
 
 		existing, err := s.guardianRepo.FindByNIKHash(hash)
@@ -74,14 +74,14 @@ func (s *guardianService) CreateGuardian(req request.GuardianCreateRequest) (*re
 			return nil, err
 		}
 		if existing != nil {
-			return nil, apperrors.NewConflictError("nik already exists")
+			return nil, apperrors.NewConflictError("NIK already exists")
 		}
 		nikHash = &hash
 
 		// b. Encrypt
 		encrypted, err := s.encryptionUtil.Encrypt(*req.NIK)
 		if err != nil {
-			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
+			return nil, fmt.Errorf("Failed to encrypt NIK: %w", err)
 		}
 		encryptedNIK = &encrypted
 	}
@@ -116,7 +116,7 @@ func (s *guardianService) CreateGuardian(req request.GuardianCreateRequest) (*re
 		return nil, err
 	}
 	if createdGuardian == nil {
-		return nil, apperrors.NewInternalError("failed to retrieve created guardian")
+		return nil, apperrors.NewInternalError("Failed to retrieve created guardian")
 	}
 
 	// 6. Konversi ke Response Detail
@@ -144,7 +144,7 @@ func (s *guardianService) GetGuardianByID(id string) (*response.GuardianDetailRe
 		return nil, err
 	}
 	if guardian == nil {
-		return nil, apperrors.NewNotFoundError("guardian not found")
+		return nil, apperrors.NewNotFoundError("Guardian not found")
 	}
 	// Panggil konverter untuk response detail (dengan dekripsi NIK)
 	resp := s.converter.ToGuardianDetailResponse(guardian)
@@ -181,7 +181,7 @@ func (s *guardianService) UpdateGuardian(id string, req request.GuardianUpdateRe
 		return nil, err
 	}
 	if guardian == nil {
-		return nil, apperrors.NewNotFoundError("guardian not found")
+		return nil, apperrors.NewNotFoundError("Guardian not found")
 	}
 
 	// Update fields jika disediakan
@@ -194,7 +194,7 @@ func (s *guardianService) UpdateGuardian(id string, req request.GuardianUpdateRe
 		if guardian.PhoneNumber == nil || *req.PhoneNumber != *guardian.PhoneNumber {
 			if *req.PhoneNumber != "" {
 				if existing, _ := s.guardianRepo.FindByPhone(*req.PhoneNumber); existing != nil {
-					return nil, apperrors.NewConflictError("phone number already exists")
+					return nil, apperrors.NewConflictError("Phone number already exists")
 				}
 			}
 			guardian.PhoneNumber = req.PhoneNumber
@@ -205,7 +205,7 @@ func (s *guardianService) UpdateGuardian(id string, req request.GuardianUpdateRe
 		if guardian.Email == nil || *req.Email != *guardian.Email {
 			if *req.Email != "" {
 				if existing, _ := s.guardianRepo.FindByEmail(*req.Email); existing != nil {
-					return nil, apperrors.NewConflictError("email already exists")
+					return nil, apperrors.NewConflictError("Email already exists")
 				}
 			}
 			guardian.Email = req.Email
@@ -218,7 +218,7 @@ func (s *guardianService) UpdateGuardian(id string, req request.GuardianUpdateRe
 			// Hitung hash baru
 			newHash, err := s.encryptionUtil.Hash(*req.NIK)
 			if err != nil {
-				return nil, fmt.Errorf("failed to hash nik: %w", err)
+				return nil, fmt.Errorf("Failed to hash NIK: %w", err)
 			}
 
 			// Cek keunikan jika hash berubah atau sebelumnya null
@@ -229,7 +229,7 @@ func (s *guardianService) UpdateGuardian(id string, req request.GuardianUpdateRe
 					return nil, err
 				}
 				if existing != nil && existing.ID != id {
-					return nil, apperrors.NewConflictError("nik already exists")
+					return nil, apperrors.NewConflictError("NIK already exists")
 				}
 			}
 
@@ -238,7 +238,7 @@ func (s *guardianService) UpdateGuardian(id string, req request.GuardianUpdateRe
 			// Enkripsi
 			encryptedNIK, err := s.encryptionUtil.Encrypt(*req.NIK)
 			if err != nil {
-				return nil, fmt.Errorf("failed to encrypt nik: %w", err)
+				return nil, fmt.Errorf("Failed to encrypt NIK: %w", err)
 			}
 			guardian.NIK = &encryptedNIK
 		} else {
@@ -315,7 +315,7 @@ func (s *guardianService) DeleteGuardian(id string) error {
 		return err
 	}
 	if guardian == nil {
-		return apperrors.NewNotFoundError("guardian not found")
+		return apperrors.NewNotFoundError("Guardian not found")
 	}
 
 	return s.guardianRepo.Delete(id)
@@ -329,7 +329,7 @@ func (s *guardianService) LinkUser(guardianID string, userID string) error {
 		return err
 	}
 	if guardian == nil {
-		return apperrors.NewNotFoundError("guardian not found")
+		return apperrors.NewNotFoundError("Guardian not found")
 	}
 
 	// 2. Cek apakah User ada
@@ -338,13 +338,13 @@ func (s *guardianService) LinkUser(guardianID string, userID string) error {
 		return err
 	}
 	if user == nil {
-		return apperrors.NewNotFoundError("user not found")
+		return apperrors.NewNotFoundError("User not found")
 	}
 
 	// 3. Tautkan akun (Kita andalkan UNIQUE constraint di DB untuk error duplikat)
 	if err := s.guardianRepo.SetUserID(guardianID, &userID); err != nil {
 		if strings.Contains(err.Error(), "Duplicate entry") {
-			return apperrors.NewConflictError("this user account is already linked to another guardian")
+			return apperrors.NewConflictError("This user account is already linked to another guardian")
 		}
 		return err
 	}
@@ -359,7 +359,7 @@ func (s *guardianService) UnlinkUser(guardianID string) error {
 		return err
 	}
 	if guardian == nil {
-		return errors.New("guardian not found")
+		return errors.New("Guardian not found")
 	}
 
 	// 2. Hapus tautan (set user_id ke NULL)
