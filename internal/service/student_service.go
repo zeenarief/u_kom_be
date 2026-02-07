@@ -498,11 +498,17 @@ func (s *studentService) fetchGuardianInfo(guardianID *string, guardianType *str
 		}
 
 		// Petakan domain.Guardian ke response.GuardianInfoResponse
+		// Asumsi domain.Guardian juga punya PhoneNumber/Email sebagai pointer?
+		// Jika domain.Guardian masih string, kita perlu ambil address-nya atau convert.
+		// Mari kita cek domain.Guardian nanti. Untuk sekarang asumsikan pointer atau kita bikin helper.
+		phone := &guardian.PhoneNumber
+		email := &guardian.Email
+
 		return &response.GuardianInfoResponse{
 			ID:           guardian.ID,
 			FullName:     guardian.FullName,
-			PhoneNumber:  guardian.PhoneNumber,
-			Email:        guardian.Email,
+			PhoneNumber:  phone,
+			Email:        email,
 			Type:         "guardian",
 			Relationship: guardian.RelationshipToStudent, // cth: 'UNCLE', 'AUNT'
 		}, nil
@@ -775,7 +781,11 @@ func (s *studentService) ExportStudentBiodata(id string) (*bytes.Buffer, error) 
 			// Asumsikan sudah ada:
 			if p.Parent.ID != "" {
 				printRow(parentLabel, p.Parent.FullName)
-				printRow("   No. HP", p.Parent.PhoneNumber)
+				phone := "-"
+				if p.Parent.PhoneNumber != nil {
+					phone = *p.Parent.PhoneNumber
+				}
+				printRow("   No. HP", phone)
 			}
 		}
 	} else {

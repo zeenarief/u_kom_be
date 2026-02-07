@@ -45,14 +45,14 @@ func NewParentService(
 
 // CreateParent menangani pembuatan data orang tua baru
 func (s *parentService) CreateParent(req request.ParentCreateRequest) (*response.ParentDetailResponse, error) {
-	// 1. Validasi Duplikat (Phone & Email)
-	if req.PhoneNumber != "" {
-		if existing, _ := s.parentRepo.FindByPhone(req.PhoneNumber); existing != nil {
+	// 1. Validasi Duplikat (Phone & Email) - jika ada
+	if req.PhoneNumber != nil && *req.PhoneNumber != "" {
+		if existing, _ := s.parentRepo.FindByPhone(*req.PhoneNumber); existing != nil {
 			return nil, apperrors.NewConflictError("phone number already exists")
 		}
 	}
-	if req.Email != "" {
-		if existing, _ := s.parentRepo.FindByEmail(req.Email); existing != nil {
+	if req.Email != nil && *req.Email != "" {
+		if existing, _ := s.parentRepo.FindByEmail(*req.Email); existing != nil {
 			return nil, apperrors.NewConflictError("email already exists")
 		}
 	}
@@ -61,9 +61,9 @@ func (s *parentService) CreateParent(req request.ParentCreateRequest) (*response
 	var encryptedNIK *string
 	var nikHash *string
 
-	if req.NIK != "" {
+	if req.NIK != nil && *req.NIK != "" {
 		// a. Hash & Check Unique
-		hash, err := s.encryptionUtil.Hash(req.NIK)
+		hash, err := s.encryptionUtil.Hash(*req.NIK)
 		if err != nil {
 			return nil, fmt.Errorf("failed to hash nik: %w", err)
 		}
@@ -78,7 +78,7 @@ func (s *parentService) CreateParent(req request.ParentCreateRequest) (*response
 		nikHash = &hash
 
 		// b. Encrypt
-		encrypted, err := s.encryptionUtil.Encrypt(req.NIK)
+		encrypted, err := s.encryptionUtil.Encrypt(*req.NIK)
 		if err != nil {
 			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
 		}
@@ -86,6 +86,12 @@ func (s *parentService) CreateParent(req request.ParentCreateRequest) (*response
 	}
 
 	// 3. Buat Domain Object
+	// Helper untuk set default LifeStatus
+	lifeStatus := "alive"
+	if req.LifeStatus != nil {
+		lifeStatus = *req.LifeStatus
+	}
+
 	parent := &domain.Parent{
 		FullName:       req.FullName,
 		NIK:            encryptedNIK, // <-- Simpan data terenkripsi (pointer)
@@ -93,7 +99,7 @@ func (s *parentService) CreateParent(req request.ParentCreateRequest) (*response
 		Gender:         req.Gender,
 		PlaceOfBirth:   req.PlaceOfBirth,
 		DateOfBirth:    req.DateOfBirth,
-		LifeStatus:     req.LifeStatus,
+		LifeStatus:     &lifeStatus,
 		MaritalStatus:  req.MaritalStatus,
 		PhoneNumber:    req.PhoneNumber,
 		Email:          req.Email,
@@ -108,11 +114,6 @@ func (s *parentService) CreateParent(req request.ParentCreateRequest) (*response
 		City:           req.City,
 		Province:       req.Province,
 		PostalCode:     req.PostalCode,
-	}
-
-	// Menetapkan default 'alive' jika tidak diset, sesuai skema DB
-	if parent.LifeStatus == "" {
-		parent.LifeStatus = "alive"
 	}
 
 	// 4. Panggil Repository
@@ -203,96 +204,114 @@ func (s *parentService) UpdateParent(id string, req request.ParentUpdateRequest)
 	}
 
 	// Validasi duplikat baru
-	if req.PhoneNumber != "" && req.PhoneNumber != parent.PhoneNumber {
-		if existing, _ := s.parentRepo.FindByPhone(req.PhoneNumber); existing != nil {
-			return nil, apperrors.NewConflictError("phone number already exists")
+	if req.PhoneNumber != nil {
+		if parent.PhoneNumber == nil || *req.PhoneNumber != *parent.PhoneNumber {
+			if *req.PhoneNumber != "" { // Hanya cek jika tidak kosong
+				if existing, _ := s.parentRepo.FindByPhone(*req.PhoneNumber); existing != nil {
+					return nil, apperrors.NewConflictError("phone number already exists")
+				}
+			}
+			parent.PhoneNumber = req.PhoneNumber
 		}
-		parent.PhoneNumber = req.PhoneNumber
 	}
-	if req.Email != "" && req.Email != parent.Email {
-		if existing, _ := s.parentRepo.FindByEmail(req.Email); existing != nil {
-			return nil, apperrors.NewConflictError("email already exists")
+
+	if req.Email != nil {
+		if parent.Email == nil || *req.Email != *parent.Email {
+			if *req.Email != "" {
+				if existing, _ := s.parentRepo.FindByEmail(*req.Email); existing != nil {
+					return nil, apperrors.NewConflictError("email already exists")
+				}
+			}
+			parent.Email = req.Email
 		}
-		parent.Email = req.Email
 	}
 
 	// Enkripsi NIK jika diperbarui
-	if req.NIK != "" {
-		// Hitung hash baru
-		newHash, err := s.encryptionUtil.Hash(req.NIK)
-		if err != nil {
-			return nil, fmt.Errorf("failed to hash nik: %w", err)
-		}
-
-		// Cek keunikan jika hash berubah atau sebelumnya null
-		isDifferent := parent.NIKHash == nil || *parent.NIKHash != newHash
-		if isDifferent {
-			existing, err := s.parentRepo.FindByNIKHash(newHash)
+	if req.NIK != nil {
+		// Jika kosong string, kita anggap hapus NIK? Atau validasi di FE?
+		// Asumsi: jika pointer != nil dan string != "", kita update. Jika "", kita bisa set nil atau biarkan kosong.
+		// Sesuai logic Create, NIK boleh kosong/nil.
+		if *req.NIK != "" {
+			// Hitung hash baru
+			newHash, err := s.encryptionUtil.Hash(*req.NIK)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("failed to hash nik: %w", err)
 			}
-			if existing != nil && existing.ID != id {
-				return nil, apperrors.NewConflictError("nik already exists")
+
+			// Cek keunikan jika hash berubah atau sebelumnya null
+			isDifferent := parent.NIKHash == nil || *parent.NIKHash != newHash
+			if isDifferent {
+				existing, err := s.parentRepo.FindByNIKHash(newHash)
+				if err != nil {
+					return nil, err
+				}
+				if existing != nil && existing.ID != id {
+					return nil, apperrors.NewConflictError("nik already exists")
+				}
 			}
-		}
 
-		parent.NIKHash = &newHash
+			parent.NIKHash = &newHash
 
-		// Enkripsi
-		encryptedNIK, err := s.encryptionUtil.Encrypt(req.NIK)
-		if err != nil {
-			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
+			// Enkripsi
+			encryptedNIK, err := s.encryptionUtil.Encrypt(*req.NIK)
+			if err != nil {
+				return nil, fmt.Errorf("failed to encrypt nik: %w", err)
+			}
+			parent.NIK = &encryptedNIK
+		} else {
+			// Jika explicit empty string, mungkin user ingin menghapus NIK?
+			parent.NIK = nil
+			parent.NIKHash = nil
 		}
-		parent.NIK = &encryptedNIK
 	}
 
-	// Update field lainnya (pola `!= ""`)
-	if req.Gender != "" {
+	// Update field lainnya (pointer check)
+	if req.Gender != nil {
 		parent.Gender = req.Gender
 	}
-	if req.PlaceOfBirth != "" {
+	if req.PlaceOfBirth != nil {
 		parent.PlaceOfBirth = req.PlaceOfBirth
 	}
-	if !req.DateOfBirth.IsZero() {
+	if req.DateOfBirth != nil {
 		parent.DateOfBirth = req.DateOfBirth
 	}
-	if req.LifeStatus != "" {
+	if req.LifeStatus != nil {
 		parent.LifeStatus = req.LifeStatus
 	}
-	if req.MaritalStatus != "" {
+	if req.MaritalStatus != nil {
 		parent.MaritalStatus = req.MaritalStatus
 	}
-	if req.EducationLevel != "" {
+	if req.EducationLevel != nil {
 		parent.EducationLevel = req.EducationLevel
 	}
-	if req.Occupation != "" {
+	if req.Occupation != nil {
 		parent.Occupation = req.Occupation
 	}
-	if req.IncomeRange != "" {
+	if req.IncomeRange != nil {
 		parent.IncomeRange = req.IncomeRange
 	}
-	if req.Address != "" {
+	if req.Address != nil {
 		parent.Address = req.Address
 	}
-	if req.RT != "" {
+	if req.RT != nil {
 		parent.RT = req.RT
 	}
-	if req.RW != "" {
+	if req.RW != nil {
 		parent.RW = req.RW
 	}
-	if req.SubDistrict != "" {
+	if req.SubDistrict != nil {
 		parent.SubDistrict = req.SubDistrict
 	}
-	if req.District != "" {
+	if req.District != nil {
 		parent.District = req.District
 	}
-	if req.City != "" {
+	if req.City != nil {
 		parent.City = req.City
 	}
-	if req.Province != "" {
+	if req.Province != nil {
 		parent.Province = req.Province
 	}
-	if req.PostalCode != "" {
+	if req.PostalCode != nil {
 		parent.PostalCode = req.PostalCode
 	}
 

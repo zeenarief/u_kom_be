@@ -29,20 +29,22 @@ func NewParentConverter(encryptionUtil utils.EncryptionUtil) ParentConverterInte
 // ToParentDetailResponse mengubah domain Parent (terenkripsi) ke response detail (plaintext)
 func (c *parentConverter) ToParentDetailResponse(parent *domain.Parent) *response.ParentDetailResponse {
 	// Dekripsi NIK
-	decryptedNIK := ""
+	var decryptedNIK *string
 	if parent.NIK != nil {
-		var err error
-		decryptedNIK, err = c.encryptionUtil.Decrypt(*parent.NIK)
+		decrypted, err := c.encryptionUtil.Decrypt(*parent.NIK)
 		if err != nil {
 			log.Printf("Failed to decrypt NIK for parent %s: %v", parent.ID, err)
-			decryptedNIK = "[DECRYPTION_ERROR]"
+			errStr := "[DECRYPTION_ERROR]"
+			decryptedNIK = &errStr
+		} else {
+			decryptedNIK = &decrypted
 		}
 	}
 
 	return &response.ParentDetailResponse{
 		ID:             parent.ID,
 		FullName:       parent.FullName,
-		NIK:            decryptedNIK, // <-- Data plaintext
+		NIK:            decryptedNIK, // <-- Data plaintext *string
 		Gender:         parent.Gender,
 		PlaceOfBirth:   parent.PlaceOfBirth,
 		DateOfBirth:    parent.DateOfBirth,

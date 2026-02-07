@@ -24,10 +24,10 @@ type ParentRelationshipResponse struct {
 // GuardianInfoResponse adalah DTO generik untuk menampilkan data wali
 // Ini bisa berisi data dari 'parent' ATAU 'guardian'
 type GuardianInfoResponse struct {
-	ID          string `json:"id"`
-	FullName    string `json:"full_name"`
-	PhoneNumber string `json:"phone_number"`
-	Email       string `json:"email"`
+	ID          string  `json:"id"`
+	FullName    string  `json:"full_name"`
+	PhoneNumber *string `json:"phone_number"`
+	Email       *string `json:"email"`
 	// Field ini memberi tahu dari tabel mana data ini berasal
 	Type string `json:"type"` // 'parent' or 'guardian'
 	// Field ini memberi tahu apa hubungannya (cth: 'FATHER', 'MOTHER', 'UNCLE')
