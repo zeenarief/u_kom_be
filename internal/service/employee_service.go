@@ -58,10 +58,25 @@ func (s *employeeService) CreateEmployee(req request.EmployeeCreateRequest) (*re
 		}
 	}
 
-	// 2. Enkripsi NIK
+	// 2. Enkripsi & Hash NIK
 	encryptedNIK := ""
+	nikHash := ""
 	if req.NIK != "" {
+		// a. Cek Unik via Blind Index
 		var err error
+		nikHash, err = s.encryptUtil.Hash(req.NIK)
+		if err != nil {
+			return nil, fmt.Errorf("failed to hash nik: %w", err)
+		}
+		existing, err := s.employeeRepo.FindByNIKHash(nikHash)
+		if err != nil {
+			return nil, err
+		}
+		if existing != nil {
+			return nil, errors.New("nik already exists")
+		}
+
+		// b. Enkripsi
 		encryptedNIK, err = s.encryptUtil.Encrypt(req.NIK)
 		if err != nil {
 			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
@@ -74,6 +89,7 @@ func (s *employeeService) CreateEmployee(req request.EmployeeCreateRequest) (*re
 		NIP:              req.NIP,
 		JobTitle:         req.JobTitle,
 		NIK:              encryptedNIK, // <-- Simpan data terenkripsi
+		NIKHash:          nikHash,      // <-- Simpan hash untuk validasi
 		Gender:           req.Gender,
 		PhoneNumber:      req.PhoneNumber,
 		Address:          req.Address,
@@ -190,13 +206,29 @@ func (s *employeeService) UpdateEmployee(id string, req request.EmployeeUpdateRe
 		employee.PhoneNumber = req.PhoneNumber
 	}
 
-	// Enkripsi NIK jika diperbarui
+	// Enkripsi & Hash NIK jika diperbarui
 	if req.NIK != "" {
+		// Validasi unik
+		nikHash, err := s.encryptUtil.Hash(req.NIK)
+		if err != nil {
+			return nil, fmt.Errorf("failed to hash nik: %w", err)
+		}
+
+		// Cek apakah hash sudah ada di record LAIN
+		existing, err := s.employeeRepo.FindByNIKHash(nikHash)
+		if err != nil {
+			return nil, err
+		}
+		if existing != nil && existing.ID != id {
+			return nil, errors.New("nik already exists")
+		}
+
 		encryptedNIK, err := s.encryptUtil.Encrypt(req.NIK)
 		if err != nil {
 			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
 		}
 		employee.NIK = encryptedNIK
+		employee.NIKHash = nikHash
 	}
 
 	// Update field lainnya

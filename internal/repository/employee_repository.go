@@ -13,6 +13,7 @@ type EmployeeRepository interface {
 	FindByNIP(nip string) (*domain.Employee, error)
 	FindByPhone(phone string) (*domain.Employee, error)
 	FindByUserID(userID string) (*domain.Employee, error)
+	FindByNIKHash(hash string) (*domain.Employee, error) // Blind Index
 	FindAll(search string) ([]domain.Employee, error)
 	Update(employee *domain.Employee) error
 	Delete(id string) error
@@ -73,6 +74,18 @@ func (r *employeeRepository) FindByUserID(userID string) (*domain.Employee, erro
 	err := r.db.First(&employee, "user_id = ?", userID).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &employee, nil
+}
+
+func (r *employeeRepository) FindByNIKHash(hash string) (*domain.Employee, error) {
+	var employee domain.Employee
+	err := r.db.First(&employee, "nik_hash = ?", hash).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil // Not found
 	}
 	if err != nil {
 		return nil, err

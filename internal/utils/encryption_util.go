@@ -3,8 +3,11 @@ package utils
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/hmac"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -14,6 +17,7 @@ import (
 type EncryptionUtil interface {
 	Encrypt(plaintext string) (string, error)
 	Decrypt(ciphertext string) (string, error)
+	Hash(plaintext string) (string, error)
 }
 
 type encryptionUtil struct {
@@ -79,4 +83,13 @@ func (e *encryptionUtil) Decrypt(ciphertext string) (string, error) {
 	}
 
 	return string(plaintext), nil
+}
+
+func (e *encryptionUtil) Hash(plaintext string) (string, error) {
+	h := hmac.New(sha256.New, e.key)
+	_, err := h.Write([]byte(plaintext))
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(h.Sum(nil)), nil
 }
