@@ -119,23 +119,31 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 
 	// 3. Buat Domain Object
 	student := &domain.Student{
-		FullName:     req.FullName,
-		NoKK:         encryptedNoKK,
-		NIK:          encryptedNIK,
-		NIKHash:      nikHash,
-		NISN:         nisn,
-		NIM:          nim,
-		Gender:       req.Gender,
-		PlaceOfBirth: req.PlaceOfBirth,
-		DateOfBirth:  req.DateOfBirth,
-		Address:      req.Address,
-		RT:           req.RT,
-		RW:           req.RW,
-		SubDistrict:  req.SubDistrict,
-		District:     req.District,
-		City:         req.City,
-		Province:     req.Province,
-		PostalCode:   req.PostalCode,
+		FullName:       req.FullName,
+		NoKK:           encryptedNoKK,
+		NIK:            encryptedNIK,
+		NIKHash:        nikHash,
+		NISN:           nisn,
+		NIM:            nim,
+		Gender:         req.Gender,
+		PlaceOfBirth:   req.PlaceOfBirth,
+		DateOfBirth:    req.DateOfBirth,
+		Address:        req.Address,
+		RT:             req.RT,
+		RW:             req.RW,
+		SubDistrict:    req.SubDistrict,
+		District:       req.District,
+		City:           req.City,
+		Province:       req.Province,
+		PostalCode:     req.PostalCode,
+		Status:         req.Status,
+		EntryYear:      req.EntryYear,
+		GraduationYear: req.GraduationYear,
+	}
+
+	// Set default status if empty
+	if student.Status == "" {
+		student.Status = "ACTIVE"
 	}
 
 	// 4. Panggil Repository
@@ -327,6 +335,15 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 	}
 	if req.PostalCode != "" {
 		student.PostalCode = req.PostalCode
+	}
+	if req.Status != "" {
+		student.Status = req.Status
+	}
+	if req.EntryYear != "" {
+		student.EntryYear = req.EntryYear
+	}
+	if req.GraduationYear != "" {
+		student.GraduationYear = req.GraduationYear
 	}
 
 	if err := s.studentRepo.Update(student); err != nil {
@@ -586,7 +603,7 @@ func (s *studentService) ExportStudentsToExcel() (*bytes.Buffer, error) {
 	f.DeleteSheet("Sheet1")
 
 	// 3. Buat Header
-	headers := []string{"No", "NISN", "NIM", "Nama Lengkap", "Gender", "Tempat Lahir", "Tanggal Lahir", "Alamat", "No HP"}
+	headers := []string{"No", "NISN", "NIM", "Nama Lengkap", "Gender", "Tempat Lahir", "Tanggal Lahir", "Alamat", "No HP", "Status", "Tahun Masuk", "Tahun Lulus"}
 	for i, header := range headers {
 		// Konversi koordinat (0,0 -> A1, 1,0 -> B1)
 		cell, _ := excelize.CoordinatesToCellName(i+1, 1)
@@ -598,7 +615,7 @@ func (s *studentService) ExportStudentsToExcel() (*bytes.Buffer, error) {
 		Font: &excelize.Font{Bold: true},
 		Fill: excelize.Fill{Type: "pattern", Color: []string{"#FFFF00"}, Pattern: 1},
 	})
-	f.SetCellStyle(sheetName, "A1", "I1", style)
+	f.SetCellStyle(sheetName, "A1", "L1", style)
 
 	// 4. Isi Data
 	for i, student := range students {
@@ -619,6 +636,9 @@ func (s *studentService) ExportStudentsToExcel() (*bytes.Buffer, error) {
 		f.SetCellValue(sheetName, fmt.Sprintf("H%d", row), student.Address)
 		// Ambil HP dari User jika ada, atau field lain (sesuaikan struktur data Anda)
 		f.SetCellValue(sheetName, fmt.Sprintf("I%d", row), "-")
+		f.SetCellValue(sheetName, fmt.Sprintf("J%d", row), student.Status)
+		f.SetCellValue(sheetName, fmt.Sprintf("K%d", row), student.EntryYear)
+		f.SetCellValue(sheetName, fmt.Sprintf("L%d", row), student.GraduationYear)
 	}
 
 	// 5. Simpan ke Buffer (Memory)

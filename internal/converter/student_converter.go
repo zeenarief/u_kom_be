@@ -71,26 +71,29 @@ func (c *studentConverter) ToStudentDetailResponse(student *domain.Student) *res
 	}
 
 	return &response.StudentDetailResponse{
-		ID:           student.ID,
-		FullName:     student.FullName,
-		NoKK:         decryptedNoKK, // <-- Data plaintext
-		NIK:          decryptedNIK,  // <-- Data plaintext
-		NISN:         student.NISN,
-		NIM:          student.NIM,
-		Gender:       student.Gender,
-		PlaceOfBirth: student.PlaceOfBirth,
-		DateOfBirth:  student.DateOfBirth,
-		Address:      student.Address,
-		RT:           student.RT,
-		RW:           student.RW,
-		SubDistrict:  student.SubDistrict,
-		District:     student.District,
-		City:         student.City,
-		Province:     student.Province,
-		PostalCode:   student.PostalCode,
-		CreatedAt:    student.CreatedAt,
-		UpdatedAt:    student.UpdatedAt,
-		Parents:      parentResponses,
+		ID:             student.ID,
+		FullName:       student.FullName,
+		NoKK:           decryptedNoKK, // <-- Data plaintext
+		NIK:            decryptedNIK,  // <-- Data plaintext
+		NISN:           student.NISN,
+		NIM:            student.NIM,
+		Gender:         student.Gender,
+		PlaceOfBirth:   student.PlaceOfBirth,
+		DateOfBirth:    student.DateOfBirth,
+		Address:        student.Address,
+		RT:             student.RT,
+		RW:             student.RW,
+		SubDistrict:    student.SubDistrict,
+		District:       student.District,
+		City:           student.City,
+		Province:       student.Province,
+		PostalCode:     student.PostalCode,
+		Status:         student.Status,
+		EntryYear:      student.EntryYear,
+		GraduationYear: student.GraduationYear,
+		CreatedAt:      student.CreatedAt,
+		UpdatedAt:      student.UpdatedAt,
+		Parents:        parentResponses,
 	}
 }
 

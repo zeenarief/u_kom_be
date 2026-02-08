@@ -25,6 +25,10 @@ CREATE TABLE students (
 
                           postal_code VARCHAR(5),
 
+                          status ENUM('ACTIVE', 'GRADUATED', 'DROPOUT') DEFAULT 'ACTIVE',
+                          entry_year VARCHAR(4),
+                          graduation_year VARCHAR(4),
+
                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
