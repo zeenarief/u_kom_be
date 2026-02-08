@@ -80,7 +80,11 @@ func (r *studentRepository) FindAll(search string) ([]domain.Student, error) {
 		query = query.Where("full_name LIKE ? OR nisn LIKE ? OR nim LIKE ? OR city LIKE ?", searchPattern, searchPattern, searchPattern, searchPattern)
 	}
 
-	err := query.Find(&students).Error
+	err := query.
+		Preload("User").
+		Preload("StudentClassrooms", "status = ?", "ACTIVE").
+		Preload("StudentClassrooms.Classroom").
+		Find(&students).Error
 	return students, err
 }
 

@@ -96,13 +96,39 @@ func (c *studentConverter) ToStudentDetailResponse(student *domain.Student) *res
 
 // ToStudentListResponse mengubah domain ke response list (ringkas)
 func (c *studentConverter) ToStudentListResponse(student *domain.Student) *response.StudentListResponse {
+	// Cari kelas aktif
+	var className, major, level, status string
+	// Default status if no class found? Or maybe "UNASSIGNED"
+	status = "UNASSIGNED"
+
+	if len(student.StudentClassrooms) > 0 {
+		// Karena di repository kita filter "status = ACTIVE", maka yg muncul di sini harusnya aktif semua.
+		// Kita ambil yg pertama.
+		activeClass := student.StudentClassrooms[0]
+		className = activeClass.Classroom.Name
+		major = activeClass.Classroom.Major
+		level = activeClass.Classroom.Level
+		status = activeClass.Status
+	}
+
+	email := ""
+	if student.User.ID != "" {
+		email = student.User.Email
+	}
+
 	return &response.StudentListResponse{
-		ID:       student.ID,
-		FullName: student.FullName,
-		NISN:     student.NISN,
-		NIM:      student.NIM,
-		Gender:   student.Gender,
-		City:     student.City,
+		ID:        student.ID,
+		FullName:  student.FullName,
+		NISN:      student.NISN,
+		NIM:       student.NIM,
+		Gender:    student.Gender,
+		District:  student.District,
+		City:      student.City,
+		ClassName: className,
+		Major:     major,
+		Level:     level,
+		Status:    status,
+		Email:     email,
 	}
 }
 

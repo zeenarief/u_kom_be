@@ -7,12 +7,18 @@ import (
 
 // StudentListResponse adalah DTO untuk tampilan list (ringkas)
 type StudentListResponse struct {
-	ID       string  `json:"id"`
-	FullName string  `json:"full_name"`
-	NISN     *string `json:"nisn"`
-	NIM      *string `json:"nim"`
-	Gender   string  `json:"gender"`
-	City     string  `json:"city"`
+	ID        string  `json:"id"`
+	FullName  string  `json:"full_name"`
+	NISN      *string `json:"nisn"`
+	NIM       *string `json:"nim"`
+	Gender    string  `json:"gender"`
+	District  string  `json:"district"`
+	City      string  `json:"city"`
+	ClassName string  `json:"class_name"` // e.g. "X IPA 1"
+	Major     string  `json:"major"`      // e.g. "IPA"
+	Level     string  `json:"level"`      // e.g. "X"
+	Status    string  `json:"status"`     // e.g. "ACTIVE", "GRADUATED"
+	Email     string  `json:"email"`      // from User account
 }
 
 // ParentRelationshipResponse adalah DTO untuk menampilkan relasi orang tua

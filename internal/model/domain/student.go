@@ -32,6 +32,9 @@ type Student struct {
 	// Relasi ke tabel pivot StudentParent
 	Parents []StudentParent `gorm:"foreignKey:StudentID" json:"parents,omitempty"`
 
+	// Relasi ke tabel pivot StudentClassroom
+	StudentClassrooms []StudentClassroom `gorm:"foreignKey:StudentID" json:"student_classrooms,omitempty"`
+
 	GuardianID   *string `gorm:"type:char(36);index:idx_student_guardian" json:"guardian_id"`
 	GuardianType *string `gorm:"type:varchar(20);index:idx_student_guardian" json:"guardian_type"`
 
