@@ -1,6 +1,8 @@
 package response
 
-import "time"
+import (
+	"u_kom_be/internal/utils"
+)
 
 // Response detail sesi beserta list siswanya
 type AttendanceSessionDetailResponse struct {
@@ -22,10 +24,10 @@ type AttendanceDetailResponse struct {
 
 // Response ringkas untuk history
 type AttendanceHistoryResponse struct {
-	ID          string    `json:"id"`
-	Date        time.Time `json:"date"`
-	SubjectName string    `json:"subject_name"`
-	ClassName   string    `json:"class_name"`
-	Topic       string    `json:"topic"`
-	CountAbsent int       `json:"count_absent"` // Jumlah yg tidak hadir
+	ID          string     `json:"id"`
+	Date        utils.Date `json:"date"`
+	SubjectName string     `json:"subject_name"`
+	ClassName   string     `json:"class_name"`
+	Topic       string     `json:"topic"`
+	CountAbsent int        `json:"count_absent"` // Jumlah yg tidak hadir
 }

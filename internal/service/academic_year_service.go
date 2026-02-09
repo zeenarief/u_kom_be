@@ -7,6 +7,7 @@ import (
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/model/response"
 	"u_kom_be/internal/repository"
+	"u_kom_be/internal/utils"
 
 	"gorm.io/gorm"
 )
@@ -61,8 +62,8 @@ func (s *academicYearService) Create(req request.AcademicYearCreateRequest) (*re
 	academicYear := &domain.AcademicYear{
 		Name:      req.Name,
 		Status:    "INACTIVE", // Default Inactive
-		StartDate: startDate,
-		EndDate:   endDate,
+		StartDate: utils.Date(startDate),
+		EndDate:   utils.Date(endDate),
 	}
 
 	if err := s.repo.Create(academicYear); err != nil {
@@ -117,7 +118,7 @@ func (s *academicYearService) Update(id string, req request.AcademicYearUpdateRe
 		if err != nil {
 			return nil, apperrors.NewBadRequestError("Invalid start_date format")
 		}
-		ay.StartDate = parsedStart
+		ay.StartDate = utils.Date(parsedStart)
 	}
 
 	if req.EndDate != "" {
@@ -125,7 +126,7 @@ func (s *academicYearService) Update(id string, req request.AcademicYearUpdateRe
 		if err != nil {
 			return nil, apperrors.NewBadRequestError("Invalid end_date format")
 		}
-		ay.EndDate = parsedEnd
+		ay.EndDate = utils.Date(parsedEnd)
 	}
 
 	if err := s.repo.Update(ay); err != nil {

@@ -8,13 +8,13 @@ import (
 )
 
 type AttendanceSession struct {
-	ID         string    `gorm:"primaryKey;type:char(36)" json:"id"`
-	ScheduleID string    `gorm:"type:char(36);not null" json:"schedule_id"`
-	Date       time.Time `gorm:"type:date;not null" json:"date"`
-	Topic      string    `gorm:"type:text" json:"topic"`
-	Notes      string    `gorm:"type:text" json:"notes"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	ID         string     `gorm:"primaryKey;type:char(36)" json:"id"`
+	ScheduleID string     `gorm:"type:char(36);not null" json:"schedule_id"`
+	Date       utils.Date `gorm:"type:date;not null" json:"date"`
+	Topic      string     `gorm:"type:text" json:"topic"`
+	Notes      string     `gorm:"type:text" json:"notes"`
+	CreatedAt  time.Time  `json:"created_at"`
+	UpdatedAt  time.Time  `json:"updated_at"`
 
 	// Relations
 	Schedule Schedule           `gorm:"foreignKey:ScheduleID" json:"schedule,omitempty"`

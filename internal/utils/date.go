@@ -14,27 +14,45 @@ type Date time.Time
 
 const DateLayout = "2006-01-02"
 
-// UnmarshalJSON parses JSON string "YYYY-MM-DD" into Date
+// UnmarshalJSON parses JSON string in various formats:
+// - "YYYY-MM-DD" (from frontend)
+// - "YYYY-MM-DDTHH:MM:SSZ" (ISO 8601)
+// - null or "" → zero date
 func (d *Date) UnmarshalJSON(b []byte) error {
 	s := strings.Trim(string(b), "\"")
 	if s == "" || s == "null" {
 		*d = Date(time.Time{})
 		return nil
 	}
+
+	// Try parsing YYYY-MM-DD first (most common from frontend)
 	t, err := time.Parse(DateLayout, s)
-	if err != nil {
-		return err
+	if err == nil {
+		*d = Date(t)
+		return nil
 	}
-	*d = Date(t)
-	return nil
+
+	// Try parsing ISO 8601 with timezone
+	t, err = time.Parse(time.RFC3339, s)
+	if err == nil {
+		*d = Date(t)
+		return nil
+	}
+
+	return fmt.Errorf("invalid date format: %s (expected YYYY-MM-DD or ISO 8601)", s)
 }
 
-// MarshalJSON formats Date as JSON string "YYYY-MM-DD"
+// MarshalJSON formats Date as ISO 8601 with UTC timezone
+// Output: "YYYY-MM-DDTHH:MM:SS.sssZ" (e.g., "2000-01-15T00:00:00.000Z")
 func (d Date) MarshalJSON() ([]byte, error) {
 	if time.Time(d).IsZero() {
 		return json.Marshal(nil)
 	}
-	return json.Marshal(time.Time(d).Format(DateLayout))
+	// Convert to UTC and format as ISO 8601 with milliseconds
+	t := time.Time(d).UTC()
+	// Use custom format to ensure .000Z format
+	formatted := t.Format("2006-01-02T15:04:05.000Z07:00")
+	return json.Marshal(formatted)
 }
 
 // Scanc implements the Scanner interface for database values
@@ -106,4 +124,22 @@ func (d Date) Format(layout string) string {
 // ToTime converts Date back to time.Time
 func (d Date) ToTime() time.Time {
 	return time.Time(d)
+}
+
+// DatePtr converts Date to *Date pointer.
+// Returns nil if the date is zero value.
+func DatePtr(d Date) *Date {
+	if d.IsZero() {
+		return nil
+	}
+	return &d
+}
+
+// DateValue safely dereferences *Date pointer.
+// Returns zero Date if pointer is nil.
+func DateValue(d *Date) Date {
+	if d == nil {
+		return Date(time.Time{})
+	}
+	return *d
 }

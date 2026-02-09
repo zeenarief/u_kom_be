@@ -72,7 +72,7 @@ func (s *attendanceService) SubmitAttendance(req request.AttendanceSubmitRequest
 		// Masuk sini jika record not found (errFind != nil)
 		session := &domain.AttendanceSession{
 			ScheduleID: req.ScheduleID,
-			Date:       date,
+			Date:       utils.Date(date),
 			Topic:      req.Topic,
 			Notes:      req.Notes,
 			Details:    newDetails,
@@ -158,7 +158,6 @@ func (s *attendanceService) GetHistoryByTeacher(teacherID string) ([]response.At
 
 	return history, nil
 }
-
 
 func (s *attendanceService) GetSessionByScheduleDate(scheduleID, dateStr string) (*response.AttendanceSessionDetailResponse, error) {
 	date, err := time.ParseInLocation("2006-01-02", dateStr, time.Local)
