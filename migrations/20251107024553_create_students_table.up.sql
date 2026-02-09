@@ -27,7 +27,7 @@ CREATE TABLE students (
 
                           status ENUM('INACTIVE', 'ACTIVE', 'GRADUATED', 'DROPOUT') DEFAULT 'INACTIVE',
                           entry_year VARCHAR(4),
-                          graduation_year VARCHAR(4),
+                          exit_year VARCHAR(4),
 
                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

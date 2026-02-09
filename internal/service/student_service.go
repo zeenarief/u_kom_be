@@ -119,26 +119,26 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 
 	// 3. Buat Domain Object
 	student := &domain.Student{
-		FullName:       req.FullName,
-		NoKK:           encryptedNoKK,
-		NIK:            encryptedNIK,
-		NIKHash:        nikHash,
-		NISN:           nisn,
-		NIM:            nim,
-		Gender:         req.Gender,
-		PlaceOfBirth:   req.PlaceOfBirth,
-		DateOfBirth:    req.DateOfBirth,
-		Address:        req.Address,
-		RT:             req.RT,
-		RW:             req.RW,
-		SubDistrict:    req.SubDistrict,
-		District:       req.District,
-		City:           req.City,
-		Province:       req.Province,
-		PostalCode:     req.PostalCode,
-		Status:         req.Status,
-		EntryYear:      req.EntryYear,
-		GraduationYear: req.GraduationYear,
+		FullName:     req.FullName,
+		NoKK:         encryptedNoKK,
+		NIK:          encryptedNIK,
+		NIKHash:      nikHash,
+		NISN:         nisn,
+		NIM:          nim,
+		Gender:       req.Gender,
+		PlaceOfBirth: req.PlaceOfBirth,
+		DateOfBirth:  req.DateOfBirth,
+		Address:      req.Address,
+		RT:           req.RT,
+		RW:           req.RW,
+		SubDistrict:  req.SubDistrict,
+		District:     req.District,
+		City:         req.City,
+		Province:     req.Province,
+		PostalCode:   req.PostalCode,
+		Status:       req.Status,
+		EntryYear:    req.EntryYear,
+		ExitYear:     req.ExitYear,
 	}
 
 	// Set default status if empty
@@ -342,8 +342,8 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 	if req.EntryYear != "" {
 		student.EntryYear = req.EntryYear
 	}
-	if req.GraduationYear != "" {
-		student.GraduationYear = req.GraduationYear
+	if req.ExitYear != "" {
+		student.ExitYear = req.ExitYear
 	}
 
 	if err := s.studentRepo.Update(student); err != nil {
@@ -603,7 +603,7 @@ func (s *studentService) ExportStudentsToExcel() (*bytes.Buffer, error) {
 	f.DeleteSheet("Sheet1")
 
 	// 3. Buat Header
-	headers := []string{"No", "NISN", "NIM", "Nama Lengkap", "Gender", "Tempat Lahir", "Tanggal Lahir", "Alamat", "No HP", "Status", "Tahun Masuk", "Tahun Lulus"}
+	headers := []string{"No", "NISN", "NIM", "Nama Lengkap", "Jenis Kelamin", "Tempat Lahir", "Tanggal Lahir", "Alamat", "Status", "Tahun Masuk", "Tahun Keluar"}
 	for i, header := range headers {
 		// Konversi koordinat (0,0 -> A1, 1,0 -> B1)
 		cell, _ := excelize.CoordinatesToCellName(i+1, 1)
@@ -621,24 +621,34 @@ func (s *studentService) ExportStudentsToExcel() (*bytes.Buffer, error) {
 	for i, student := range students {
 		row := i + 2 // Mulai dari baris ke-2
 
-		f.SetCellValue(sheetName, fmt.Sprintf("A%d", row), i+1)
-		f.SetCellValue(sheetName, fmt.Sprintf("B%d", row), student.NISN)
-		f.SetCellValue(sheetName, fmt.Sprintf("C%d", row), student.NIM)
-		f.SetCellValue(sheetName, fmt.Sprintf("D%d", row), student.FullName)
-		f.SetCellValue(sheetName, fmt.Sprintf("E%d", row), student.Gender)
-		f.SetCellValue(sheetName, fmt.Sprintf("F%d", row), student.PlaceOfBirth)
 		// Format Tanggal
 		dob := ""
 		if !student.DateOfBirth.IsZero() {
 			dob = student.DateOfBirth.Format("2006-01-02")
 		}
+
+		address := utils.JoinAddress(
+			&student.Address,
+			&student.RT,
+			&student.RW,
+			&student.SubDistrict,
+			&student.District,
+			&student.City,
+			&student.Province,
+			&student.PostalCode,
+		)
+
+		f.SetCellValue(sheetName, fmt.Sprintf("A%d", row), i+1)
+		f.SetCellValue(sheetName, fmt.Sprintf("B%d", row), utils.SafeString(student.NISN))
+		f.SetCellValue(sheetName, fmt.Sprintf("C%d", row), utils.SafeString(student.NIM))
+		f.SetCellValue(sheetName, fmt.Sprintf("D%d", row), student.FullName)
+		f.SetCellValue(sheetName, fmt.Sprintf("E%d", row), student.Gender)
+		f.SetCellValue(sheetName, fmt.Sprintf("F%d", row), student.PlaceOfBirth)
 		f.SetCellValue(sheetName, fmt.Sprintf("G%d", row), dob)
-		f.SetCellValue(sheetName, fmt.Sprintf("H%d", row), student.Address)
-		// Ambil HP dari User jika ada, atau field lain (sesuaikan struktur data Anda)
-		f.SetCellValue(sheetName, fmt.Sprintf("I%d", row), "-")
-		f.SetCellValue(sheetName, fmt.Sprintf("J%d", row), student.Status)
-		f.SetCellValue(sheetName, fmt.Sprintf("K%d", row), student.EntryYear)
-		f.SetCellValue(sheetName, fmt.Sprintf("L%d", row), student.GraduationYear)
+		f.SetCellValue(sheetName, fmt.Sprintf("H%d", row), address)
+		f.SetCellValue(sheetName, fmt.Sprintf("I%d", row), student.Status)
+		f.SetCellValue(sheetName, fmt.Sprintf("J%d", row), student.EntryYear)
+		f.SetCellValue(sheetName, fmt.Sprintf("K%d", row), student.ExitYear)
 	}
 
 	// 5. Simpan ke Buffer (Memory)

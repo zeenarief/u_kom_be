@@ -7,6 +7,7 @@ import (
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/model/response"
 	"u_kom_be/internal/repository"
+	"u_kom_be/internal/utils"
 )
 
 type AttendanceService interface {
@@ -119,7 +120,7 @@ func (s *attendanceService) GetSessionDetail(id string) (*response.AttendanceSes
 		res.Details = append(res.Details, response.AttendanceDetailResponse{
 			StudentID:   d.StudentID,
 			StudentName: d.Student.FullName, // Asumsi Preload Student berhasil
-			NISN:        safeString(d.Student.NISN),
+			NISN:        utils.SafeString(d.Student.NISN),
 			Status:      d.Status,
 			Notes:       d.Notes,
 		})
@@ -158,13 +159,6 @@ func (s *attendanceService) GetHistoryByTeacher(teacherID string) ([]response.At
 	return history, nil
 }
 
-// Helper safe pointer string
-func safeString(ptr *string) string {
-	if ptr == nil {
-		return ""
-	}
-	return *ptr
-}
 
 func (s *attendanceService) GetSessionByScheduleDate(scheduleID, dateStr string) (*response.AttendanceSessionDetailResponse, error) {
 	date, err := time.ParseInLocation("2006-01-02", dateStr, time.Local)
