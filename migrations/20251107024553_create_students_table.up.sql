@@ -25,7 +25,7 @@ CREATE TABLE students (
 
                           postal_code VARCHAR(5),
 
-                          status ENUM('ACTIVE', 'GRADUATED', 'DROPOUT') DEFAULT 'ACTIVE',
+                          status ENUM('INACTIVE', 'ACTIVE', 'GRADUATED', 'DROPOUT') DEFAULT 'INACTIVE',
                           entry_year VARCHAR(4),
                           graduation_year VARCHAR(4),
 

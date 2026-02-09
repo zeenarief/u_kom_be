@@ -100,9 +100,10 @@ func (c *studentConverter) ToStudentDetailResponse(student *domain.Student) *res
 // ToStudentListResponse mengubah domain ke response list (ringkas)
 func (c *studentConverter) ToStudentListResponse(student *domain.Student) *response.StudentListResponse {
 	// Cari kelas aktif
-	var className, major, level, status string
-	// Default status if no class found? Or maybe "UNASSIGNED"
-	status = "UNASSIGNED"
+	var className, major, level string
+
+	// Gunakan status dari tabel students sebagai default (ACTIVE, GRADUATED, dll)
+	status := student.Status
 
 	if len(student.StudentClassrooms) > 0 {
 		// Karena di repository kita filter "status = ACTIVE", maka yg muncul di sini harusnya aktif semua.
@@ -111,7 +112,8 @@ func (c *studentConverter) ToStudentListResponse(student *domain.Student) *respo
 		className = activeClass.Classroom.Name
 		major = activeClass.Classroom.Major
 		level = activeClass.Classroom.Level
-		status = activeClass.Status
+		// Optional: Anda bisa gunakan activeClass.Status jika ingin override dengan status classroom
+		// status = activeClass.Status
 	}
 
 	email := ""
