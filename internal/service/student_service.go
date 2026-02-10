@@ -733,23 +733,45 @@ func (s *studentService) ExportStudentBiodata(id string) (*bytes.Buffer, error) 
 		return nil, err
 	}
 	if student == nil {
-		return nil, apperrors.NewNotFoundError("student not found")
+		return nil, apperrors.NewNotFoundError("Student not found")
 	}
 
 	// 2. Init PDF (Portrait, A4)
 	pdf := fpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
 
-	// --- HEADER ---
+	// --- HEADER KOP ---
+	// Cek apakah ada logo
+	logoPath := "assets/logo_sekolah.png"
+	// Kita coba load image, jika tidak ada, skip
+	// ImageOptions(src, x, y, width, height, flow, options, link, linkStr)
+	// x=10, y=10, w=25, h=0 (auto keep aspect ratio)
+	pdf.ImageOptions(logoPath, 10, 10, 25, 0, false, fpdf.ImageOptions{ImageType: "PNG", ReadDpi: true}, 0, "")
+
+	// Geser Text agak ke kanan jika ada logo (atau selalu geser biar rapi)
+	// Tapi karena "C" (Center) itu relatif terhadap page width, kita bisa mainkan Margin atau Cell width.
+	// Cara umum KOP: Logo kiri absolute, Teks Center di page.
+
+	pdf.SetFont("Arial", "", 13)
+	pdf.SetY(10)
+	pdf.CellFormat(0, 6, "YAYASAN MAJLIS TALIM NURUL HUDA KARTASURA", "", 1, "C", false, 0, "")
+
 	pdf.SetFont("Arial", "B", 14)
-	pdf.CellFormat(0, 10, "BIODATA SISWA", "", 1, "C", false, 0, "")
-	pdf.SetFont("Arial", "", 10)
-	pdf.CellFormat(0, 5, "SISTEM INFORMASI SEKOLAH", "", 1, "C", false, 0, "")
+	pdf.CellFormat(0, 6, "PONDOK PESANTREN NURUL HUDA KARTASURA", "", 1, "C", false, 0, "")
+
+	pdf.SetFont("Arial", "", 12)
+	pdf.CellFormat(0, 6, "(WISMA ASUHAN YATIM NURUL HUDA KARTASURA)", "", 1, "C", false, 0, "")
+
+	pdf.SetFont("Arial", "", 9)
+	pdf.CellFormat(0, 6, "Gg. Anggrek, Bakalan 02/02, Pucangan, Kartasura, Sukoharjo", "", 1, "C", false, 0, "")
+
 	pdf.Ln(5)
 
-	// Garis pembatas
-	pdf.Line(10, 25, 200, 25)
-	pdf.Ln(10)
+	// Garis pembatas (Double line atau tebal)
+	pdf.SetLineWidth(0.5)
+	pdf.Line(10, 32, 200, 32)
+	pdf.SetLineWidth(0.2) // Balikin ke default
+	pdf.Ln(5)             // Space setelah garis
 
 	// Helper function untuk baris data: [Label : Value]
 	printRow := func(label, value string) {
