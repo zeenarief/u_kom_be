@@ -42,28 +42,28 @@ type GuardianInfoResponse struct {
 
 // StudentDetailResponse adalah DTO untuk tampilan detail (lengkap)
 type StudentDetailResponse struct {
-	ID           string     `json:"id"`
-	FullName     string     `json:"full_name"`
-	NoKK         string     `json:"no_kk,omitempty"` // Akan berisi plaintext
-	NIK          string     `json:"nik,omitempty"`   // Akan berisi plaintext
-	NISN         *string    `json:"nisn"`
-	NIM          *string    `json:"nim"`
-	Gender       string     `json:"gender"`
-	PlaceOfBirth string     `json:"place_of_birth"`
-	DateOfBirth  utils.Date `json:"date_of_birth"`
-	Address      string     `json:"address"`
-	RT           string     `json:"rt"`
-	RW           string     `json:"rw"`
-	SubDistrict  string     `json:"sub_district"`
-	District     string     `json:"district"`
-	City         string     `json:"city"`
-	Province     string     `json:"province"`
-	PostalCode   string     `json:"postal_code"`
-	Status       string     `json:"status"`
-	EntryYear    string     `json:"entry_year"`
-	ExitYear     string     `json:"exit_year"`
-	CreatedAt    time.Time  `json:"created_at"`
-	UpdatedAt    time.Time  `json:"updated_at"`
+	ID           string      `json:"id"`
+	FullName     string      `json:"full_name"`
+	NoKK         string      `json:"no_kk,omitempty"` // Akan berisi plaintext
+	NIK          string      `json:"nik,omitempty"`   // Akan berisi plaintext
+	NISN         *string     `json:"nisn"`
+	NIM          *string     `json:"nim"`
+	Gender       string      `json:"gender"`
+	PlaceOfBirth *string     `json:"place_of_birth"`
+	DateOfBirth  *utils.Date `json:"date_of_birth"`
+	Address      *string     `json:"address"`
+	RT           *string     `json:"rt"`
+	RW           *string     `json:"rw"`
+	SubDistrict  *string     `json:"sub_district"`
+	District     *string     `json:"district"`
+	City         *string     `json:"city"`
+	Province     *string     `json:"province"`
+	PostalCode   *string     `json:"postal_code"`
+	Status       string      `json:"status"`
+	EntryYear    *string     `json:"entry_year"`
+	ExitYear     *string     `json:"exit_year"`
+	CreatedAt    time.Time   `json:"created_at"`
+	UpdatedAt    time.Time   `json:"updated_at"`
 
 	// Relasi M:N ke Parents (Sudah ada)
 	Parents []ParentRelationshipResponse `json:"parents,omitempty"`

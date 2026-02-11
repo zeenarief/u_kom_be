@@ -43,14 +43,14 @@ func (c *employeeConverter) ToEmployeeDetailResponse(employee *domain.Employee) 
 		ID:               employee.ID,
 		FullName:         employee.FullName,
 		NIP:              employee.NIP,
-		JobTitle:         employee.JobTitle,
-		NIK:              decryptedNIK, // <-- Data plaintext
-		Gender:           employee.Gender,
+		JobTitle:         employee.JobTitle, // Direct assign pointer
+		NIK:              decryptedNIK,      // <-- Data plaintext
+		Gender:           employee.Gender,   // Direct assign pointer
 		PhoneNumber:      employee.PhoneNumber,
-		Address:          employee.Address,
+		Address:          employee.Address, // Direct assign pointer
 		DateOfBirth:      employee.DateOfBirth,
 		JoinDate:         employee.JoinDate,
-		EmploymentStatus: employee.EmploymentStatus,
+		EmploymentStatus: employee.EmploymentStatus, // Direct assign pointer
 		CreatedAt:        employee.CreatedAt,
 		UpdatedAt:        employee.UpdatedAt,
 	}
@@ -62,9 +62,9 @@ func (c *employeeConverter) ToEmployeeListResponse(employee *domain.Employee) *r
 		ID:               employee.ID,
 		FullName:         employee.FullName,
 		NIP:              employee.NIP,
-		JobTitle:         employee.JobTitle,
+		JobTitle:         employee.JobTitle, // Direct assign pointer
 		PhoneNumber:      employee.PhoneNumber,
-		EmploymentStatus: employee.EmploymentStatus,
+		EmploymentStatus: employee.EmploymentStatus, // Direct assign pointer
 	}
 }
 

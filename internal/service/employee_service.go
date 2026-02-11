@@ -175,36 +175,39 @@ func (s *employeeService) UpdateEmployee(id string, req request.EmployeeUpdateRe
 		return nil, err
 	}
 	if employee == nil {
-		return nil, apperrors.NewNotFoundError("employee not found")
+		return nil, apperrors.NewNotFoundError("Employee not found")
 	}
 
 	// Update fields jika disediakan
 	if req.FullName != "" {
 		employee.FullName = req.FullName
 	}
-	if req.JobTitle != nil {
-		employee.JobTitle = *req.JobTitle
-	}
+	// JobTitle sekarang pointer, langsung assign
+	employee.JobTitle = req.JobTitle
 
-	// Validasi duplikat NIP (jika NIP diubah)
-	if req.NIP != nil {
-		if (employee.NIP == nil || *req.NIP != *employee.NIP) && *req.NIP != "" {
+	// Validasi duplikat NIP - hanya jika ada value baru
+	if req.NIP != nil && *req.NIP != "" {
+		// Ada value baru, cek duplikat
+		if employee.NIP == nil || *req.NIP != *employee.NIP {
 			if existing, _ := s.employeeRepo.FindByNIP(*req.NIP); existing != nil {
-				return nil, apperrors.NewConflictError("nip already exists")
+				return nil, apperrors.NewConflictError("NIP already exists")
 			}
 		}
-		employee.NIP = req.NIP
 	}
+	// Update NIP (termasuk jika nil untuk set null)
+	employee.NIP = req.NIP
 
-	// Validasi duplikat Telepon (jika diubah)
-	if req.PhoneNumber != nil {
-		if (employee.PhoneNumber == nil || *req.PhoneNumber != *employee.PhoneNumber) && *req.PhoneNumber != "" {
+	// Validasi duplikat PhoneNumber - hanya jika ada value baru
+	if req.PhoneNumber != nil && *req.PhoneNumber != "" {
+		// Ada value baru, cek duplikat
+		if employee.PhoneNumber == nil || *req.PhoneNumber != *employee.PhoneNumber {
 			if existing, _ := s.employeeRepo.FindByPhone(*req.PhoneNumber); existing != nil {
-				return nil, apperrors.NewConflictError("phone number already exists")
+				return nil, apperrors.NewConflictError("Phone number already exists")
 			}
 		}
-		employee.PhoneNumber = req.PhoneNumber
 	}
+	// Update phone number (termasuk jika nil untuk set null)
+	employee.PhoneNumber = req.PhoneNumber
 
 	// Enkripsi & Hash NIK jika diperbarui - bisa di-null dengan empty string
 	if req.NIK == "" {
@@ -215,7 +218,7 @@ func (s *employeeService) UpdateEmployee(id string, req request.EmployeeUpdateRe
 		// Validasi unik
 		nikHash, err := s.encryptUtil.Hash(req.NIK)
 		if err != nil {
-			return nil, fmt.Errorf("failed to hash nik: %w", err)
+			return nil, fmt.Errorf("Failed to hash NIK: %w", err)
 		}
 
 		// Cek apakah hash sudah ada di record LAIN
@@ -224,38 +227,27 @@ func (s *employeeService) UpdateEmployee(id string, req request.EmployeeUpdateRe
 			return nil, err
 		}
 		if existing != nil && existing.ID != id {
-			return nil, apperrors.NewConflictError("nik already exists")
+			return nil, apperrors.NewConflictError("NIK already exists")
 		}
 
 		encryptedNIK, err := s.encryptUtil.Encrypt(req.NIK)
 		if err != nil {
-			return nil, fmt.Errorf("failed to encrypt nik: %w", err)
+			return nil, fmt.Errorf("Failed to encrypt NIK: %w", err)
 		}
 		employee.NIK = encryptedNIK
 		employee.NIKHash = nikHash
 	}
 
-	// Update field lainnya - handle pointer dari request
-	if req.JobTitle != nil {
-		employee.JobTitle = *req.JobTitle
-	}
-	if req.Gender != nil {
-		employee.Gender = *req.Gender
-	}
-	if req.Address != nil {
-		employee.Address = *req.Address
-	}
-	if req.EmploymentStatus != nil {
-		employee.EmploymentStatus = *req.EmploymentStatus
-	}
+	// Update field lainnya - langsung assign pointer ke pointer domain
+	// Sekarang domain sudah menggunakan *string, jadi langsung assign
+	employee.JobTitle = req.JobTitle
+	employee.Gender = req.Gender
+	employee.Address = req.Address
+	employee.EmploymentStatus = req.EmploymentStatus
 
-	// Date fields - cek pointer
-	if req.DateOfBirth != nil {
-		employee.DateOfBirth = req.DateOfBirth
-	}
-	if req.JoinDate != nil {
-		employee.JoinDate = req.JoinDate
-	}
+	// Date fields - langsung assign pointer (support set null)
+	employee.DateOfBirth = req.DateOfBirth
+	employee.JoinDate = req.JoinDate
 
 	// Simpan perubahan
 	if err := s.employeeRepo.Update(employee); err != nil {

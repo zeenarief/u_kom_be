@@ -64,6 +64,20 @@ func NewStudentService(
 
 // CreateStudent menangani pembuatan siswa baru
 func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*response.StudentDetailResponse, error) {
+	// Helpers untuk konversi string kosong ke nil pointer
+	toPtr := func(s string) *string {
+		if s == "" {
+			return nil
+		}
+		return &s
+	}
+	toDatePtr := func(d utils.Date) *utils.Date {
+		if d.IsZero() {
+			return nil
+		}
+		return &d
+	}
+
 	// 1. Validasi Duplikat
 	var nisn *string
 	if req.NISN != "" {
@@ -127,19 +141,19 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 		NISN:         nisn,
 		NIM:          nim,
 		Gender:       req.Gender,
-		PlaceOfBirth: req.PlaceOfBirth,
-		DateOfBirth:  req.DateOfBirth,
-		Address:      req.Address,
-		RT:           req.RT,
-		RW:           req.RW,
-		SubDistrict:  req.SubDistrict,
-		District:     req.District,
-		City:         req.City,
-		Province:     req.Province,
-		PostalCode:   req.PostalCode,
+		PlaceOfBirth: toPtr(req.PlaceOfBirth),
+		DateOfBirth:  toDatePtr(req.DateOfBirth),
+		Address:      toPtr(req.Address),
+		RT:           toPtr(req.RT),
+		RW:           toPtr(req.RW),
+		SubDistrict:  toPtr(req.SubDistrict),
+		District:     toPtr(req.District),
+		City:         toPtr(req.City),
+		Province:     toPtr(req.Province),
+		PostalCode:   toPtr(req.PostalCode),
 		Status:       req.Status,
-		EntryYear:    req.EntryYear,
-		ExitYear:     req.ExitYear,
+		EntryYear:    toPtr(req.EntryYear),
+		ExitYear:     toPtr(req.ExitYear),
 	}
 
 	// Set default status if empty
@@ -263,35 +277,42 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 
 	// Enkripsi field yang diperbarui
 	// Enkripsi field yang diperbarui
-	if req.NIK != "" {
-		// Cek apakah NIK berubah atau datanya belum ada (meski user kirim NIK sama, kita proses saja)
-		// Optimalisasi: cek hash dulu? Tapi request raw string, di DB terenkripsi/hash.
-		// Kita hitung hash dari request.
-		newHash, err := s.encryptionUtil.Hash(req.NIK)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to hash NIK: %w", err)
-		}
-
-		// Cek keunikan jika hash berubah atau sebelumnya null
-		isDifferent := student.NIKHash == nil || *student.NIKHash != newHash
-		if isDifferent {
-			existing, err := s.studentRepo.FindByNIKHash(newHash)
+	// Enkripsi field yang diperbarui
+	if req.NIK != nil {
+		// Logika update NIK:
+		// Jika empty string ("") -> Clear NIK
+		// Jika ada isi -> Update (Hash+Encrypt)
+		if *req.NIK == "" {
+			student.NIK = nil
+			student.NIKHash = nil
+		} else {
+			// Hash & Check
+			newHash, err := s.encryptionUtil.Hash(*req.NIK)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("Failed to hash NIK: %w", err)
 			}
-			if existing != nil && existing.ID != id {
-				return nil, apperrors.NewConflictError("NIK already exists")
+
+			// Cek keunikan jika hash berubah atau sebelumnya null
+			isDifferent := student.NIKHash == nil || *student.NIKHash != newHash
+			if isDifferent {
+				existing, err := s.studentRepo.FindByNIKHash(newHash)
+				if err != nil {
+					return nil, err
+				}
+				if existing != nil && existing.ID != id {
+					return nil, apperrors.NewConflictError("NIK already exists")
+				}
 			}
-		}
 
-		student.NIKHash = &newHash
+			student.NIKHash = &newHash
 
-		// Enkripsi
-		encryptedNIK, err := s.encryptionUtil.Encrypt(req.NIK)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to encrypt NIK: %w", err)
+			// Enkripsi
+			encryptedNIK, err := s.encryptionUtil.Encrypt(*req.NIK)
+			if err != nil {
+				return nil, fmt.Errorf("Failed to encrypt NIK: %w", err)
+			}
+			student.NIK = &encryptedNIK
 		}
-		student.NIK = &encryptedNIK
 	}
 	// NoKK - bisa di-null dengan mengirim empty string
 	if req.NoKK == "" {
@@ -304,55 +325,26 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 		student.NoKK = encryptedNoKK
 	}
 
-	// Update field lainnya - handle pointer dari request
-	// Direct assign pointer, GORM akan handle conversion
+	// Update field lainnya - direct assign untuk pointer fields
+	student.PlaceOfBirth = req.PlaceOfBirth
+	student.DateOfBirth = req.DateOfBirth
+	student.Address = req.Address
+	student.RT = req.RT
+	student.RW = req.RW
+	student.SubDistrict = req.SubDistrict
+	student.District = req.District
+	student.City = req.City
+	student.Province = req.Province
+	student.PostalCode = req.PostalCode
+	student.EntryYear = req.EntryYear
+	student.ExitYear = req.ExitYear
+
+	// Non-pointer fields need dereference
 	if req.Gender != nil {
 		student.Gender = *req.Gender
 	}
-	if req.PlaceOfBirth != nil {
-		student.PlaceOfBirth = *req.PlaceOfBirth
-	}
-
-	// Untuk time.Time, kita cek IsZero()
-	if !req.DateOfBirth.IsZero() {
-		student.DateOfBirth = req.DateOfBirth
-	}
-
-	// Alamat fields - handle pointer dari request
-	if req.Address != nil {
-		student.Address = *req.Address
-	}
-	if req.RT != nil {
-		student.RT = *req.RT
-	}
-	if req.RW != nil {
-		student.RW = *req.RW
-	}
-	if req.SubDistrict != nil {
-		student.SubDistrict = *req.SubDistrict
-	}
-	if req.District != nil {
-		student.District = *req.District
-	}
-	if req.City != nil {
-		student.City = *req.City
-	}
-	if req.Province != nil {
-		student.Province = *req.Province
-	}
-	if req.PostalCode != nil {
-		student.PostalCode = *req.PostalCode
-	}
-
-	// Status dan tahun - handle pointer dari request
 	if req.Status != nil {
 		student.Status = *req.Status
-	}
-	if req.EntryYear != nil {
-		student.EntryYear = *req.EntryYear
-	}
-	if req.ExitYear != nil {
-		student.ExitYear = *req.ExitYear
 	}
 
 	if err := s.studentRepo.Update(student); err != nil {
@@ -637,14 +629,14 @@ func (s *studentService) ExportStudentsToExcel() (*bytes.Buffer, error) {
 		}
 
 		address := utils.JoinAddress(
-			&student.Address,
-			&student.RT,
-			&student.RW,
-			&student.SubDistrict,
-			&student.District,
-			&student.City,
-			&student.Province,
-			&student.PostalCode,
+			student.Address,
+			student.RT,
+			student.RW,
+			student.SubDistrict,
+			student.District,
+			student.City,
+			student.Province,
+			student.PostalCode,
 		)
 
 		f.SetCellValue(sheetName, fmt.Sprintf("A%d", row), i+1)
@@ -652,7 +644,7 @@ func (s *studentService) ExportStudentsToExcel() (*bytes.Buffer, error) {
 		f.SetCellValue(sheetName, fmt.Sprintf("C%d", row), utils.SafeString(student.NIM))
 		f.SetCellValue(sheetName, fmt.Sprintf("D%d", row), student.FullName)
 		f.SetCellValue(sheetName, fmt.Sprintf("E%d", row), student.Gender)
-		f.SetCellValue(sheetName, fmt.Sprintf("F%d", row), student.PlaceOfBirth)
+		f.SetCellValue(sheetName, fmt.Sprintf("F%d", row), utils.SafeString(student.PlaceOfBirth))
 		f.SetCellValue(sheetName, fmt.Sprintf("G%d", row), dob)
 		f.SetCellValue(sheetName, fmt.Sprintf("H%d", row), address)
 		f.SetCellValue(sheetName, fmt.Sprintf("I%d", row), student.Status)
@@ -719,7 +711,7 @@ func (s *studentService) ExportStudentsToPdf() (*bytes.Buffer, error) {
 		pdf.CellFormat(widths[2], 8, student.FullName, "1", 0, "L", false, 0, "")
 		pdf.CellFormat(widths[3], 8, gender, "1", 0, "C", false, 0, "")
 		pdf.CellFormat(widths[4], 8, dob, "1", 0, "C", false, 0, "")
-		pdf.CellFormat(widths[5], 8, student.Address, "1", 0, "L", false, 0, "") // Alamat mungkin terpotong jika panjang, nanti bisa pakai MultiCell
+		pdf.CellFormat(widths[5], 8, utils.SafeString(student.Address), "1", 0, "L", false, 0, "") // Alamat mungkin terpotong jika panjang, nanti bisa pakai MultiCell
 		pdf.Ln(-1)
 	}
 
@@ -799,7 +791,7 @@ func (s *studentService) ExportStudentBiodata(id string) (*bytes.Buffer, error) 
 	if !student.DateOfBirth.IsZero() {
 		dob = student.DateOfBirth.Format("02 January 2006")
 	}
-	placeDate := fmt.Sprintf("%s, %s", student.PlaceOfBirth, dob)
+	placeDate := fmt.Sprintf("%s, %s", utils.SafeString(student.PlaceOfBirth), dob)
 	printRow("Tempat, Tgl Lahir", placeDate)
 
 	gender := "Laki-laki"
@@ -810,15 +802,15 @@ func (s *studentService) ExportStudentBiodata(id string) (*bytes.Buffer, error) 
 
 	// Alamat lengkap
 	fullAddress := utils.JoinAddress(
-		&student.Address,
-		&student.RT,
-		&student.RW,
-		&student.SubDistrict,
-		&student.District,
+		student.Address,
+		student.RT,
+		student.RW,
+		student.SubDistrict,
+		student.District,
 	)
 	printRow("Detail Alamat", fullAddress)
-	printRow("Kota/Kab", student.City)
-	printRow("Provinsi", student.Province)
+	printRow("Kota/Kab", utils.SafeString(student.City))
+	printRow("Provinsi", utils.SafeString(student.Province))
 
 	pdf.Ln(5)
 
