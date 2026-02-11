@@ -15,6 +15,7 @@ import (
 	"u_kom_be/internal/utils"
 
 	"github.com/go-pdf/fpdf"
+	"github.com/phpdave11/gofpdf/contrib/gofpdi"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -725,9 +726,6 @@ func (s *studentService) ExportStudentsToPdf() (*bytes.Buffer, error) {
 
 func (s *studentService) ExportStudentBiodata(id string) (*bytes.Buffer, error) {
 	// 1. Ambil data lengkap (termasuk parents & guardian)
-	// Kita gunakan GetStudentByID yg sudah ada logic lengkapnya (parents, guardian info, dll)
-	// Tapi karena GetStudentByID mengembalikan Response DTO, dan kita butuh Domain Object untuk report,
-	// Lebih aman kita panggil Repo langsung:
 	student, err := s.studentRepo.FindByIDWithParents(id)
 	if err != nil {
 		return nil, err
@@ -736,42 +734,38 @@ func (s *studentService) ExportStudentBiodata(id string) (*bytes.Buffer, error) 
 		return nil, apperrors.NewNotFoundError("Student not found")
 	}
 
-	// 2. Init PDF (Portrait, A4)
+	// 2. Buat PDF instance baru
 	pdf := fpdf.New("P", "mm", "A4", "")
+
+	// 3. Tambahkan halaman baru terlebih dahulu
 	pdf.AddPage()
 
-	// --- HEADER KOP ---
-	// Cek apakah ada logo
-	logoPath := "assets/logo_sekolah.png"
-	// Kita coba load image, jika tidak ada, skip
-	// ImageOptions(src, x, y, width, height, flow, options, link, linkStr)
-	// x=10, y=10, w=25, h=0 (auto keep aspect ratio)
-	pdf.ImageOptions(logoPath, 10, 10, 25, 0, false, fpdf.ImageOptions{ImageType: "PNG", ReadDpi: true}, 0, "")
+	// 4. Import kop surat PDF menggunakan gofpdi (CARA YANG BENAR)
+	// Pastikan path file benar. Jika dijalankan dari root project, biasanya "assets/..."
+	kopSuratPath := "assets/kop_surat_a4.pdf"
 
-	// Geser Text agak ke kanan jika ada logo (atau selalu geser biar rapi)
-	// Tapi karena "C" (Center) itu relatif terhadap page width, kita bisa mainkan Margin atau Cell width.
-	// Cara umum KOP: Logo kiri absolute, Teks Center di page.
+	// ImportPage(pdfInstance, pathFile, halamanKe, boxType)
+	// Fungsi ini otomatis me-link template ke object 'pdf' Anda
+	tpl := gofpdi.ImportPage(pdf, kopSuratPath, 1, "/MediaBox")
 
-	pdf.SetFont("Arial", "", 13)
-	pdf.SetY(10)
-	pdf.CellFormat(0, 6, "YAYASAN MAJLIS TALIM NURUL HUDA KARTASURA", "", 1, "C", false, 0, "")
+	// Gambar template ke halaman
+	// UseImportedTemplate(pdfInstance, tplId, x, y, width, height)
+	// x=0, y=0, w=210 (Full A4 Width), h=0 (Auto height/Full Height)
+	gofpdi.UseImportedTemplate(pdf, tpl, 0, 0, 210, 0)
 
-	pdf.SetFont("Arial", "B", 14)
-	pdf.CellFormat(0, 6, "PONDOK PESANTREN NURUL HUDA KARTASURA", "", 1, "C", false, 0, "")
+	// Format: SetMargins(kiri, atas, kanan)
+	// Satuan dalam mm.
+	// 15mm = 1.5cm (supaya lebih masuk 0.5cm dari default 1cm)
+	// Margin atas diset 10mm (standar), karena kita pakai SetY(45) manual untuk halaman 1.
+	pdf.SetMargins(15, 10, 15)
 
-	pdf.SetFont("Arial", "", 12)
-	pdf.CellFormat(0, 6, "(WISMA ASUHAN YATIM NURUL HUDA KARTASURA)", "", 1, "C", false, 0, "")
+	// 5. Set posisi Y mulai dari 50mm (5cm) agar tidak menimpa kop surat
+	pdf.SetY(45)
 
-	pdf.SetFont("Arial", "", 9)
-	pdf.CellFormat(0, 6, "Gg. Anggrek, Bakalan 02/02, Pucangan, Kartasura, Sukoharjo", "", 1, "C", false, 0, "")
+	pdf.SetFont("Arial", "BU", 14)
+	pdf.CellFormat(0, 8, "LEMBAR DATA DIRI SANTRI", "", 1, "C", false, 0, "")
 
 	pdf.Ln(5)
-
-	// Garis pembatas (Double line atau tebal)
-	pdf.SetLineWidth(0.5)
-	pdf.Line(10, 32, 200, 32)
-	pdf.SetLineWidth(0.2) // Balikin ke default
-	pdf.Ln(5)             // Space setelah garis
 
 	// Helper function untuk baris data: [Label : Value]
 	printRow := func(label, value string) {
@@ -807,7 +801,13 @@ func (s *studentService) ExportStudentBiodata(id string) (*bytes.Buffer, error) 
 	printRow("Jenis Kelamin", gender)
 
 	// Alamat lengkap
-	fullAddress := fmt.Sprintf("%s RT %s / RW %s, Kel. %s, Kec. %s", student.Address, student.RT, student.RW, student.SubDistrict, student.District)
+	fullAddress := utils.JoinAddress(
+		&student.Address,
+		&student.RT,
+		&student.RW,
+		&student.SubDistrict,
+		&student.District,
+	)
 	printRow("Detail Alamat", fullAddress)
 	printRow("Kota/Kab", student.City)
 	printRow("Provinsi", student.Province)
@@ -821,23 +821,82 @@ func (s *studentService) ExportStudentBiodata(id string) (*bytes.Buffer, error) 
 
 	if len(student.Parents) > 0 {
 		for i, p := range student.Parents {
-			// Kita perlu fetch data parent detail karena di student.Parents cuma ada ID & Relasi (tergantung preload)
-			// Asumsi FindByIDWithParents sudah preload 'Parent' objectnya
-			// Jika struktur domain Anda: Student struct { Parents []StudentParent } dan StudentParent punya { Parent Parent }
-
-			// Sederhananya, kita ambil parent pertama sebagai contoh,
-			// atau jika Anda sudah implementasi preload yang benar:
-			parentLabel := fmt.Sprintf("Orang Tua %d (%s)", i+1, p.RelationshipType)
-			// Disini kita butuh akses ke nama parent.
-			// Jika preload di repo belum deep, mungkin nama parent kosong.
-			// Asumsikan sudah ada:
 			if p.Parent.ID != "" {
-				printRow(parentLabel, p.Parent.FullName)
+				// Header Orang Tua
+
+				relation := ""
+
+				if p.RelationshipType != "" {
+					switch p.RelationshipType {
+					case "FATHER":
+						relation = "Ayah"
+					case "MOTHER":
+						relation = "Ibu"
+					default:
+						relation = p.RelationshipType
+					}
+				}
+
+				parentLabel := fmt.Sprintf("Orang Tua %d - %s", i+1, relation)
+				pdf.SetFont("Arial", "B", 10)
+				pdf.Cell(0, 7, parentLabel)
+				pdf.Ln(7)
+
+				
+
+				// Nama
+				printRow("Nama Lengkap", p.Parent.FullName)
+
+				// No Telepon
 				phone := "-"
 				if p.Parent.PhoneNumber != nil {
 					phone = *p.Parent.PhoneNumber
 				}
-				printRow("   No. HP", phone)
+				printRow("No. Telepon", phone)
+
+				// Email
+				email := "-"
+				if p.Parent.Email != nil {
+					email = *p.Parent.Email
+				}
+				printRow("Email", email)
+
+				// Pendidikan
+				education := "-"
+				if p.Parent.EducationLevel != nil {
+					education = *p.Parent.EducationLevel
+				}
+				printRow("Pendidikan", education)
+
+				// Pekerjaan
+				occupation := "-"
+				if p.Parent.Occupation != nil {
+					occupation = *p.Parent.Occupation
+				}
+				printRow("Pekerjaan", occupation)
+
+				// Penghasilan
+				income := "-"
+				if p.Parent.IncomeRange != nil {
+					income = *p.Parent.IncomeRange
+				}
+				printRow("Penghasilan", income)
+
+				// Alamat Lengkap
+				parentAddress := utils.JoinAddress(
+					p.Parent.Address,
+					p.Parent.RT,
+					p.Parent.RW,
+					p.Parent.SubDistrict,
+					p.Parent.District,
+					p.Parent.City,
+					p.Parent.Province,
+				)
+				if parentAddress != "" {
+					printRow("Alamat", parentAddress)
+				}
+
+				pdf.Ln(3) // Spacing antar orang tua
 			}
 		}
 	} else {
@@ -847,11 +906,121 @@ func (s *studentService) ExportStudentBiodata(id string) (*bytes.Buffer, error) 
 	}
 
 	// Jika ada Wali (Guardian)
-	if student.GuardianID != nil {
-		// Logic fetch guardian info sama seperti di GetStudentByID
-		// Untuk ringkasnya di PDF, Anda bisa fetch ulang atau pakai helper fetchGuardianInfo
-		// ...
-		printRow("Wali Murid", "Terdata (Lihat detail di sistem)")
+	if student.GuardianID != nil && student.GuardianType != nil {
+		pdf.Ln(3)
+
+		// Fetch guardian info menggunakan helper yang sudah ada
+		guardianInfo, err := s.fetchGuardianInfo(student.GuardianID, student.GuardianType)
+		if err == nil && guardianInfo != nil {
+			// Header Wali
+			pdf.SetFont("Arial", "B", 10)
+			pdf.Cell(0, 7, "Wali Murid")
+			pdf.Ln(7)
+
+			// Nama
+			printRow("Nama Lengkap", guardianInfo.FullName)
+
+			// No Telepon
+			phone := "-"
+			if guardianInfo.PhoneNumber != nil && *guardianInfo.PhoneNumber != "" {
+				phone = *guardianInfo.PhoneNumber
+			}
+			printRow("No. Telepon", phone)
+
+			// Email
+			email := "-"
+			if guardianInfo.Email != nil && *guardianInfo.Email != "" {
+				email = *guardianInfo.Email
+			}
+			printRow("Email", email)
+
+			// Relasi/Hubungan
+			relationship := "-"
+			if guardianInfo.Relationship != "" {
+				relationship = guardianInfo.Relationship
+			}
+			printRow("Hubungan", relationship)
+
+			// Untuk Guardian, kita perlu fetch data lengkap dari repository
+			// karena GuardianInfoResponse tidak memiliki semua field
+			if *student.GuardianType == "guardian" {
+				guardian, err := s.guardianRepo.FindByID(*student.GuardianID)
+				if err == nil && guardian != nil {
+					// Alamat Lengkap
+					guardianAddress := utils.JoinAddress(
+						guardian.Address,
+						guardian.RT,
+						guardian.RW,
+						guardian.SubDistrict,
+						guardian.District,
+					)
+					if guardianAddress != "" {
+						printRow("Alamat", guardianAddress)
+
+						city := "-"
+						if guardian.City != nil {
+							city = *guardian.City
+						}
+						printRow("Kota/Kab", city)
+
+						province := "-"
+						if guardian.Province != nil {
+							province = *guardian.Province
+						}
+						printRow("Provinsi", province)
+					}
+				}
+			} else if *student.GuardianType == "parent" {
+				// Jika wali adalah parent, fetch dari parent repo
+				parent, err := s.parentRepo.FindByID(*student.GuardianID)
+				if err == nil && parent != nil {
+					// Pendidikan
+					education := "-"
+					if parent.EducationLevel != nil {
+						education = *parent.EducationLevel
+					}
+					printRow("Pendidikan", education)
+
+					// Pekerjaan
+					occupation := "-"
+					if parent.Occupation != nil {
+						occupation = *parent.Occupation
+					}
+					printRow("Pekerjaan", occupation)
+
+					// Penghasilan
+					income := "-"
+					if parent.IncomeRange != nil {
+						income = *parent.IncomeRange
+					}
+					printRow("Penghasilan", income)
+
+					// Alamat Lengkap
+					guardianAddress := utils.JoinAddress(
+						parent.Address,
+						parent.RT,
+						parent.RW,
+						parent.SubDistrict,
+						parent.District,
+					)
+					if guardianAddress != "" {
+						printRow("Alamat", guardianAddress)
+
+						city := "-"
+						if parent.City != nil {
+							city = *parent.City
+						}
+						printRow("Kota/Kab", city)
+
+						province := "-"
+						if parent.Province != nil {
+							province = *parent.Province
+						}
+						printRow("Provinsi", province)
+					}
+				}
+			}
+		}
 	}
 
 	pdf.Ln(10)
