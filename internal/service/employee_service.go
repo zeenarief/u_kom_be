@@ -182,8 +182,8 @@ func (s *employeeService) UpdateEmployee(id string, req request.EmployeeUpdateRe
 	if req.FullName != "" {
 		employee.FullName = req.FullName
 	}
-	if req.JobTitle != "" {
-		employee.JobTitle = req.JobTitle
+	if req.JobTitle != nil {
+		employee.JobTitle = *req.JobTitle
 	}
 
 	// Validasi duplikat NIP (jika NIP diubah)
@@ -206,8 +206,12 @@ func (s *employeeService) UpdateEmployee(id string, req request.EmployeeUpdateRe
 		employee.PhoneNumber = req.PhoneNumber
 	}
 
-	// Enkripsi & Hash NIK jika diperbarui
-	if req.NIK != "" {
+	// Enkripsi & Hash NIK jika diperbarui - bisa di-null dengan empty string
+	if req.NIK == "" {
+		// User ingin menghapus NIK
+		employee.NIK = ""
+		employee.NIKHash = ""
+	} else {
 		// Validasi unik
 		nikHash, err := s.encryptUtil.Hash(req.NIK)
 		if err != nil {
@@ -231,16 +235,21 @@ func (s *employeeService) UpdateEmployee(id string, req request.EmployeeUpdateRe
 		employee.NIKHash = nikHash
 	}
 
-	// Update field lainnya
-	if req.Gender != "" {
-		employee.Gender = req.Gender
+	// Update field lainnya - handle pointer dari request
+	if req.JobTitle != nil {
+		employee.JobTitle = *req.JobTitle
 	}
-	if req.Address != "" {
-		employee.Address = req.Address
+	if req.Gender != nil {
+		employee.Gender = *req.Gender
 	}
-	if req.EmploymentStatus != "" {
-		employee.EmploymentStatus = req.EmploymentStatus
+	if req.Address != nil {
+		employee.Address = *req.Address
 	}
+	if req.EmploymentStatus != nil {
+		employee.EmploymentStatus = *req.EmploymentStatus
+	}
+
+	// Date fields - cek pointer
 	if req.DateOfBirth != nil {
 		employee.DateOfBirth = req.DateOfBirth
 	}

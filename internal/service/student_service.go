@@ -293,7 +293,10 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 		}
 		student.NIK = &encryptedNIK
 	}
-	if req.NoKK != "" {
+	// NoKK - bisa di-null dengan mengirim empty string
+	if req.NoKK == "" {
+		student.NoKK = "" // Set ke empty untuk null
+	} else {
 		encryptedNoKK, err := s.encryptionUtil.Encrypt(req.NoKK)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to encrypt NoKK: %w", err)
@@ -301,50 +304,55 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 		student.NoKK = encryptedNoKK
 	}
 
-	// Update field lainnya
-	if req.Gender != "" {
-		student.Gender = req.Gender
+	// Update field lainnya - handle pointer dari request
+	// Direct assign pointer, GORM akan handle conversion
+	if req.Gender != nil {
+		student.Gender = *req.Gender
 	}
-	if req.PlaceOfBirth != "" {
-		student.PlaceOfBirth = req.PlaceOfBirth
+	if req.PlaceOfBirth != nil {
+		student.PlaceOfBirth = *req.PlaceOfBirth
 	}
+
 	// Untuk time.Time, kita cek IsZero()
 	if !req.DateOfBirth.IsZero() {
 		student.DateOfBirth = req.DateOfBirth
 	}
-	if req.Address != "" {
-		student.Address = req.Address
+
+	// Alamat fields - handle pointer dari request
+	if req.Address != nil {
+		student.Address = *req.Address
 	}
-	// ... (lakukan hal yang sama untuk RT, RW, SubDistrict, Dll.) ...
-	if req.RT != "" {
-		student.RT = req.RT
+	if req.RT != nil {
+		student.RT = *req.RT
 	}
-	if req.RW != "" {
-		student.RW = req.RW
+	if req.RW != nil {
+		student.RW = *req.RW
 	}
-	if req.SubDistrict != "" {
-		student.SubDistrict = req.SubDistrict
+	if req.SubDistrict != nil {
+		student.SubDistrict = *req.SubDistrict
 	}
-	if req.District != "" {
-		student.District = req.District
+	if req.District != nil {
+		student.District = *req.District
 	}
-	if req.City != "" {
-		student.City = req.City
+	if req.City != nil {
+		student.City = *req.City
 	}
-	if req.Province != "" {
-		student.Province = req.Province
+	if req.Province != nil {
+		student.Province = *req.Province
 	}
-	if req.PostalCode != "" {
-		student.PostalCode = req.PostalCode
+	if req.PostalCode != nil {
+		student.PostalCode = *req.PostalCode
 	}
-	if req.Status != "" {
-		student.Status = req.Status
+
+	// Status dan tahun - handle pointer dari request
+	if req.Status != nil {
+		student.Status = *req.Status
 	}
-	if req.EntryYear != "" {
-		student.EntryYear = req.EntryYear
+	if req.EntryYear != nil {
+		student.EntryYear = *req.EntryYear
 	}
-	if req.ExitYear != "" {
-		student.ExitYear = req.ExitYear
+	if req.ExitYear != nil {
+		student.ExitYear = *req.ExitYear
 	}
 
 	if err := s.studentRepo.Update(student); err != nil {
@@ -842,8 +850,6 @@ func (s *studentService) ExportStudentBiodata(id string) (*bytes.Buffer, error) 
 				pdf.Cell(0, 7, parentLabel)
 				pdf.Ln(7)
 
-				
-
 				// Nama
 				printRow("Nama Lengkap", p.Parent.FullName)
 
@@ -943,7 +949,8 @@ func (s *studentService) ExportStudentBiodata(id string) (*bytes.Buffer, error) 
 
 			// Untuk Guardian, kita perlu fetch data lengkap dari repository
 			// karena GuardianInfoResponse tidak memiliki semua field
-			if *student.GuardianType == "guardian" {
+			switch *student.GuardianType {
+			case "guardian":
 				guardian, err := s.guardianRepo.FindByID(*student.GuardianID)
 				if err == nil && guardian != nil {
 					// Alamat Lengkap
@@ -970,7 +977,7 @@ func (s *studentService) ExportStudentBiodata(id string) (*bytes.Buffer, error) 
 						printRow("Provinsi", province)
 					}
 				}
-			} else if *student.GuardianType == "parent" {
+			case "parent":
 				// Jika wali adalah parent, fetch dari parent repo
 				parent, err := s.parentRepo.FindByID(*student.GuardianID)
 				if err == nil && parent != nil {

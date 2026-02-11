@@ -203,28 +203,31 @@ func (s *parentService) UpdateParent(id string, req request.ParentUpdateRequest)
 		parent.FullName = req.FullName
 	}
 
-	// Validasi duplikat baru
-	if req.PhoneNumber != nil {
+	// Validasi duplikat untuk PhoneNumber
+	// Jika nil atau empty string dari request, kita set ke nil (hapus phone number)
+	// Jika ada value, validasi uniqueness terlebih dahulu
+	if req.PhoneNumber != nil && *req.PhoneNumber != "" {
+		// Ada value baru, cek duplikat
 		if parent.PhoneNumber == nil || *req.PhoneNumber != *parent.PhoneNumber {
-			if *req.PhoneNumber != "" { // Hanya cek jika tidak kosong
-				if existing, _ := s.parentRepo.FindByPhone(*req.PhoneNumber); existing != nil {
-					return nil, apperrors.NewConflictError("Phone number already exists")
-				}
+			if existing, _ := s.parentRepo.FindByPhone(*req.PhoneNumber); existing != nil {
+				return nil, apperrors.NewConflictError("Phone number already exists")
 			}
-			parent.PhoneNumber = req.PhoneNumber
 		}
 	}
+	// Update phone number (termasuk jika nil atau empty untuk set null)
+	parent.PhoneNumber = req.PhoneNumber
 
-	if req.Email != nil {
+	// Validasi duplikat untuk Email
+	if req.Email != nil && *req.Email != "" {
+		// Ada value baru, cek duplikat
 		if parent.Email == nil || *req.Email != *parent.Email {
-			if *req.Email != "" {
-				if existing, _ := s.parentRepo.FindByEmail(*req.Email); existing != nil {
-					return nil, apperrors.NewConflictError("Email already exists")
-				}
+			if existing, _ := s.parentRepo.FindByEmail(*req.Email); existing != nil {
+				return nil, apperrors.NewConflictError("Email already exists")
 			}
-			parent.Email = req.Email
 		}
 	}
+	// Update email (termasuk jika nil atau empty untuk set null)
+	parent.Email = req.Email
 
 	// Enkripsi NIK jika diperbarui
 	if req.NIK != nil {
@@ -265,55 +268,23 @@ func (s *parentService) UpdateParent(id string, req request.ParentUpdateRequest)
 		}
 	}
 
-	// Update field lainnya (pointer check)
-	if req.Gender != nil {
-		parent.Gender = req.Gender
-	}
-	if req.PlaceOfBirth != nil {
-		parent.PlaceOfBirth = req.PlaceOfBirth
-	}
-	if req.DateOfBirth != nil {
-		parent.DateOfBirth = req.DateOfBirth
-	}
-	if req.LifeStatus != nil {
-		parent.LifeStatus = req.LifeStatus
-	}
-	if req.MaritalStatus != nil {
-		parent.MaritalStatus = req.MaritalStatus
-	}
-	if req.EducationLevel != nil {
-		parent.EducationLevel = req.EducationLevel
-	}
-	if req.Occupation != nil {
-		parent.Occupation = req.Occupation
-	}
-	if req.IncomeRange != nil {
-		parent.IncomeRange = req.IncomeRange
-	}
-	if req.Address != nil {
-		parent.Address = req.Address
-	}
-	if req.RT != nil {
-		parent.RT = req.RT
-	}
-	if req.RW != nil {
-		parent.RW = req.RW
-	}
-	if req.SubDistrict != nil {
-		parent.SubDistrict = req.SubDistrict
-	}
-	if req.District != nil {
-		parent.District = req.District
-	}
-	if req.City != nil {
-		parent.City = req.City
-	}
-	if req.Province != nil {
-		parent.Province = req.Province
-	}
-	if req.PostalCode != nil {
-		parent.PostalCode = req.PostalCode
-	}
+	// Update field lainnya - langsung assign untuk bisa null dari JSON
+	parent.Gender = req.Gender
+	parent.PlaceOfBirth = req.PlaceOfBirth
+	parent.DateOfBirth = req.DateOfBirth
+	parent.LifeStatus = req.LifeStatus
+	parent.MaritalStatus = req.MaritalStatus
+	parent.EducationLevel = req.EducationLevel
+	parent.Occupation = req.Occupation
+	parent.IncomeRange = req.IncomeRange
+	parent.Address = req.Address
+	parent.RT = req.RT
+	parent.RW = req.RW
+	parent.SubDistrict = req.SubDistrict
+	parent.District = req.District
+	parent.City = req.City
+	parent.Province = req.Province
+	parent.PostalCode = req.PostalCode
 
 	// Simpan perubahan
 	if err := s.parentRepo.Update(parent); err != nil {

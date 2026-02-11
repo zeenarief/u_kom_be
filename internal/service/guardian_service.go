@@ -189,28 +189,29 @@ func (s *guardianService) UpdateGuardian(id string, req request.GuardianUpdateRe
 		guardian.FullName = req.FullName
 	}
 
-	// Validasi duplikat baru
-	if req.PhoneNumber != nil {
+	// Validasi duplikat untuk PhoneNumber
+	if req.PhoneNumber != nil && *req.PhoneNumber != "" {
+		// Ada value baru, cek duplikat
 		if guardian.PhoneNumber == nil || *req.PhoneNumber != *guardian.PhoneNumber {
-			if *req.PhoneNumber != "" {
-				if existing, _ := s.guardianRepo.FindByPhone(*req.PhoneNumber); existing != nil {
-					return nil, apperrors.NewConflictError("Phone number already exists")
-				}
+			if existing, _ := s.guardianRepo.FindByPhone(*req.PhoneNumber); existing != nil {
+				return nil, apperrors.NewConflictError("Phone number already exists")
 			}
-			guardian.PhoneNumber = req.PhoneNumber
 		}
 	}
+	// Update phone number (termasuk jika nil atau empty untuk set null)
+	guardian.PhoneNumber = req.PhoneNumber
 
-	if req.Email != nil {
+	// Validasi duplikat untuk Email
+	if req.Email != nil && *req.Email != "" {
+		// Ada value baru, cek duplikat
 		if guardian.Email == nil || *req.Email != *guardian.Email {
-			if *req.Email != "" {
-				if existing, _ := s.guardianRepo.FindByEmail(*req.Email); existing != nil {
-					return nil, apperrors.NewConflictError("Email already exists")
-				}
+			if existing, _ := s.guardianRepo.FindByEmail(*req.Email); existing != nil {
+				return nil, apperrors.NewConflictError("Email already exists")
 			}
-			guardian.Email = req.Email
 		}
 	}
+	// Update email (termasuk jika nil atau empty untuk set null)
+	guardian.Email = req.Email
 
 	// Enkripsi NIK jika diperbarui
 	if req.NIK != nil {
@@ -248,37 +249,17 @@ func (s *guardianService) UpdateGuardian(id string, req request.GuardianUpdateRe
 		}
 	}
 
-	// Update field lainnya (pola `!= nil`)
-	if req.Gender != nil {
-		guardian.Gender = req.Gender
-	}
-	if req.Address != nil {
-		guardian.Address = req.Address
-	}
-	if req.RT != nil {
-		guardian.RT = req.RT
-	}
-	if req.RW != nil {
-		guardian.RW = req.RW
-	}
-	if req.SubDistrict != nil {
-		guardian.SubDistrict = req.SubDistrict
-	}
-	if req.District != nil {
-		guardian.District = req.District
-	}
-	if req.City != nil {
-		guardian.City = req.City
-	}
-	if req.Province != nil {
-		guardian.Province = req.Province
-	}
-	if req.PostalCode != nil {
-		guardian.PostalCode = req.PostalCode
-	}
-	if req.RelationshipToStudent != nil {
-		guardian.RelationshipToStudent = req.RelationshipToStudent
-	}
+	// Update field lainnya - langsung assign untuk bisa null dari JSON
+	guardian.Gender = req.Gender
+	guardian.Address = req.Address
+	guardian.RT = req.RT
+	guardian.RW = req.RW
+	guardian.SubDistrict = req.SubDistrict
+	guardian.District = req.District
+	guardian.City = req.City
+	guardian.Province = req.Province
+	guardian.PostalCode = req.PostalCode
+	guardian.RelationshipToStudent = req.RelationshipToStudent
 
 	// Simpan perubahan
 	if err := s.guardianRepo.Update(guardian); err != nil {
