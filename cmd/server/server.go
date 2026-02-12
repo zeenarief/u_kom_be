@@ -48,6 +48,8 @@ func NewServer() *Server {
 	// Load configuration
 	cfg := config.LoadConfig()
 
+	baseURL := cfg.AppUrl
+
 	// Set Gin mode dari config
 	gin.SetMode(cfg.ServerMode)
 
@@ -82,7 +84,7 @@ func NewServer() *Server {
 	// Initialize converters
 	parentConverter := converter.NewParentConverter(encryptionUtil)
 	guardianConverter := converter.NewGuardianConverter(encryptionUtil)
-	studentConverter := converter.NewStudentConverter(encryptionUtil, parentConverter)
+	studentConverter := converter.NewStudentConverter(encryptionUtil, parentConverter, baseURL)
 	employeeConverter := converter.NewEmployeeConverter(encryptionUtil)
 
 	// Initialize services

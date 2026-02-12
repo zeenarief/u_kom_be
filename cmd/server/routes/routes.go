@@ -3,6 +3,7 @@ package routes
 import (
 	"time"
 	"u_kom_be/internal/handler"
+	"u_kom_be/internal/middleware"
 	"u_kom_be/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -48,6 +49,11 @@ func SetupRoutes(
 	RegisterScheduleRoutes(apiV1, scheduleHandler, authService)
 	RegisterAttendanceRoutes(apiV1, attendanceHandler, authService)
 
+	protected := apiV1.Group("/")
+	protected.Use(middleware.AuthMiddleware(authService))
+
+	protected.GET("/files/:folder/:filename", authHandler.ServeFile)
+	
 	// Health check route
 	apiV1.GET("/health", healthCheck)
 }

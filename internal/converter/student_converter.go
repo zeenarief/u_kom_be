@@ -1,7 +1,9 @@
 package converter
 
 import (
+	"fmt"
 	"log"
+	"os"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/response"
 	"u_kom_be/internal/utils"
@@ -18,16 +20,19 @@ type StudentConverterInterface interface {
 type studentConverter struct {
 	encryptionUtil  utils.EncryptionUtil
 	parentConverter ParentConverterInterface
+	baseURL         string
 }
 
 // NewStudentConverter membuat instance konverter baru
 func NewStudentConverter(
 	encryptionUtil utils.EncryptionUtil,
 	parentConverter ParentConverterInterface,
+	baseURL string,
 ) StudentConverterInterface {
 	return &studentConverter{
 		encryptionUtil:  encryptionUtil,
 		parentConverter: parentConverter,
+		baseURL:         baseURL,
 	}
 }
 
@@ -70,30 +75,61 @@ func (c *studentConverter) ToStudentDetailResponse(student *domain.Student) *res
 		}
 	}
 
+	var (
+		birthCertURL, familyCardURL, parentStmtURL, studentStmtURL *string
+		healthInsURL, diplomaURL, gradCertURL, finHardshipURL      *string
+	)
+
+	// Helper to generate URL
+	generateURL := func(path *string) *string {
+		if path != nil && *path != "" {
+			url := fmt.Sprintf("%s/api/v1/files/%s", c.baseURL, *path)
+			return &url
+		}
+		return nil
+	}
+
+	birthCertURL = generateURL(student.BirthCertificateFile)
+	familyCardURL = generateURL(student.FamilyCardFile)
+	parentStmtURL = generateURL(student.ParentStatementFile)
+	studentStmtURL = generateURL(student.StudentStatementFile)
+	healthInsURL = generateURL(student.HealthInsuranceFile)
+	diplomaURL = generateURL(student.DiplomaCertificateFile)
+	gradCertURL = generateURL(student.GraduationCertificateFile)
+	finHardshipURL = generateURL(student.FinancialHardshipLetterFile)
+
 	return &response.StudentDetailResponse{
-		ID:           student.ID,
-		FullName:     student.FullName,
-		NoKK:         decryptedNoKK, // <-- Data plaintext
-		NIK:          decryptedNIK,  // <-- Data plaintext
-		NISN:         student.NISN,
-		NIM:          student.NIM,
-		Gender:       student.Gender,
-		PlaceOfBirth: student.PlaceOfBirth,
-		DateOfBirth:  student.DateOfBirth,
-		Address:      student.Address,
-		RT:           student.RT,
-		RW:           student.RW,
-		SubDistrict:  student.SubDistrict,
-		District:     student.District,
-		City:         student.City,
-		Province:     student.Province,
-		PostalCode:   student.PostalCode,
-		Status:       student.Status,
-		EntryYear:    student.EntryYear,
-		ExitYear:     student.ExitYear,
-		CreatedAt:    student.CreatedAt,
-		UpdatedAt:    student.UpdatedAt,
-		Parents:      parentResponses,
+		ID:                             student.ID,
+		FullName:                       student.FullName,
+		NoKK:                           decryptedNoKK, // <-- Data plaintext
+		NIK:                            decryptedNIK,  // <-- Data plaintext
+		NISN:                           student.NISN,
+		NIM:                            student.NIM,
+		Gender:                         student.Gender,
+		PlaceOfBirth:                   student.PlaceOfBirth,
+		DateOfBirth:                    student.DateOfBirth,
+		Address:                        student.Address,
+		RT:                             student.RT,
+		RW:                             student.RW,
+		SubDistrict:                    student.SubDistrict,
+		District:                       student.District,
+		City:                           student.City,
+		Province:                       student.Province,
+		PostalCode:                     student.PostalCode,
+		Status:                         student.Status,
+		EntryYear:                      student.EntryYear,
+		ExitYear:                       student.ExitYear,
+		BirthCertificateFileURL:        birthCertURL,
+		FamilyCardFileURL:              familyCardURL,
+		ParentStatementFileURL:         parentStmtURL,
+		StudentStatementFileURL:        studentStmtURL,
+		HealthInsuranceFileURL:         healthInsURL,
+		DiplomaCertificateFileURL:      diplomaURL,
+		GraduationCertificateFileURL:   gradCertURL,
+		FinancialHardshipLetterFileURL: finHardshipURL,
+		CreatedAt:                      student.CreatedAt,
+		UpdatedAt:                      student.UpdatedAt,
+		Parents:                        parentResponses,
 	}
 }
 
@@ -144,4 +180,11 @@ func (c *studentConverter) ToStudentListResponses(students []domain.Student) []r
 		responses = append(responses, *c.ToStudentListResponse(&s)) // <-- Memanggil ToStudentListResponse
 	}
 	return responses
+}
+
+func getEnv(key, defaultValue string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return defaultValue
 }

@@ -1,34 +1,43 @@
 CREATE TABLE students (
-                          id CHAR(36) PRIMARY KEY,
-                          full_name VARCHAR(100) NOT NULL,
+    id CHAR(36) PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
 
-                          no_kk TEXT,
-                          nik TEXT,
-                          nik_hash VARCHAR(64) UNIQUE,
+    no_kk TEXT,
+    nik TEXT,
+    nik_hash VARCHAR(64) UNIQUE,
 
-                          nisn VARCHAR(20) UNIQUE,
-                          nim VARCHAR(20) UNIQUE,
+    nisn VARCHAR(20) UNIQUE,
+    nim VARCHAR(20) UNIQUE,
 
-                          gender VARCHAR(10),
+    gender VARCHAR(10),
 
-                          place_of_birth VARCHAR(100),
-                          date_of_birth DATE,
-                          address TEXT,
+    place_of_birth VARCHAR(100),
+    date_of_birth DATE,
+    address TEXT,
 
-                          rt VARCHAR(3),
-                          rw VARCHAR(3),
+    rt VARCHAR(3),
+    rw VARCHAR(3),
 
-                          sub_district VARCHAR(100),
-                          district VARCHAR(100),
-                          city VARCHAR(100),
-                          province VARCHAR(100),
+    sub_district VARCHAR(100),
+    district VARCHAR(100),
+    city VARCHAR(100),
+    province VARCHAR(100),
 
-                          postal_code VARCHAR(5),
+    postal_code VARCHAR(5),
 
-                          status ENUM('INACTIVE', 'ACTIVE', 'GRADUATED', 'DROPOUT') DEFAULT 'INACTIVE',
-                          entry_year VARCHAR(4),
-                          exit_year VARCHAR(4),
+    status ENUM('INACTIVE', 'ACTIVE', 'GRADUATED', 'DROPOUT') DEFAULT 'INACTIVE',
+    entry_year VARCHAR(4),
+    exit_year VARCHAR(4),
 
-                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    birth_certificate_file VARCHAR(255),
+    family_card_file VARCHAR(255),
+    parent_statement_file VARCHAR(255),
+    student_statement_file VARCHAR(255),
+    health_insurance_file VARCHAR(255),
+    diploma_certificate_file VARCHAR(255),
+    graduation_certificate_file VARCHAR(255),
+    financial_hardship_letter_file VARCHAR(255),
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

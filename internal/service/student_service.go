@@ -20,10 +20,10 @@ import (
 )
 
 type StudentService interface {
-	CreateStudent(req request.StudentCreateRequest) (*response.StudentDetailResponse, error)
+	CreateStudent(req request.StudentCreateRequest, files StudentFiles) (*response.StudentDetailResponse, error)
 	GetStudentByID(id string) (*response.StudentDetailResponse, error)
 	GetAllStudents(search string) ([]response.StudentListResponse, error)
-	UpdateStudent(id string, req request.StudentUpdateRequest) (*response.StudentDetailResponse, error)
+	UpdateStudent(id string, req request.StudentUpdateRequest, files StudentFiles) (*response.StudentDetailResponse, error)
 	DeleteStudent(id string) error
 	SyncParents(studentID string, req request.StudentSyncParentsRequest) error
 	SetGuardian(studentID string, req request.StudentSetGuardianRequest) error
@@ -33,6 +33,17 @@ type StudentService interface {
 	ExportStudentsToExcel() (*bytes.Buffer, error)
 	ExportStudentsToPdf() (*bytes.Buffer, error)
 	ExportStudentBiodata(id string) (*bytes.Buffer, error)
+}
+
+type StudentFiles struct {
+	BirthCertificateFile        string
+	FamilyCardFile              string
+	ParentStatementFile         string
+	StudentStatementFile        string
+	HealthInsuranceFile         string
+	DiplomaCertificateFile      string
+	GraduationCertificateFile   string
+	FinancialHardshipLetterFile string
 }
 
 type studentService struct {
@@ -63,7 +74,7 @@ func NewStudentService(
 }
 
 // CreateStudent menangani pembuatan siswa baru
-func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*response.StudentDetailResponse, error) {
+func (s *studentService) CreateStudent(req request.StudentCreateRequest, files StudentFiles) (*response.StudentDetailResponse, error) {
 	// Helpers untuk konversi string kosong ke nil pointer
 	toPtr := func(s string) *string {
 		if s == "" {
@@ -103,7 +114,7 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 		// a. Hash & Check Unique
 		hash, err := s.encryptionUtil.Hash(req.NIK)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to hash NIK: %w", err)
+			return nil, fmt.Errorf("failed to hash NIK: %w", err)
 		}
 
 		existing, err := s.studentRepo.FindByNIKHash(hash)
@@ -118,7 +129,7 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 		// b. Encrypt
 		encrypted, err := s.encryptionUtil.Encrypt(req.NIK)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to encrypt NIK: %w", err)
+			return nil, fmt.Errorf("failed to encrypt NIK: %w", err)
 		}
 		encryptedNIK = &encrypted
 	}
@@ -128,32 +139,40 @@ func (s *studentService) CreateStudent(req request.StudentCreateRequest) (*respo
 		var err error
 		encryptedNoKK, err = s.encryptionUtil.Encrypt(req.NoKK)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to encrypt NoKK: %w", err)
+			return nil, fmt.Errorf("failed to encrypt NoKK: %w", err)
 		}
 	}
 
 	// 3. Buat Domain Object
 	student := &domain.Student{
-		FullName:     req.FullName,
-		NoKK:         encryptedNoKK,
-		NIK:          encryptedNIK,
-		NIKHash:      nikHash,
-		NISN:         nisn,
-		NIM:          nim,
-		Gender:       req.Gender,
-		PlaceOfBirth: toPtr(req.PlaceOfBirth),
-		DateOfBirth:  toDatePtr(req.DateOfBirth),
-		Address:      toPtr(req.Address),
-		RT:           toPtr(req.RT),
-		RW:           toPtr(req.RW),
-		SubDistrict:  toPtr(req.SubDistrict),
-		District:     toPtr(req.District),
-		City:         toPtr(req.City),
-		Province:     toPtr(req.Province),
-		PostalCode:   toPtr(req.PostalCode),
-		Status:       req.Status,
-		EntryYear:    toPtr(req.EntryYear),
-		ExitYear:     toPtr(req.ExitYear),
+		FullName:                    req.FullName,
+		NoKK:                        encryptedNoKK,
+		NIK:                         encryptedNIK,
+		NIKHash:                     nikHash,
+		NISN:                        nisn,
+		NIM:                         nim,
+		Gender:                      req.Gender,
+		PlaceOfBirth:                toPtr(req.PlaceOfBirth),
+		DateOfBirth:                 toDatePtr(req.DateOfBirth),
+		Address:                     toPtr(req.Address),
+		RT:                          toPtr(req.RT),
+		RW:                          toPtr(req.RW),
+		SubDistrict:                 toPtr(req.SubDistrict),
+		District:                    toPtr(req.District),
+		City:                        toPtr(req.City),
+		Province:                    toPtr(req.Province),
+		PostalCode:                  toPtr(req.PostalCode),
+		Status:                      req.Status,
+		EntryYear:                   toPtr(req.EntryYear),
+		ExitYear:                    toPtr(req.ExitYear),
+		BirthCertificateFile:        toPtr(files.BirthCertificateFile),
+		FamilyCardFile:              toPtr(files.FamilyCardFile),
+		ParentStatementFile:         toPtr(files.ParentStatementFile),
+		StudentStatementFile:        toPtr(files.StudentStatementFile),
+		HealthInsuranceFile:         toPtr(files.HealthInsuranceFile),
+		DiplomaCertificateFile:      toPtr(files.DiplomaCertificateFile),
+		GraduationCertificateFile:   toPtr(files.GraduationCertificateFile),
+		FinancialHardshipLetterFile: toPtr(files.FinancialHardshipLetterFile),
 	}
 
 	// Set default status if empty
@@ -237,7 +256,7 @@ func (s *studentService) GetAllStudents(search string) ([]response.StudentListRe
 }
 
 // UpdateStudent memperbarui data siswa
-func (s *studentService) UpdateStudent(id string, req request.StudentUpdateRequest) (*response.StudentDetailResponse, error) {
+func (s *studentService) UpdateStudent(id string, req request.StudentUpdateRequest, files StudentFiles) (*response.StudentDetailResponse, error) {
 	student, err := s.studentRepo.FindByID(id)
 	if err != nil {
 		return nil, err
@@ -275,8 +294,6 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 		}
 	}
 
-	// Enkripsi field yang diperbarui
-	// Enkripsi field yang diperbarui
 	// Enkripsi field yang diperbarui
 	if req.NIK != nil {
 		// Logika update NIK:
@@ -347,6 +364,26 @@ func (s *studentService) UpdateStudent(id string, req request.StudentUpdateReque
 		student.Status = *req.Status
 	}
 
+	// Update File Paths
+	// Helper to update file path if provided
+	updateFile := func(currentPath **string, newPath string) {
+		if newPath != "" {
+			if *currentPath != nil {
+				utils.RemoveFile(**currentPath)
+			}
+			*currentPath = &newPath
+		}
+	}
+
+	updateFile(&student.BirthCertificateFile, files.BirthCertificateFile)
+	updateFile(&student.FamilyCardFile, files.FamilyCardFile)
+	updateFile(&student.ParentStatementFile, files.ParentStatementFile)
+	updateFile(&student.StudentStatementFile, files.StudentStatementFile)
+	updateFile(&student.HealthInsuranceFile, files.HealthInsuranceFile)
+	updateFile(&student.DiplomaCertificateFile, files.DiplomaCertificateFile)
+	updateFile(&student.GraduationCertificateFile, files.GraduationCertificateFile)
+	updateFile(&student.FinancialHardshipLetterFile, files.FinancialHardshipLetterFile)
+
 	if err := s.studentRepo.Update(student); err != nil {
 		return nil, err
 	}
@@ -367,7 +404,7 @@ func (s *studentService) DeleteStudent(id string) error {
 		return err
 	}
 	if student == nil {
-		return apperrors.NewNotFoundError("Student not found")
+		return apperrors.NewNotFoundError("student not found")
 	}
 
 	// Opsional: Tambahkan logika bisnis
@@ -386,7 +423,7 @@ func (s *studentService) SyncParents(studentID string, req request.StudentSyncPa
 		return err
 	}
 	if student == nil {
-		return errors.New("Student not found")
+		return errors.New("student not found")
 	}
 
 	var parentRelations []domain.StudentParent
@@ -403,7 +440,7 @@ func (s *studentService) SyncParents(studentID string, req request.StudentSyncPa
 		// Cek apakah parent_id ada di database
 		parent, err := s.parentRepo.FindByID(p.ParentID)
 		if err != nil {
-			return fmt.Errorf("Error checking parent: %w", err)
+			return fmt.Errorf("error checking parent: %w", err)
 		}
 		if parent == nil {
 			return apperrors.NewNotFoundError(fmt.Sprintf("Parent not found with id: %s", p.ParentID))
@@ -429,7 +466,7 @@ func (s *studentService) SetGuardian(studentID string, req request.StudentSetGua
 		return err
 	}
 	if student == nil {
-		return errors.New("Student not found")
+		return errors.New("student not found")
 	}
 
 	// 2. Validasi apakah guardian_id yang diberikan ada di tabel yang benar
@@ -437,7 +474,7 @@ func (s *studentService) SetGuardian(studentID string, req request.StudentSetGua
 	case "parent":
 		parent, err := s.parentRepo.FindByID(req.GuardianID)
 		if err != nil {
-			return fmt.Errorf("Error checking parent: %w", err)
+			return fmt.Errorf("error checking parent: %w", err)
 		}
 		if parent == nil {
 			return apperrors.NewNotFoundError(fmt.Sprintf("Parent not found with id: %s", req.GuardianID))
@@ -445,7 +482,7 @@ func (s *studentService) SetGuardian(studentID string, req request.StudentSetGua
 	case "guardian":
 		guardian, err := s.guardianRepo.FindByID(req.GuardianID)
 		if err != nil {
-			return fmt.Errorf("Error checking guardian: %w", err)
+			return fmt.Errorf("error checking guardian: %w", err)
 		}
 		if guardian == nil {
 			return apperrors.NewNotFoundError(fmt.Sprintf("Guardian not found with id: %s", req.GuardianID))
@@ -469,7 +506,7 @@ func (s *studentService) RemoveGuardian(studentID string) error {
 		return err
 	}
 	if student == nil {
-		return errors.New("Student not found")
+		return errors.New("student not found")
 	}
 
 	// 2. Panggil repository dengan nil untuk menghapus
@@ -493,7 +530,7 @@ func (s *studentService) fetchGuardianInfo(guardianID *string, guardianType *str
 			return nil, err
 		}
 		if parent == nil {
-			return nil, fmt.Errorf("Data integrity error: Parent guardian with id %s not found", id)
+			return nil, fmt.Errorf("data integrity error: Parent guardian with id %s not found", id)
 		}
 
 		// Petakan domain.Parent ke response.GuardianInfoResponse
@@ -512,7 +549,7 @@ func (s *studentService) fetchGuardianInfo(guardianID *string, guardianType *str
 			return nil, err
 		}
 		if guardian == nil {
-			return nil, fmt.Errorf("Data integrity error: Guardian with id %s not found", id)
+			return nil, fmt.Errorf("data integrity error: Guardian with id %s not found", id)
 		}
 
 		// Petakan domain.Guardian ke response.GuardianInfoResponse
@@ -532,7 +569,7 @@ func (s *studentService) fetchGuardianInfo(guardianID *string, guardianType *str
 		}, nil
 	}
 
-	return nil, fmt.Errorf("Unknown guardian_type: %s", tipe)
+	return nil, fmt.Errorf("unknown guardian_type: %s", tipe)
 }
 
 // LinkUser menautkan profil Student ke akun User
@@ -543,7 +580,7 @@ func (s *studentService) LinkUser(studentID string, userID string) error {
 		return err
 	}
 	if student == nil {
-		return errors.New("Student not found")
+		return errors.New("student not found")
 	}
 
 	// 2. Cek apakah User ada

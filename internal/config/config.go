@@ -30,6 +30,7 @@ type Config struct {
 	EncryptionKey string
 
 	// Server
+	AppUrl     string
 	ServerPort string
 	ServerHost string
 	ServerMode string
@@ -81,6 +82,7 @@ func LoadConfig() *Config {
 		EncryptionKey: getEnv("ENCRYPTION_KEY", "default_32_byte_key_1234567890!@"),
 
 		// Server
+		AppUrl:     getEnv("APP_URL", "http://localhost:8080"),
 		ServerPort: getEnv("SERVER_PORT", "8080"),
 		ServerHost: getEnv("SERVER_HOST", "0.0.0.0"),
 		ServerMode: getEnv("SERVER_MODE", "debug"),

@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"fmt"
+	"os"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/service"
 
@@ -93,4 +95,26 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	}
 
 	SuccessResponse(c, "Logged out successfully", nil)
+}
+
+func (h *AuthHandler) ServeFile(c *gin.Context) {
+	folder := c.Param("folder")     // e.g., "students"
+	filename := c.Param("filename") // e.g., "akta_xyz.pdf"
+
+	// Validasi folder agar user tidak bisa akses folder sistem (Path Traversal Attack)
+	if folder != "students" && folder != "employees" {
+		c.JSON(403, gin.H{"error": "Forbidden access"})
+		return
+	}
+
+	targetPath := fmt.Sprintf("./storage/uploads/%s/%s", folder, filename)
+
+	// Cek file ada atau tidak
+	if _, err := os.Stat(targetPath); os.IsNotExist(err) {
+		c.JSON(404, gin.H{"error": "File not found"})
+		return
+	}
+
+	// Sajikan file
+	c.File(targetPath)
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/service"
+	"u_kom_be/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,12 +20,68 @@ func NewStudentHandler(studentService service.StudentService) *StudentHandler {
 
 func (h *StudentHandler) CreateStudent(c *gin.Context) {
 	var req request.StudentCreateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	// Ganti ShouldBindJSON ke ShouldBind agar support multipart/form-data
+	if err := c.ShouldBind(&req); err != nil {
 		BadRequestError(c, "Invalid request payload", err.Error())
 		return
 	}
 
-	student, err := h.studentService.CreateStudent(req)
+	// List file yang akan diupload
+	fileKeys := []struct {
+		Key      string
+		FieldPtr *string
+	}{
+		{"birth_certificate_file", nil},
+		{"family_card_file", nil},
+		{"parent_statement_file", nil},
+		{"student_statement_file", nil},
+		{"health_insurance_file", nil},
+		{"diploma_certificate_file", nil},
+		{"graduation_certificate_file", nil},
+		{"financial_hardship_letter_file", nil},
+	}
+
+	uploadedPaths := make(map[string]string)
+
+	// Clean up jika terjadi error di tengah jalan
+	defer func() {
+		if c.IsAborted() {
+			for _, path := range uploadedPaths {
+				utils.RemoveFile(path)
+			}
+		}
+	}()
+
+	for _, fk := range fileKeys {
+		file, err := c.FormFile(fk.Key)
+		if err == nil {
+			// Simpan file
+			path, errSave := utils.SaveUploadedFile(c, file, "students", fk.Key)
+			if errSave != nil {
+				// Hapus file yang sudah terlanjur terupload
+				for _, p := range uploadedPaths {
+					utils.RemoveFile(p)
+				}
+				BadRequestError(c, fmt.Sprintf("Failed to upload %s", fk.Key), errSave.Error())
+				return
+			}
+			uploadedPaths[fk.Key] = path
+		}
+	}
+
+	// Masukkan ke struct
+	filesToCheck := service.StudentFiles{
+		BirthCertificateFile:        uploadedPaths["birth_certificate_file"],
+		FamilyCardFile:              uploadedPaths["family_card_file"],
+		ParentStatementFile:         uploadedPaths["parent_statement_file"],
+		StudentStatementFile:        uploadedPaths["student_statement_file"],
+		HealthInsuranceFile:         uploadedPaths["health_insurance_file"],
+		DiplomaCertificateFile:      uploadedPaths["diploma_certificate_file"],
+		GraduationCertificateFile:   uploadedPaths["graduation_certificate_file"],
+		FinancialHardshipLetterFile: uploadedPaths["financial_hardship_letter_file"],
+	}
+
+	student, err := h.studentService.CreateStudent(req, filesToCheck)
 	if err != nil {
 		HandleError(c, err)
 		return
@@ -60,12 +117,54 @@ func (h *StudentHandler) UpdateStudent(c *gin.Context) {
 	id := c.Param("id")
 
 	var req request.StudentUpdateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	// Ganti ShouldBindJSON ke ShouldBind
+	if err := c.ShouldBind(&req); err != nil {
 		BadRequestError(c, "Invalid request payload", err.Error())
 		return
 	}
 
-	student, err := h.studentService.UpdateStudent(id, req)
+	// File upload loop
+	fileKeys := []string{
+		"birth_certificate_file",
+		"family_card_file",
+		"parent_statement_file",
+		"student_statement_file",
+		"health_insurance_file",
+		"diploma_certificate_file",
+		"graduation_certificate_file",
+		"financial_hardship_letter_file",
+	}
+
+	uploadedPaths := make(map[string]string)
+
+	for _, key := range fileKeys {
+		file, err := c.FormFile(key)
+		if err == nil {
+			path, errSave := utils.SaveUploadedFile(c, file, "students", key)
+			if errSave != nil {
+				// Cleanup newly uploaded files
+				for _, p := range uploadedPaths {
+					utils.RemoveFile(p)
+				}
+				BadRequestError(c, fmt.Sprintf("Failed to upload %s", key), errSave.Error())
+				return
+			}
+			uploadedPaths[key] = path
+		}
+	}
+
+	filesToUpdate := service.StudentFiles{
+		BirthCertificateFile:        uploadedPaths["birth_certificate_file"],
+		FamilyCardFile:              uploadedPaths["family_card_file"],
+		ParentStatementFile:         uploadedPaths["parent_statement_file"],
+		StudentStatementFile:        uploadedPaths["student_statement_file"],
+		HealthInsuranceFile:         uploadedPaths["health_insurance_file"],
+		DiplomaCertificateFile:      uploadedPaths["diploma_certificate_file"],
+		GraduationCertificateFile:   uploadedPaths["graduation_certificate_file"],
+		FinancialHardshipLetterFile: uploadedPaths["financial_hardship_letter_file"],
+	}
+
+	student, err := h.studentService.UpdateStudent(id, req, filesToUpdate)
 	if err != nil {
 		HandleError(c, err)
 		return
