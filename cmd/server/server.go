@@ -35,6 +35,7 @@ type Server struct {
 	TeachingAssignmentHandler *handler.TeachingAssignmentHandler
 	ScheduleHandler           *handler.ScheduleHandler
 	AttendanceHandler         *handler.AttendanceHandler
+	GradeHandler              *handler.GradeHandler
 	AuthService               service.AuthService
 }
 
@@ -74,6 +75,7 @@ func NewServer() *Server {
 	teachingAssignmentRepo := repository.NewTeachingAssignmentRepository(db)
 	scheduleRepo := repository.NewScheduleRepository(db)
 	attendanceRepo := repository.NewAttendanceRepository(db)
+	gradeRepo := repository.NewGradeRepository(db)
 
 	// Initialize utils
 	encryptionUtil, err := utils.NewEncryptionUtil(cfg.EncryptionKey)
@@ -145,7 +147,8 @@ func NewServer() *Server {
 		employeeRepo,
 	)
 	scheduleService := service.NewScheduleService(scheduleRepo, teachingAssignmentRepo)
-	attendanceService := service.NewAttendanceService(attendanceRepo, scheduleRepo)
+	attendanceService := service.NewAttendanceService(attendanceRepo, scheduleRepo, studentRepo)
+	gradeService := service.NewGradeService(gradeRepo)
 
 	// Initialize handlers
 	userHandler := handler.NewUserHandler(userService)
@@ -163,6 +166,7 @@ func NewServer() *Server {
 	teachingAssignmentHandler := handler.NewTeachingAssignmentHandler(teachingAssignmentService)
 	scheduleHandler := handler.NewScheduleHandler(scheduleService)
 	attendanceHandler := handler.NewAttendanceHandler(attendanceService)
+	gradeHandler := handler.NewGradeHandler(gradeService)
 
 	// Setup router with middleware
 	router := setupRouter(cfg, authService)
@@ -185,6 +189,7 @@ func NewServer() *Server {
 		TeachingAssignmentHandler: teachingAssignmentHandler,
 		ScheduleHandler:           scheduleHandler,
 		AttendanceHandler:         attendanceHandler,
+		GradeHandler:              gradeHandler,
 		AuthService:               authService,
 	}
 }
@@ -226,6 +231,7 @@ func (s *Server) Start() error {
 		s.TeachingAssignmentHandler,
 		s.ScheduleHandler,
 		s.AttendanceHandler,
+		s.GradeHandler,
 	)
 
 	// Start server

@@ -15,20 +15,24 @@ type AttendanceService interface {
 	GetSessionDetail(id string) (*response.AttendanceSessionDetailResponse, error)
 	GetHistoryByTeacher(teacherID string) ([]response.AttendanceHistoryResponse, error)
 	GetSessionByScheduleDate(scheduleID, dateStr string) (*response.AttendanceSessionDetailResponse, error)
+	GetSessionOrClassList(scheduleID, dateStr string) (*response.AttendanceSessionDetailResponse, error)
 }
 
 type attendanceService struct {
 	repo         repository.AttendanceRepository
 	scheduleRepo repository.ScheduleRepository
+	studentRepo  repository.StudentRepository
 }
 
 func NewAttendanceService(
 	repo repository.AttendanceRepository,
 	schedRepo repository.ScheduleRepository,
+	studRepo repository.StudentRepository,
 ) AttendanceService {
 	return &attendanceService{
 		repo:         repo,
 		scheduleRepo: schedRepo,
+		studentRepo:  studRepo,
 	}
 }
 
@@ -172,4 +176,64 @@ func (s *attendanceService) GetSessionByScheduleDate(scheduleID, dateStr string)
 
 	// Reuse logic mapping
 	return s.GetSessionDetail(session.ID)
+}
+
+// GetSessionOrClassList mengembalikan sesi yang ada ATAU list siswa jika belum ada absen
+func (s *attendanceService) GetSessionOrClassList(scheduleID, dateStr string) (*response.AttendanceSessionDetailResponse, error) {
+	// 1. Cek apakah sesi absen sudah ada
+	date, err := time.ParseInLocation("2006-01-02", dateStr, time.Local)
+	if err != nil {
+		return nil, apperrors.NewBadRequestError("invalid date format")
+	}
+
+	session, err := s.repo.FindSessionByScheduleDate(scheduleID, date)
+	if err == nil && session != nil {
+		// Jika ADA, kembalikan detail sesi
+		return s.GetSessionDetail(session.ID)
+	}
+
+	// 2. Jika BELUM ADA, ambil data Schedule -> Classroom -> Students
+	schedule, err := s.scheduleRepo.FindByID(scheduleID)
+	if err != nil {
+		return nil, err
+	}
+	if schedule == nil {
+		return nil, apperrors.NewNotFoundError("schedule not found")
+	}
+
+	// Ambil list siswa yang aktif di kelas tersebut
+	students, err := s.studentRepo.FindByClassroomID(schedule.TeachingAssignment.ClassroomID)
+	if err != nil {
+		return nil, err
+	}
+
+	// 3. Construct response "kosong" tapi berisi list siswa
+	res := &response.AttendanceSessionDetailResponse{
+		ID:    "", // Kosong menandakan belum disave
+		Date:  dateStr,
+		Topic: "",
+		ScheduleInfo: response.ScheduleResponse{
+			ID:            schedule.ID,
+			DayOfWeek:     schedule.DayOfWeek,
+			StartTime:     schedule.StartTime,
+			EndTime:       schedule.EndTime,
+			SubjectName:   schedule.TeachingAssignment.Subject.Name,
+			ClassroomName: schedule.TeachingAssignment.Classroom.Name,
+			TeacherName:   schedule.TeachingAssignment.Teacher.FullName,
+		},
+		Details: []response.AttendanceDetailResponse{},
+		Summary: make(map[string]int),
+	}
+
+	for _, student := range students {
+		res.Details = append(res.Details, response.AttendanceDetailResponse{
+			StudentID:   student.ID,
+			StudentName: student.FullName,
+			NISN:        utils.SafeString(student.NISN),
+			Status:      "", // Kosong atau default "PRESENT"
+			Notes:       "",
+		})
+	}
+
+	return res, nil
 }

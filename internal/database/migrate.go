@@ -79,6 +79,8 @@ func AutoMigrateForDev(db *gorm.DB) error {
 		&domain.StudentParent{},
 		&domain.Subject{},
 		&domain.TeachingAssignment{},
+		&domain.Assessment{},
+		&domain.StudentScore{},
 	)
 
 	if err != nil {

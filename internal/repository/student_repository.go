@@ -12,7 +12,7 @@ type StudentRepository interface {
 	FindByID(id string) (*domain.Student, error)
 	FindByNISN(nisn string) (*domain.Student, error)
 	FindByNIM(nim string) (*domain.Student, error)
-	FindAll(search string) ([]domain.Student, error)
+	FindAll(search string, classroomID string) ([]domain.Student, error)
 	Update(student *domain.Student) error
 	Delete(id string) error
 	FindByIDWithParents(id string) (*domain.Student, error)
@@ -21,6 +21,7 @@ type StudentRepository interface {
 	SetUserID(studentID string, userID *string) error
 	FindByNIKHash(hash string) (*domain.Student, error)
 	FindByUserID(userID string) (*domain.Student, error)
+	FindByClassroomID(classroomID string) ([]domain.Student, error)
 }
 
 type studentRepository struct {
@@ -72,19 +73,26 @@ func (r *studentRepository) FindByNIM(nim string) (*domain.Student, error) {
 	return &student, nil
 }
 
-func (r *studentRepository) FindAll(search string) ([]domain.Student, error) {
+func (r *studentRepository) FindAll(search string, classroomID string) ([]domain.Student, error) {
 	var students []domain.Student
 	query := r.db
 
+	if classroomID != "" {
+		// Filter by classroom using JOIN
+		query = query.Joins("JOIN student_classrooms sc ON sc.student_id = students.id").
+			Where("sc.classroom_id = ? AND sc.status = ?", classroomID, "ACTIVE")
+	}
+
 	if search != "" {
 		searchPattern := "%" + search + "%"
-		query = query.Where("full_name LIKE ? OR nisn LIKE ? OR nim LIKE ? OR city LIKE ?", searchPattern, searchPattern, searchPattern, searchPattern)
+		query = query.Where("students.full_name LIKE ? OR students.nisn LIKE ? OR students.nim LIKE ? OR students.city LIKE ?", searchPattern, searchPattern, searchPattern, searchPattern)
 	}
 
 	err := query.
 		Preload("User").
 		Preload("StudentClassrooms", "status = ?", "ACTIVE").
 		Preload("StudentClassrooms.Classroom").
+		Order("students.full_name ASC").
 		Find(&students).Error
 	return students, err
 }
@@ -182,4 +190,17 @@ func (r *studentRepository) FindByUserID(userID string) (*domain.Student, error)
 		return nil, err
 	}
 	return &student, nil
+}
+
+func (r *studentRepository) FindByClassroomID(classroomID string) ([]domain.Student, error) {
+	var students []domain.Student
+	// Join with student_classrooms table
+	err := r.db.Joins("JOIN student_classrooms sc ON sc.student_id = students.id").
+		Where("sc.classroom_id = ? AND sc.status = ?", classroomID, "ACTIVE").
+		Order("students.full_name ASC").
+		Find(&students).Error
+	if err != nil {
+		return nil, err
+	}
+	return students, nil
 }

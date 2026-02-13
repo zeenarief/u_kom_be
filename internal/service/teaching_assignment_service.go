@@ -41,12 +41,27 @@ func (s *teachingAssignmentService) toResponse(d *domain.TeachingAssignment) res
 	if d.Teacher.NIP != nil {
 		nip = *d.Teacher.NIP
 	}
+
 	return response.TeachingAssignmentResponse{
-		ID:            d.ID,
-		ClassroomName: d.Classroom.Name,
-		SubjectName:   d.Subject.Name,
-		TeacherName:   d.Teacher.FullName,
-		TeacherNIP:    nip,
+		ID: d.ID,
+		Classroom: response.TeachingAssignmentClassroomResponse{
+			ID:    d.Classroom.ID,
+			Name:  d.Classroom.Name,
+			Level: d.Classroom.Level,
+			Major: d.Classroom.Major,
+		},
+		Subject: response.TeachingAssignmentSubjectResponse{
+			ID:   d.Subject.ID,
+			Name: d.Subject.Name,
+			Code: d.Subject.Code,
+		},
+		Teacher: response.TeachingAssignmentTeacherResponse{
+			ID:  d.Teacher.ID,
+			NIP: nip,
+			User: response.TeachingAssignmentUserResponse{
+				Name: d.Teacher.FullName, // Using FullName from Employee struct which seems to serve as display name
+			},
+		},
 	}
 }
 

@@ -22,7 +22,7 @@ import (
 type StudentService interface {
 	CreateStudent(req request.StudentCreateRequest, files StudentFiles) (*response.StudentDetailResponse, error)
 	GetStudentByID(id string) (*response.StudentDetailResponse, error)
-	GetAllStudents(search string) ([]response.StudentListResponse, error)
+	GetAllStudents(search string, classroomID string) ([]response.StudentListResponse, error)
 	UpdateStudent(id string, req request.StudentUpdateRequest, files StudentFiles) (*response.StudentDetailResponse, error)
 	DeleteStudent(id string) error
 	SyncParents(studentID string, req request.StudentSyncParentsRequest) error
@@ -246,8 +246,8 @@ func (s *studentService) GetStudentByID(id string) (*response.StudentDetailRespo
 }
 
 // GetAllStudents mengambil semua siswa
-func (s *studentService) GetAllStudents(search string) ([]response.StudentListResponse, error) {
-	students, err := s.studentRepo.FindAll(search)
+func (s *studentService) GetAllStudents(search string, classroomID string) ([]response.StudentListResponse, error) {
+	students, err := s.studentRepo.FindAll(search, classroomID)
 	if err != nil {
 		return nil, err
 	}
@@ -627,7 +627,7 @@ func (s *studentService) UnlinkUser(studentID string) error {
 
 func (s *studentService) ExportStudentsToExcel() (*bytes.Buffer, error) {
 	// 1. Ambil semua data siswa
-	students, err := s.studentRepo.FindAll("")
+	students, err := s.studentRepo.FindAll("", "")
 	if err != nil {
 		return nil, err
 	}
@@ -699,7 +699,7 @@ func (s *studentService) ExportStudentsToExcel() (*bytes.Buffer, error) {
 }
 
 func (s *studentService) ExportStudentsToPdf() (*bytes.Buffer, error) {
-	students, err := s.studentRepo.FindAll("")
+	students, err := s.studentRepo.FindAll("", "")
 	if err != nil {
 		return nil, err
 	}

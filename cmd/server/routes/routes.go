@@ -28,6 +28,7 @@ func SetupRoutes(
 	teachingAssignmentHandler *handler.TeachingAssignmentHandler,
 	scheduleHandler *handler.ScheduleHandler,
 	attendanceHandler *handler.AttendanceHandler,
+	gradeHandler *handler.GradeHandler,
 ) {
 	// API v1 group
 	apiV1 := router.Group("/api/v1")
@@ -48,12 +49,13 @@ func SetupRoutes(
 	RegisterTeachingAssignmentRoutes(apiV1, teachingAssignmentHandler, authService)
 	RegisterScheduleRoutes(apiV1, scheduleHandler, authService)
 	RegisterAttendanceRoutes(apiV1, attendanceHandler, authService)
+	RegisterGradeRoutes(apiV1, gradeHandler, authService)
 
 	protected := apiV1.Group("/")
 	protected.Use(middleware.AuthMiddleware(authService))
 
 	protected.GET("/files/:folder/:filename", authHandler.ServeFile)
-	
+
 	// Health check route
 	apiV1.GET("/health", healthCheck)
 }

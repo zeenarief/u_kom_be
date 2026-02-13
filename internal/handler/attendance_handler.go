@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/service"
 
@@ -85,26 +84,12 @@ func (h *AttendanceHandler) CheckSession(c *gin.Context) {
 		return
 	}
 
-	// Kita reuse logic parsing date di service, tapi karena service kita
-	// belum punya method khusus check, kita bisa buat atau parsing manual disini.
-	// Agar rapi, idealnya ada di service. Tapi untuk cepat, kita parsing disini atau
-	// buat method GetSessionByScheduleDate di service.
-
-	// Mari kita buat method baru di Service (Lihat langkah 4 di bawah)
-	res, err := h.service.GetSessionByScheduleDate(scheduleID, date)
+	// Gunakan method baru yang cerdas: Return Session Existing ATAU List Siswa jika belum ada
+	res, err := h.service.GetSessionOrClassList(scheduleID, date)
 	if err != nil {
-		// Jika tidak ketemu, return null data, bukan error 404/500
-		// agar frontend tahu "Oh belum ada absen", bukan "Error server"
-		// NOTE: logic ini tetap dipertahankan karena behavior API check session
-		if _, ok := err.(*apperrors.AppError); ok {
-			// Jika error NotFound, return success dengan data nil
-			SuccessResponse(c, "Session check", nil)
-			return
-		}
-
 		HandleError(c, err)
 		return
 	}
 
-	SuccessResponse(c, "Session found", res)
+	SuccessResponse(c, "Session check / initiation", res)
 }

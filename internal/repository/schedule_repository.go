@@ -10,6 +10,7 @@ type ScheduleRepository interface {
 	Create(schedule *domain.Schedule) error
 	FindByClassroomID(classroomID string) ([]domain.Schedule, error)
 	FindByTeacherID(teacherID string) ([]domain.Schedule, error)
+	FindByID(id string) (*domain.Schedule, error)
 	Delete(id string) error
 
 	// Validasi Bentrok
@@ -54,6 +55,19 @@ func (r *scheduleRepository) FindByTeacherID(teacherID string) ([]domain.Schedul
 		Order("day_of_week ASC, start_time ASC").
 		Find(&schedules).Error
 	return schedules, err
+}
+
+func (r *scheduleRepository) FindByID(id string) (*domain.Schedule, error) {
+	var schedule domain.Schedule
+	err := r.db.Preload("TeachingAssignment").
+		Preload("TeachingAssignment.Subject").
+		Preload("TeachingAssignment.Teacher").
+		Preload("TeachingAssignment.Classroom").
+		First(&schedule, "id = ?", id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &schedule, nil
 }
 
 func (r *scheduleRepository) Delete(id string) error {
