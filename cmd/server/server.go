@@ -114,6 +114,7 @@ func NewServer() *Server {
 		studentRepo,
 		employeeRepo,
 		parentRepo,
+		guardianRepo,
 		cfg.JWTSecret,
 		cfg.JWTRefreshSecret,
 		cfg.JWTAccessTokenExpire,

@@ -28,6 +28,7 @@ type authService struct {
 	studentRepo        repository.StudentRepository
 	employeeRepo       repository.EmployeeRepository
 	parentRepo         repository.ParentRepository
+	guardianRepo       repository.GuardianRepository
 	jwtSecret          string
 	refreshSecret      string
 	accessTokenExpire  time.Duration
@@ -39,6 +40,7 @@ func NewAuthService(
 	studentRepo repository.StudentRepository,
 	employeeRepo repository.EmployeeRepository,
 	parentRepo repository.ParentRepository,
+	guardianRepo repository.GuardianRepository,
 	jwtSecret, refreshSecret string,
 	accessExpire, refreshExpire time.Duration,
 ) AuthService {
@@ -47,6 +49,7 @@ func NewAuthService(
 		studentRepo:        studentRepo,
 		employeeRepo:       employeeRepo,
 		parentRepo:         parentRepo,
+		guardianRepo:       guardianRepo,
 		jwtSecret:          jwtSecret,
 		refreshSecret:      refreshSecret,
 		accessTokenExpire:  accessExpire,
@@ -418,13 +421,25 @@ func (s *authService) getProfileContext(userID string, roles []string) *response
 	}
 
 	// 3. Check if user has parent role
-	// "orangtua" = parent, "wali" = guardian (usually mapped to parent in this context or separate)
-	if contains(roles, "parent") || contains(roles, "orangtua") || contains(roles, "wali") {
+	// "orangtua" = parent
+	if contains(roles, "parent") || contains(roles, "orangtua") {
 		parent, err := s.parentRepo.FindByUserID(userID)
 		if err == nil && parent != nil {
 			return &response.ProfileContext{
 				Type:     "parent",
 				EntityID: parent.ID,
+			}
+		}
+	}
+
+	// 4. Check if user has guardian role
+	// "wali" = guardian
+	if contains(roles, "guardian") || contains(roles, "wali") {
+		guardian, err := s.guardianRepo.FindByID(userID)
+		if err == nil && guardian != nil {
+			return &response.ProfileContext{
+				Type:     "guardian",
+				EntityID: guardian.ID,
 			}
 		}
 	}
