@@ -111,6 +111,9 @@ func NewServer() *Server {
 	)
 	authService := service.NewAuthService(
 		userRepo,
+		studentRepo,
+		employeeRepo,
+		parentRepo,
 		cfg.JWTSecret,
 		cfg.JWTRefreshSecret,
 		cfg.JWTAccessTokenExpire,

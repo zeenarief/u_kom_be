@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 	"u_kom_be/internal/apperrors"
-	"u_kom_be/internal/converter"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/model/response"
@@ -26,15 +25,28 @@ type AuthService interface {
 
 type authService struct {
 	userRepo           repository.UserRepository
+	studentRepo        repository.StudentRepository
+	employeeRepo       repository.EmployeeRepository
+	parentRepo         repository.ParentRepository
 	jwtSecret          string
 	refreshSecret      string
 	accessTokenExpire  time.Duration
 	refreshTokenExpire time.Duration
 }
 
-func NewAuthService(userRepo repository.UserRepository, jwtSecret, refreshSecret string, accessExpire, refreshExpire time.Duration) AuthService {
+func NewAuthService(
+	userRepo repository.UserRepository,
+	studentRepo repository.StudentRepository,
+	employeeRepo repository.EmployeeRepository,
+	parentRepo repository.ParentRepository,
+	jwtSecret, refreshSecret string,
+	accessExpire, refreshExpire time.Duration,
+) AuthService {
 	return &authService{
 		userRepo:           userRepo,
+		studentRepo:        studentRepo,
+		employeeRepo:       employeeRepo,
+		parentRepo:         parentRepo,
 		jwtSecret:          jwtSecret,
 		refreshSecret:      refreshSecret,
 		accessTokenExpire:  accessExpire,
@@ -110,7 +122,23 @@ func (s *authService) Register(req request.UserCreateRequest) (*response.UserWit
 		return nil, err
 	}
 
-	return converter.ToUserWithRoleResponse(createdUser), nil
+	// Manually construct response
+	var roleNames []string
+	for _, r := range createdUser.Roles {
+		roleNames = append(roleNames, r.Name)
+	}
+
+	res := &response.UserWithRoleResponse{
+		ID:        createdUser.ID,
+		Username:  createdUser.Username,
+		Name:      createdUser.Name,
+		Email:     createdUser.Email,
+		Roles:     roleNames,
+		CreatedAt: createdUser.CreatedAt,
+		UpdatedAt: createdUser.UpdatedAt,
+	}
+
+	return res, nil
 }
 
 func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, error) {
@@ -156,7 +184,25 @@ func (s *authService) Login(req request.LoginRequest) (*response.AuthResponse, e
 		return nil, err
 	}
 
-	userResponse := *converter.ToUserWithRoleResponse(user)
+	// Prepare simplified roles
+	var roleNames []string
+	for _, role := range user.Roles {
+		roleNames = append(roleNames, role.Name)
+	}
+
+	// Get Profile Context
+	profileContext := s.getProfileContext(user.ID, roleNames)
+
+	userResponse := response.UserWithRoleResponse{
+		ID:             user.ID,
+		Username:       user.Username,
+		Name:           user.Name,
+		Email:          user.Email,
+		Roles:          roleNames,
+		ProfileContext: profileContext,
+		CreatedAt:      user.CreatedAt,
+		UpdatedAt:      user.UpdatedAt,
+	}
 
 	return &response.AuthResponse{
 		AccessToken:  accessToken,
@@ -180,7 +226,7 @@ func (s *authService) RefreshToken(refreshToken string) (*response.AuthResponse,
 	}
 
 	// Find user
-	user, err := s.userRepo.FindByID(userID)
+	user, err := s.userRepo.GetUserWithRolesAndPermissions(userID)
 	if err != nil {
 		return nil, apperrors.NewNotFoundError("user not found")
 	}
@@ -202,13 +248,21 @@ func (s *authService) RefreshToken(refreshToken string) (*response.AuthResponse,
 		return nil, err
 	}
 
+	// Prepare simplified roles
+	roleNames := user.GetRoles()
+
+	// Get Profile Context
+	profileContext := s.getProfileContext(user.ID, roleNames)
+
 	userResponse := response.UserWithRoleResponse{
-		ID:        user.ID,
-		Username:  user.Username,
-		Name:      user.Name,
-		Email:     user.Email,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
+		ID:             user.ID,
+		Username:       user.Username,
+		Name:           user.Name,
+		Email:          user.Email,
+		Roles:          roleNames,
+		ProfileContext: profileContext,
+		CreatedAt:      user.CreatedAt,
+		UpdatedAt:      user.UpdatedAt,
 	}
 
 	return &response.AuthResponse{
@@ -323,4 +377,66 @@ func (s *authService) convertToResponse(user *domain.User) *response.UserWithRol
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}
+}
+
+func (s *authService) getProfileContext(userID string, roles []string) *response.ProfileContext {
+	// Helper to check if slice contains string
+	contains := func(slice []string, item string) bool {
+		for _, s := range slice {
+			if s == item {
+				return true
+			}
+		}
+		return false
+	}
+
+	// Prioritas pengecekan berdasarkan role untuk efisiensi
+
+	// 1. Check if user has student role
+	if contains(roles, "student") || contains(roles, "siswa") || contains(roles, "santri") {
+		student, err := s.studentRepo.FindByUserID(userID)
+		if err == nil && student != nil {
+			return &response.ProfileContext{
+				Type:     "student",
+				EntityID: student.ID,
+			}
+		}
+	}
+
+	// 2. Check if user has employee/teacher/admin role
+	// "guru" = teacher, "karyawan" = employee
+	if contains(roles, "employee") || contains(roles, "karyawan") ||
+		contains(roles, "teacher") || contains(roles, "guru") ||
+		contains(roles, "admin") || contains(roles, "superadmin") {
+		employee, err := s.employeeRepo.FindByUserID(userID)
+		if err == nil && employee != nil {
+			return &response.ProfileContext{
+				Type:     "employee",
+				EntityID: employee.ID,
+			}
+		}
+	}
+
+	// 3. Check if user has parent role
+	// "orangtua" = parent, "wali" = guardian (usually mapped to parent in this context or separate)
+	if contains(roles, "parent") || contains(roles, "orangtua") || contains(roles, "wali") {
+		parent, err := s.parentRepo.FindByUserID(userID)
+		if err == nil && parent != nil {
+			return &response.ProfileContext{
+				Type:     "parent",
+				EntityID: parent.ID,
+			}
+		}
+	}
+
+	// Default: return nil if no linked profile found
+	// or return "admin" context if user is pure admin without employee record (optional)
+	if contains(roles, "admin") || contains(roles, "superadmin") {
+		return &response.ProfileContext{
+			Type:     "admin",
+			EntityID: userID, // Use UserID as EntityID for pure admins
+		}
+	}
+
+	return nil
 }

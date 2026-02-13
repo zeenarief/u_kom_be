@@ -6,13 +6,9 @@ import (
 )
 
 func ToUserWithRoleResponse(user *domain.User) *response.UserWithRoleResponse {
-	var roles []response.RoleListResponse
+	var roles []string
 	for _, r := range user.Roles {
-		roles = append(roles, response.RoleListResponse{
-			ID:          r.ID,
-			Name:        r.Name,
-			Description: r.Description,
-		})
+		roles = append(roles, r.Name)
 	}
 	return &response.UserWithRoleResponse{
 		ID:        user.ID,
@@ -26,13 +22,9 @@ func ToUserWithRoleResponse(user *domain.User) *response.UserWithRoleResponse {
 }
 
 func ToUserWithRolesResponseAndPermissions(user *domain.User) *response.UserWithRolesResponseAndPermissions {
-	var roles []response.RoleListResponse
+	var roles []string
 	for _, r := range user.Roles {
-		roles = append(roles, response.RoleListResponse{
-			ID:          r.ID,
-			Name:        r.Name,
-			Description: r.Description,
-		})
+		roles = append(roles, r.Name)
 	}
 	return &response.UserWithRolesResponseAndPermissions{
 		ID:          user.ID,

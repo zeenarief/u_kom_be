@@ -17,6 +17,7 @@ type ParentRepository interface {
 	Delete(id string) error
 	SetUserID(parentID string, userID *string) error
 	FindByNIKHash(hash string) (*domain.Parent, error)
+	FindByUserID(userID string) (*domain.Parent, error)
 }
 
 type parentRepository struct {
@@ -100,6 +101,18 @@ func (r *parentRepository) FindByNIKHash(hash string) (*domain.Parent, error) {
 	err := r.db.First(&parent, "nik_hash = ?", hash).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil // Not found
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &parent, nil
+}
+
+func (r *parentRepository) FindByUserID(userID string) (*domain.Parent, error) {
+	var parent domain.Parent
+	err := r.db.First(&parent, "user_id = ?", userID).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
 	}
 	if err != nil {
 		return nil, err
