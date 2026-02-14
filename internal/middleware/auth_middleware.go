@@ -42,7 +42,7 @@ func AuthMiddleware(authService service.AuthService) gin.HandlerFunc {
 		}
 
 		// Set userID dan user object dalam context
-		c.Set("userID", userID)
+		c.Set("user_id", userID)
 		c.Set("user", user) // ✅ Ini yang penting ditambahkan
 
 		c.Next()

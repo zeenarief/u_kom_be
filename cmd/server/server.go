@@ -130,7 +130,14 @@ func NewServer() *Server {
 		encryptionUtil,
 		studentConverter,
 	)
-	dashboardService := service.NewDashboardService(dashboardRepo)
+	dashboardService := service.NewDashboardService(
+		dashboardRepo,
+		scheduleRepo,
+		attendanceRepo,
+		teachingAssignmentRepo,
+		studentRepo,
+		employeeRepo,
+	)
 	academicYearService := service.NewAcademicYearService(academicYearRepo, db)
 	classroomService := service.NewClassroomService(
 		classroomRepo,
@@ -146,7 +153,11 @@ func NewServer() *Server {
 		subjectRepo,
 		employeeRepo,
 	)
-	scheduleService := service.NewScheduleService(scheduleRepo, teachingAssignmentRepo)
+	scheduleService := service.NewScheduleService(
+		scheduleRepo,
+		teachingAssignmentRepo,
+		employeeRepo,
+	)
 	attendanceService := service.NewAttendanceService(attendanceRepo, scheduleRepo, studentRepo)
 	gradeService := service.NewGradeService(gradeRepo)
 

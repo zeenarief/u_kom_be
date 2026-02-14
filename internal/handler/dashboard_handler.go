@@ -22,3 +22,18 @@ func (h *DashboardHandler) GetStats(c *gin.Context) {
 	}
 	SuccessResponse(c, "Dashboard stats retrieved", stats)
 }
+
+func (h *DashboardHandler) GetTeacherStats(c *gin.Context) {
+	userID := c.GetString("user_id")
+	if userID == "" {
+		UnauthorizedError(c, "User ID not found in context")
+		return
+	}
+
+	stats, err := h.dashboardService.GetTeacherStats(userID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+	SuccessResponse(c, "Teacher stats retrieved", stats)
+}

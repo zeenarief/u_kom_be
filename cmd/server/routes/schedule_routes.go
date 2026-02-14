@@ -19,6 +19,7 @@ func RegisterScheduleRoutes(router *gin.RouterGroup, h *handler.ScheduleHandler,
 		// Read Access
 		group.GET("/by-class", h.GetByClassroom)
 		group.GET("/by-teacher", h.GetByTeacher)
-		group.GET("/teaching-assignment/:id", h.GetByTeachingAssignment)
+		group.GET("/by-teaching-assignment/:id", h.GetByTeachingAssignment)
+		group.GET("/teacher/today", h.GetTodaySchedule)
 	}
 }

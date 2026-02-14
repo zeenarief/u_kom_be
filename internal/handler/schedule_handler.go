@@ -80,3 +80,18 @@ func (h *ScheduleHandler) Delete(c *gin.Context) {
 	}
 	SuccessResponse(c, "Schedule removed", nil)
 }
+
+func (h *ScheduleHandler) GetTodaySchedule(c *gin.Context) {
+	userID := c.GetString("user_id")
+	if userID == "" {
+		UnauthorizedError(c, "User ID not found in context")
+		return
+	}
+
+	res, err := h.service.GetTodaySchedule(userID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+	SuccessResponse(c, "Today's schedule retrieved", res)
+}

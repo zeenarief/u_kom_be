@@ -1,6 +1,7 @@
 package service
 
 import (
+	"time"
 	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
@@ -14,18 +15,25 @@ type ScheduleService interface {
 	GetByTeacher(teacherID string) ([]response.ScheduleResponse, error)
 	GetByTeachingAssignment(taID string) ([]response.ScheduleResponse, error)
 	Delete(id string) error
+	GetTodaySchedule(userID string) ([]response.ScheduleResponse, error)
 }
 
 type scheduleService struct {
 	repo                   repository.ScheduleRepository
 	teachingAssignmentRepo repository.TeachingAssignmentRepository // Butuh ini untuk cek TeacherID & ClassID
+	employeeRepo           repository.EmployeeRepository
 }
 
 func NewScheduleService(
 	repo repository.ScheduleRepository,
 	taRepo repository.TeachingAssignmentRepository,
+	employeeRepo repository.EmployeeRepository,
 ) ScheduleService {
-	return &scheduleService{repo: repo, teachingAssignmentRepo: taRepo}
+	return &scheduleService{
+		repo:                   repo,
+		teachingAssignmentRepo: taRepo,
+		employeeRepo:           employeeRepo,
+	}
 }
 
 // Helper: Convert int day to string indonesian
@@ -140,4 +148,30 @@ func (s *scheduleService) GetByTeachingAssignment(taID string) ([]response.Sched
 
 func (s *scheduleService) Delete(id string) error {
 	return s.repo.Delete(id)
+}
+
+func (s *scheduleService) GetTodaySchedule(userID string) ([]response.ScheduleResponse, error) {
+	// Find TeacherID by UserID
+	employee, err := s.employeeRepo.FindByUserID(userID)
+	if err != nil || employee == nil {
+		return nil, apperrors.NewNotFoundError("Teacher/Employee profile not found")
+	}
+	teacherID := employee.ID
+
+	// Map time.Weekday (Sun=0, Mon=1...) to DB (Mon=1... Sun=7)
+	weekday := time.Now().Weekday()
+	dayInt := int(weekday)
+	if weekday == time.Sunday {
+		dayInt = 7
+	}
+
+	data, err := s.repo.FindByTeacherIDAndDay(teacherID, dayInt)
+	if err != nil {
+		return nil, err
+	}
+	var res []response.ScheduleResponse
+	for _, d := range data {
+		res = append(res, s.toResponse(&d))
+	}
+	return res, nil
 }

@@ -17,6 +17,7 @@ type ScheduleRepository interface {
 	// Validasi Bentrok
 	CheckClassroomConflict(classroomID string, day int, start, end string) (bool, error)
 	CheckTeacherConflict(teacherID string, day int, start, end string) (bool, error)
+	FindByTeacherIDAndDay(teacherID string, day int) ([]domain.Schedule, error)
 }
 
 type scheduleRepository struct {
@@ -112,4 +113,17 @@ func (r *scheduleRepository) CheckTeacherConflict(teacherID string, day int, sta
 		Count(&count).Error
 
 	return count > 0, err
+}
+
+func (r *scheduleRepository) FindByTeacherIDAndDay(teacherID string, day int) ([]domain.Schedule, error) {
+	var schedules []domain.Schedule
+	err := r.db.Preload("TeachingAssignment").
+		Preload("TeachingAssignment.Subject").
+		Preload("TeachingAssignment.Teacher").
+		Preload("TeachingAssignment.Classroom").
+		Joins("JOIN teaching_assignments ta ON ta.id = schedules.teaching_assignment_id").
+		Where("ta.teacher_id = ? AND schedules.day_of_week = ?", teacherID, day).
+		Order("start_time ASC").
+		Find(&schedules).Error
+	return schedules, err
 }

@@ -75,7 +75,7 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 
 func (h *AuthHandler) Logout(c *gin.Context) {
 	// Ambil userID dari context (diset oleh AuthMiddleware)
-	userID, exists := c.Get("userID")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		UnauthorizedError(c, "User ID not found in context")
 		return
