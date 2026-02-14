@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"u_kom_be/internal/service"
+	"smart_school_be/internal/service"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,4 +1,4 @@
-module u_kom_be
+module smart_school_be
 
 go 1.25.0
 

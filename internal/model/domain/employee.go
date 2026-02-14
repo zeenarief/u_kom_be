@@ -2,7 +2,7 @@ package domain
 
 import (
 	"time"
-	"u_kom_be/internal/utils"
+	"smart_school_be/internal/utils"
 
 	"gorm.io/gorm"
 )

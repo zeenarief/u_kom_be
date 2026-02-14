@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
-	"u_kom_be/internal/utils"
+	"smart_school_be/internal/utils"
 )
 
 func main() {

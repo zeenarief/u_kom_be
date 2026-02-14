@@ -3,9 +3,9 @@ package handler
 import (
 	"fmt"
 	"time"
-	"u_kom_be/internal/model/request"
-	"u_kom_be/internal/service"
-	"u_kom_be/internal/utils"
+	"smart_school_be/internal/model/request"
+	"smart_school_be/internal/service"
+	"smart_school_be/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )

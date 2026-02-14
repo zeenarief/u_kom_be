@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"sync"
 	"time"
-	"u_kom_be/internal/config"
+	"smart_school_be/internal/config"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"

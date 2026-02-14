@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"strings"
-	"u_kom_be/internal/handler"
-	"u_kom_be/internal/service"
+	"smart_school_be/internal/handler"
+	"smart_school_be/internal/service"
 
 	"github.com/gin-gonic/gin"
 )

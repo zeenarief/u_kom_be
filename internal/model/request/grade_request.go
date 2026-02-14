@@ -1,6 +1,6 @@
 package request
 
-import "u_kom_be/internal/utils"
+import "smart_school_be/internal/utils"
 
 type AssessmentCreateRequest struct {
 	TeachingAssignmentID string     `json:"teaching_assignment_id" binding:"required"`

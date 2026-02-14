@@ -3,8 +3,8 @@ package database
 import (
 	"fmt"
 	"log"
-	"u_kom_be/internal/config"
-	"u_kom_be/internal/model/domain"
+	"smart_school_be/internal/config"
+	"smart_school_be/internal/model/domain"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/mysql"

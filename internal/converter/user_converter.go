@@ -1,8 +1,8 @@
 package converter
 
 import (
-	"u_kom_be/internal/model/domain"
-	"u_kom_be/internal/model/response"
+	"smart_school_be/internal/model/domain"
+	"smart_school_be/internal/model/response"
 )
 
 func ToUserWithRoleResponse(user *domain.User) *response.UserWithRoleResponse {

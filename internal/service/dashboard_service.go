@@ -3,9 +3,9 @@ package service
 import (
 	"errors"
 	"time"
-	"u_kom_be/internal/model/domain"
-	"u_kom_be/internal/model/response"
-	"u_kom_be/internal/repository"
+	"smart_school_be/internal/model/domain"
+	"smart_school_be/internal/model/response"
+	"smart_school_be/internal/repository"
 )
 
 type DashboardService interface {

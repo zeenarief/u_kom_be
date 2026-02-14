@@ -4,8 +4,8 @@ import (
 	"flag"
 	"log"
 	"os"
-	"u_kom_be/internal/config"
-	"u_kom_be/internal/database"
+	"smart_school_be/internal/config"
+	"smart_school_be/internal/database"
 
 	"github.com/joho/godotenv"
 )

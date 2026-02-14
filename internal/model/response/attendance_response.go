@@ -1,7 +1,7 @@
 package response
 
 import (
-	"u_kom_be/internal/utils"
+	"smart_school_be/internal/utils"
 )
 
 // Response detail sesi beserta list siswanya

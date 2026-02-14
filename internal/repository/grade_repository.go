@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"u_kom_be/internal/model/domain"
+	"smart_school_be/internal/model/domain"
 
 	"gorm.io/gorm"
 )

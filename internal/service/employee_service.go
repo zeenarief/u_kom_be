@@ -2,13 +2,13 @@ package service
 
 import (
 	"fmt"
-	"u_kom_be/internal/apperrors"
-	"u_kom_be/internal/converter"
-	"u_kom_be/internal/model/domain"
-	"u_kom_be/internal/model/request"
-	"u_kom_be/internal/model/response"
-	"u_kom_be/internal/repository"
-	"u_kom_be/internal/utils"
+	"smart_school_be/internal/apperrors"
+	"smart_school_be/internal/converter"
+	"smart_school_be/internal/model/domain"
+	"smart_school_be/internal/model/request"
+	"smart_school_be/internal/model/response"
+	"smart_school_be/internal/repository"
+	"smart_school_be/internal/utils"
 )
 
 type EmployeeService interface {

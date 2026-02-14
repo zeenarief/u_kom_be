@@ -2,7 +2,7 @@ package response
 
 import (
 	"time"
-	"u_kom_be/internal/utils"
+	"smart_school_be/internal/utils"
 )
 
 // EmployeeListResponse adalah DTO untuk tampilan list (ringkas)

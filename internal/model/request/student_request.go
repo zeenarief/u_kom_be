@@ -1,6 +1,6 @@
 package request
 
-import "u_kom_be/internal/utils"
+import "smart_school_be/internal/utils"
 
 // DTO untuk Create Student
 type StudentCreateRequest struct {

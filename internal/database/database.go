@@ -3,7 +3,7 @@ package database
 import (
 	"fmt"
 	"log"
-	"u_kom_be/internal/config"
+	"smart_school_be/internal/config"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

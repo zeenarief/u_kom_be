@@ -2,9 +2,9 @@ package converter
 
 import (
 	"log"
-	"u_kom_be/internal/model/domain"
-	"u_kom_be/internal/model/response"
-	"u_kom_be/internal/utils"
+	"smart_school_be/internal/model/domain"
+	"smart_school_be/internal/model/response"
+	"smart_school_be/internal/utils"
 )
 
 // ParentConverterInterface mendefinisikan kontrak untuk konverter Parent

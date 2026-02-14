@@ -2,9 +2,9 @@ package routes
 
 import (
 	"time"
-	"u_kom_be/internal/handler"
-	"u_kom_be/internal/middleware"
-	"u_kom_be/internal/service"
+	"smart_school_be/internal/handler"
+	"smart_school_be/internal/middleware"
+	"smart_school_be/internal/service"
 
 	"github.com/gin-gonic/gin"
 )

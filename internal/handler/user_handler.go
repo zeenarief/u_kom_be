@@ -2,9 +2,9 @@ package handler
 
 import (
 	"net/http"
-	"u_kom_be/internal/model/domain"
-	"u_kom_be/internal/model/request"
-	"u_kom_be/internal/service"
+	"smart_school_be/internal/model/domain"
+	"smart_school_be/internal/model/request"
+	"smart_school_be/internal/service"
 
 	"github.com/gin-gonic/gin"
 )
