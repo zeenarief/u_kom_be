@@ -108,3 +108,12 @@ func (h *AttendanceHandler) CheckSession(c *gin.Context) {
 
 	SuccessResponse(c, "Session check / initiation", res)
 }
+
+func (h *AttendanceHandler) Delete(c *gin.Context) {
+	id := c.Param("id")
+	if err := h.service.DeleteSession(id); err != nil {
+		HandleError(c, err)
+		return
+	}
+	SuccessResponse(c, "Attendance session deleted successfully", nil)
+}

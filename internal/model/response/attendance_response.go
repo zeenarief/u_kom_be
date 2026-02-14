@@ -9,6 +9,7 @@ type AttendanceSessionDetailResponse struct {
 	ID           string                     `json:"id"`
 	Date         string                     `json:"date"`
 	Topic        string                     `json:"topic"`
+	Notes        string                     `json:"notes"`         // Added Notes field
 	ScheduleInfo ScheduleResponse           `json:"schedule_info"` // Reuse struct ScheduleResponse
 	Details      []AttendanceDetailResponse `json:"details"`
 	Summary      map[string]int             `json:"summary"` // Hadir: 30, Sakit: 1, dll

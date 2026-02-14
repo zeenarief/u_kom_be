@@ -12,6 +12,7 @@ type GradeRepository interface {
 	UpdateAssessment(assessment *domain.Assessment) error
 	FindAssessmentByID(id string) (*domain.Assessment, error)
 	GetAssessmentsByTeachingAssignment(teachingAssignmentID string) ([]domain.Assessment, error)
+	DeleteAssessment(id string) error
 
 	// Scores
 	SaveStudentScore(score *domain.StudentScore) error
@@ -91,4 +92,8 @@ func (r *gradeRepository) GetScoreByAssessmentAndStudent(assessmentID, studentID
 		return nil, err
 	}
 	return &score, nil
+}
+
+func (r *gradeRepository) DeleteAssessment(id string) error {
+	return r.db.Delete(&domain.Assessment{}, "id = ?", id).Error
 }

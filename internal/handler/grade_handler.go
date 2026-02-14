@@ -89,3 +89,13 @@ func (h *GradeHandler) SubmitScores(c *gin.Context) {
 
 	SuccessResponse(c, "Scores submitted successfully", nil)
 }
+
+func (h *GradeHandler) DeleteAssessment(c *gin.Context) {
+	id := c.Param("id")
+	if err := h.service.DeleteAssessment(id); err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	SuccessResponse(c, "Assessment deleted successfully", nil)
+}

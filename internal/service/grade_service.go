@@ -1,6 +1,7 @@
 package service
 
 import (
+	"u_kom_be/internal/apperrors"
 	"u_kom_be/internal/model/domain"
 	"u_kom_be/internal/model/request"
 	"u_kom_be/internal/repository"
@@ -12,6 +13,7 @@ type GradeService interface {
 	GetAssessmentsByTeachingAssignment(teachingAssignmentID string) ([]domain.Assessment, error)
 	GetAssessmentDetail(id string) (*domain.Assessment, error)
 	SubmitScores(req request.BulkScoreRequest) error
+	DeleteAssessment(id string) error
 }
 
 type gradeService struct {
@@ -89,4 +91,17 @@ func (s *gradeService) SubmitScores(req request.BulkScoreRequest) error {
 		}
 	}
 	return nil
+}
+
+func (s *gradeService) DeleteAssessment(id string) error {
+	// Check if assessment exists
+	assessment, err := s.gradeRepo.FindAssessmentByID(id)
+	if err != nil {
+		return err
+	}
+	if assessment == nil {
+		return apperrors.NewNotFoundError("assessment not found")
+	}
+
+	return s.gradeRepo.DeleteAssessment(id)
 }

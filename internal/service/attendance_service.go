@@ -17,6 +17,7 @@ type AttendanceService interface {
 	GetHistoryByAssignment(taID string) ([]response.AttendanceHistoryResponse, error)
 	GetSessionByScheduleDate(scheduleID, dateStr string) (*response.AttendanceSessionDetailResponse, error)
 	GetSessionOrClassList(scheduleID, dateStr string) (*response.AttendanceSessionDetailResponse, error)
+	DeleteSession(id string) error
 }
 
 type attendanceService struct {
@@ -106,6 +107,7 @@ func (s *attendanceService) GetSessionDetail(id string) (*response.AttendanceSes
 		ID:    session.ID,
 		Date:  session.Date.Format("2006-01-02"),
 		Topic: session.Topic,
+		Notes: session.Notes,
 		// Map info jadwal ringkas
 		ScheduleInfo: response.ScheduleResponse{
 			ID:            session.Schedule.ID,
@@ -235,6 +237,7 @@ func (s *attendanceService) GetSessionOrClassList(scheduleID, dateStr string) (*
 		ID:    "", // Kosong menandakan belum disave
 		Date:  dateStr,
 		Topic: "",
+		Notes: "",
 		ScheduleInfo: response.ScheduleResponse{
 			ID:            schedule.ID,
 			DayOfWeek:     schedule.DayOfWeek,
@@ -259,4 +262,17 @@ func (s *attendanceService) GetSessionOrClassList(scheduleID, dateStr string) (*
 	}
 
 	return res, nil
+}
+
+func (s *attendanceService) DeleteSession(id string) error {
+	// Cek apakah session ada
+	session, err := s.repo.FindSessionByID(id)
+	if err != nil {
+		return err
+	}
+	if session == nil {
+		return apperrors.NewNotFoundError("attendance session not found")
+	}
+
+	return s.repo.DeleteSession(id)
 }

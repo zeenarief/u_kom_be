@@ -15,6 +15,7 @@ type AttendanceRepository interface {
 	GetHistoryByTeachingAssignmentID(taID string) ([]domain.AttendanceSession, error)
 	// Update logic jika guru ingin mengedit absen
 	UpdateSession(session *domain.AttendanceSession, newDetails []domain.AttendanceDetail) error
+	DeleteSession(id string) error
 }
 
 type attendanceRepository struct {
@@ -116,4 +117,8 @@ func (r *attendanceRepository) UpdateSession(session *domain.AttendanceSession, 
 
 		return nil
 	})
+}
+
+func (r *attendanceRepository) DeleteSession(id string) error {
+	return r.db.Delete(&domain.AttendanceSession{}, "id = ?", id).Error
 }

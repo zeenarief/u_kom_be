@@ -29,6 +29,10 @@ func RegisterGradeRoutes(router *gin.RouterGroup, gradeHandler *handler.GradeHan
 		middleware.PermissionMiddleware("assessments.read", authService),
 		gradeHandler.GetAssessmentDetail)
 
+	gradeGroup.DELETE("/assessments/:id",
+		middleware.PermissionMiddleware("assignments.manage", authService),
+		gradeHandler.DeleteAssessment)
+
 	// Scores
 	gradeGroup.POST("/scores/bulk",
 		middleware.PermissionMiddleware("assignments.manage", authService),
