@@ -70,6 +70,7 @@ func (r *attendanceRepository) GetHistoryByTeacher(teacherID string) ([]domain.A
 		Joins("JOIN teaching_assignments ta ON ta.id = s.teaching_assignment_id").
 		Preload("Schedule.TeachingAssignment.Subject").
 		Preload("Schedule.TeachingAssignment.Classroom").
+		Preload("Details"). // Added Preload Details
 		Where("ta.teacher_id = ?", teacherID).
 		Order("attendance_sessions.date DESC").
 		Find(&sessions).Error
@@ -83,6 +84,7 @@ func (r *attendanceRepository) GetHistoryByTeachingAssignmentID(taID string) ([]
 		Joins("JOIN teaching_assignments ta ON ta.id = s.teaching_assignment_id").
 		Preload("Schedule.TeachingAssignment.Subject").
 		Preload("Schedule.TeachingAssignment.Classroom").
+		Preload("Details"). // Added Preload Details
 		Where("ta.id = ?", taID).
 		Order("attendance_sessions.date DESC").
 		Find(&sessions).Error

@@ -148,10 +148,13 @@ func (s *attendanceService) GetHistoryByTeacher(teacherID string) ([]response.At
 
 	var history []response.AttendanceHistoryResponse
 	for _, sess := range sessions {
-		// Hitung jumlah yang TIDAK HADIR (Sakit/Izin/Alpa) - Opsional logic
-		// Disini kita perlu preload details di repo GetHistoryByTeacher jika ingin hitung akurat
-		// Jika query repo belum preload details, count_absent akan 0.
-		// Untuk performa list, biasanya count dilakukan di query SQL, tapi untuk sekarang kita skip atau biarkan 0.
+		// Hitung jumlah yang TIDAK HADIR (Sakit/Izin/Alpa)
+		countAbsent := 0
+		for _, d := range sess.Details {
+			if d.Status != "PRESENT" {
+				countAbsent++
+			}
+		}
 
 		history = append(history, response.AttendanceHistoryResponse{
 			ID:          sess.ID,
@@ -159,7 +162,7 @@ func (s *attendanceService) GetHistoryByTeacher(teacherID string) ([]response.At
 			SubjectName: sess.Schedule.TeachingAssignment.Subject.Name,
 			ClassName:   sess.Schedule.TeachingAssignment.Classroom.Name,
 			Topic:       sess.Topic,
-			CountAbsent: 0, // Placeholder, butuh query count spesifik jika ingin ditampilkan di list
+			CountAbsent: countAbsent,
 		})
 	}
 
@@ -175,6 +178,14 @@ func (s *attendanceService) GetHistoryByAssignment(taID string) ([]response.Atte
 	var history []response.AttendanceHistoryResponse
 	for _, sess := range sessions {
 		// fmt.Printf("DEBUG ID: %s, ScheduleID: %s\n", sess.ID, sess.ScheduleID)
+		// Calculate Absent
+		countAbsent := 0
+		for _, d := range sess.Details {
+			if d.Status != "PRESENT" {
+				countAbsent++
+			}
+		}
+
 		history = append(history, response.AttendanceHistoryResponse{
 			ID:          sess.ID,
 			Date:        sess.Date,
@@ -182,7 +193,7 @@ func (s *attendanceService) GetHistoryByAssignment(taID string) ([]response.Atte
 			SubjectName: sess.Schedule.TeachingAssignment.Subject.Name,
 			ClassName:   sess.Schedule.TeachingAssignment.Classroom.Name,
 			Topic:       sess.Topic,
-			CountAbsent: 0, // Placeholder
+			CountAbsent: countAbsent,
 		})
 	}
 	return history, nil
