@@ -75,6 +75,21 @@ func (h *AttendanceHandler) GetHistory(c *gin.Context) {
 	SuccessResponse(c, "Attendance history retrieved", res)
 }
 
+func (h *AttendanceHandler) GetHistoryByAssignment(c *gin.Context) {
+	taID := c.Param("id")
+	if taID == "" {
+		BadRequestError(c, "teaching_assignment_id required", nil)
+		return
+	}
+
+	res, err := h.service.GetHistoryByAssignment(taID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+	SuccessResponse(c, "Attendance history retrieved", res)
+}
+
 func (h *AttendanceHandler) CheckSession(c *gin.Context) {
 	scheduleID := c.Query("schedule_id")
 	date := c.Query("date") // YYYY-MM-DD

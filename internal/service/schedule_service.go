@@ -12,6 +12,7 @@ type ScheduleService interface {
 	Create(req request.ScheduleCreateRequest) (*response.ScheduleResponse, error)
 	GetByClassroom(classroomID string) ([]response.ScheduleResponse, error)
 	GetByTeacher(teacherID string) ([]response.ScheduleResponse, error)
+	GetByTeachingAssignment(taID string) ([]response.ScheduleResponse, error)
 	Delete(id string) error
 }
 
@@ -61,9 +62,7 @@ func (s *scheduleService) Create(req request.ScheduleCreateRequest) (*response.S
 
 	// 2. Validasi Logic: EndTime harus > StartTime
 	if req.EndTime <= req.StartTime {
-		if req.EndTime <= req.StartTime {
-			return nil, apperrors.NewBadRequestError("End time must be greater than start time")
-		}
+		return nil, apperrors.NewBadRequestError("End time must be greater than start time")
 	}
 
 	// 3. Cek Bentrok KELAS (Apakah kelas ini sedang belajar mapel lain?)
@@ -72,9 +71,7 @@ func (s *scheduleService) Create(req request.ScheduleCreateRequest) (*response.S
 		return nil, err
 	}
 	if conflictClass {
-		if conflictClass {
-			return nil, apperrors.NewConflictError("Classroom is occupied at this time")
-		}
+		return nil, apperrors.NewConflictError("Classroom is occupied at this time")
 	}
 
 	// 4. Cek Bentrok GURU (Apakah guru ini sedang mengajar di kelas lain?)
@@ -83,9 +80,7 @@ func (s *scheduleService) Create(req request.ScheduleCreateRequest) (*response.S
 		return nil, err
 	}
 	if conflictTeacher {
-		if conflictTeacher {
-			return nil, apperrors.NewConflictError("Teacher is teaching in another class at this time")
-		}
+		return nil, apperrors.NewConflictError("Teacher is teaching in another class at this time")
 	}
 
 	// 5. Simpan
@@ -121,6 +116,18 @@ func (s *scheduleService) GetByClassroom(classroomID string) ([]response.Schedul
 
 func (s *scheduleService) GetByTeacher(teacherID string) ([]response.ScheduleResponse, error) {
 	data, err := s.repo.FindByTeacherID(teacherID)
+	if err != nil {
+		return nil, err
+	}
+	var res []response.ScheduleResponse
+	for _, d := range data {
+		res = append(res, s.toResponse(&d))
+	}
+	return res, nil
+}
+
+func (s *scheduleService) GetByTeachingAssignment(taID string) ([]response.ScheduleResponse, error) {
+	data, err := s.repo.FindByTeachingAssignmentID(taID)
 	if err != nil {
 		return nil, err
 	}

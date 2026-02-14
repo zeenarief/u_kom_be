@@ -9,6 +9,7 @@ import (
 type GradeRepository interface {
 	// Assessments
 	CreateAssessment(assessment *domain.Assessment) error
+	UpdateAssessment(assessment *domain.Assessment) error
 	FindAssessmentByID(id string) (*domain.Assessment, error)
 	GetAssessmentsByTeachingAssignment(teachingAssignmentID string) ([]domain.Assessment, error)
 
@@ -28,6 +29,10 @@ func NewGradeRepository(db *gorm.DB) GradeRepository {
 
 func (r *gradeRepository) CreateAssessment(assessment *domain.Assessment) error {
 	return r.db.Create(assessment).Error
+}
+
+func (r *gradeRepository) UpdateAssessment(assessment *domain.Assessment) error {
+	return r.db.Save(assessment).Error
 }
 
 func (r *gradeRepository) FindAssessmentByID(id string) (*domain.Assessment, error) {

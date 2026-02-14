@@ -10,6 +10,7 @@ type ScheduleRepository interface {
 	Create(schedule *domain.Schedule) error
 	FindByClassroomID(classroomID string) ([]domain.Schedule, error)
 	FindByTeacherID(teacherID string) ([]domain.Schedule, error)
+	FindByTeachingAssignmentID(taID string) ([]domain.Schedule, error)
 	FindByID(id string) (*domain.Schedule, error)
 	Delete(id string) error
 
@@ -52,6 +53,18 @@ func (r *scheduleRepository) FindByTeacherID(teacherID string) ([]domain.Schedul
 		Preload("TeachingAssignment.Classroom").
 		Joins("JOIN teaching_assignments ta ON ta.id = schedules.teaching_assignment_id").
 		Where("ta.teacher_id = ?", teacherID).
+		Order("day_of_week ASC, start_time ASC").
+		Find(&schedules).Error
+	return schedules, err
+}
+
+func (r *scheduleRepository) FindByTeachingAssignmentID(taID string) ([]domain.Schedule, error) {
+	var schedules []domain.Schedule
+	err := r.db.Preload("TeachingAssignment").
+		Preload("TeachingAssignment.Subject").
+		Preload("TeachingAssignment.Teacher").
+		Preload("TeachingAssignment.Classroom").
+		Where("teaching_assignment_id = ?", taID).
 		Order("day_of_week ASC, start_time ASC").
 		Find(&schedules).Error
 	return schedules, err

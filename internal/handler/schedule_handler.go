@@ -58,6 +58,20 @@ func (h *ScheduleHandler) GetByTeacher(c *gin.Context) {
 	SuccessResponse(c, "Schedules retrieved", res)
 }
 
+func (h *ScheduleHandler) GetByTeachingAssignment(c *gin.Context) {
+	taID := c.Param("id")
+	if taID == "" {
+		BadRequestError(c, "teaching_assignment_id required", nil)
+		return
+	}
+	res, err := h.service.GetByTeachingAssignment(taID)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+	SuccessResponse(c, "Schedules retrieved", res)
+}
+
 func (h *ScheduleHandler) Delete(c *gin.Context) {
 	// 	id := c.Param("id")
 	if err := h.service.Delete(c.Param("id")); err != nil {

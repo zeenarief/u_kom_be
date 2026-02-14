@@ -14,6 +14,7 @@ type AttendanceService interface {
 	SubmitAttendance(req request.AttendanceSubmitRequest) (*response.AttendanceSessionDetailResponse, error)
 	GetSessionDetail(id string) (*response.AttendanceSessionDetailResponse, error)
 	GetHistoryByTeacher(teacherID string) ([]response.AttendanceHistoryResponse, error)
+	GetHistoryByAssignment(taID string) ([]response.AttendanceHistoryResponse, error)
 	GetSessionByScheduleDate(scheduleID, dateStr string) (*response.AttendanceSessionDetailResponse, error)
 	GetSessionOrClassList(scheduleID, dateStr string) (*response.AttendanceSessionDetailResponse, error)
 }
@@ -160,6 +161,28 @@ func (s *attendanceService) GetHistoryByTeacher(teacherID string) ([]response.At
 		})
 	}
 
+	return history, nil
+}
+
+func (s *attendanceService) GetHistoryByAssignment(taID string) ([]response.AttendanceHistoryResponse, error) {
+	sessions, err := s.repo.GetHistoryByTeachingAssignmentID(taID)
+	if err != nil {
+		return nil, err
+	}
+
+	var history []response.AttendanceHistoryResponse
+	for _, sess := range sessions {
+		// fmt.Printf("DEBUG ID: %s, ScheduleID: %s\n", sess.ID, sess.ScheduleID)
+		history = append(history, response.AttendanceHistoryResponse{
+			ID:          sess.ID,
+			Date:        sess.Date,
+			ScheduleID:  sess.ScheduleID,
+			SubjectName: sess.Schedule.TeachingAssignment.Subject.Name,
+			ClassName:   sess.Schedule.TeachingAssignment.Classroom.Name,
+			Topic:       sess.Topic,
+			CountAbsent: 0, // Placeholder
+		})
+	}
 	return history, nil
 }
 

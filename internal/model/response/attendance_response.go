@@ -26,6 +26,7 @@ type AttendanceDetailResponse struct {
 type AttendanceHistoryResponse struct {
 	ID          string     `json:"id"`
 	Date        utils.Date `json:"date"`
+	ScheduleID  string     `json:"schedule_id"` // Added for Edit Feature
 	SubjectName string     `json:"subject_name"`
 	ClassName   string     `json:"class_name"`
 	Topic       string     `json:"topic"`

@@ -12,6 +12,7 @@ type AttendanceRepository interface {
 	FindSessionByScheduleDate(scheduleID string, date time.Time) (*domain.AttendanceSession, error)
 	FindSessionByID(id string) (*domain.AttendanceSession, error)
 	GetHistoryByTeacher(teacherID string) ([]domain.AttendanceSession, error)
+	GetHistoryByTeachingAssignmentID(taID string) ([]domain.AttendanceSession, error)
 	// Update logic jika guru ingin mengedit absen
 	UpdateSession(session *domain.AttendanceSession, newDetails []domain.AttendanceDetail) error
 }
@@ -69,6 +70,19 @@ func (r *attendanceRepository) GetHistoryByTeacher(teacherID string) ([]domain.A
 		Preload("Schedule.TeachingAssignment.Subject").
 		Preload("Schedule.TeachingAssignment.Classroom").
 		Where("ta.teacher_id = ?", teacherID).
+		Order("attendance_sessions.date DESC").
+		Find(&sessions).Error
+	return sessions, err
+}
+
+func (r *attendanceRepository) GetHistoryByTeachingAssignmentID(taID string) ([]domain.AttendanceSession, error) {
+	var sessions []domain.AttendanceSession
+	err := r.db.Select("attendance_sessions.*").
+		Joins("JOIN schedules s ON s.id = attendance_sessions.schedule_id").
+		Joins("JOIN teaching_assignments ta ON ta.id = s.teaching_assignment_id").
+		Preload("Schedule.TeachingAssignment.Subject").
+		Preload("Schedule.TeachingAssignment.Classroom").
+		Where("ta.id = ?", taID).
 		Order("attendance_sessions.date DESC").
 		Find(&sessions).Error
 	return sessions, err

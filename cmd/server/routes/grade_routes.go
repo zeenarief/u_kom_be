@@ -13,20 +13,24 @@ func RegisterGradeRoutes(router *gin.RouterGroup, gradeHandler *handler.GradeHan
 	gradeGroup.Use(middleware.AuthMiddleware(authService))
 
 	// Assessments
-	gradeGroup.POST("/assessments", 
-		middleware.PermissionMiddleware("assignments.manage", authService), 
+	gradeGroup.POST("/assessments",
+		middleware.PermissionMiddleware("assignments.manage", authService),
 		gradeHandler.CreateAssessment)
 
-	gradeGroup.GET("/assessments/teaching-assignment/:teachingAssignmentID", 
-		middleware.PermissionMiddleware("assessments.read", authService), 
+	gradeGroup.PUT("/assessments/:id",
+		middleware.PermissionMiddleware("assignments.manage", authService),
+		gradeHandler.UpdateAssessment)
+
+	gradeGroup.GET("/assessments/teaching-assignment/:teachingAssignmentID",
+		middleware.PermissionMiddleware("assessments.read", authService),
 		gradeHandler.GetAssessmentsByTeachingAssignment) // Note: permissions need to be checked
 
-	gradeGroup.GET("/assessments/:id", 
-		middleware.PermissionMiddleware("assessments.read", authService), 
+	gradeGroup.GET("/assessments/:id",
+		middleware.PermissionMiddleware("assessments.read", authService),
 		gradeHandler.GetAssessmentDetail)
 
 	// Scores
-	gradeGroup.POST("/scores/bulk", 
-		middleware.PermissionMiddleware("assignments.manage", authService), 
+	gradeGroup.POST("/scores/bulk",
+		middleware.PermissionMiddleware("assignments.manage", authService),
 		gradeHandler.SubmitScores)
 }

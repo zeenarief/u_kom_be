@@ -31,6 +31,23 @@ func (h *GradeHandler) CreateAssessment(c *gin.Context) {
 	CreatedResponse(c, "Assessment created successfully", res)
 }
 
+func (h *GradeHandler) UpdateAssessment(c *gin.Context) {
+	id := c.Param("id")
+	var req request.AssessmentCreateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		BadRequestError(c, "Invalid request payload", err.Error())
+		return
+	}
+
+	res, err := h.service.UpdateAssessment(id, req)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	SuccessResponse(c, "Assessment updated successfully", res)
+}
+
 func (h *GradeHandler) GetAssessmentsByTeachingAssignment(c *gin.Context) {
 	teachingAssignmentID := c.Param("teachingAssignmentID")
 	if teachingAssignmentID == "" {

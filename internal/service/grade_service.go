@@ -8,6 +8,7 @@ import (
 
 type GradeService interface {
 	CreateAssessment(req request.AssessmentCreateRequest) (*domain.Assessment, error)
+	UpdateAssessment(id string, req request.AssessmentCreateRequest) (*domain.Assessment, error)
 	GetAssessmentsByTeachingAssignment(teachingAssignmentID string) ([]domain.Assessment, error)
 	GetAssessmentDetail(id string) (*domain.Assessment, error)
 	SubmitScores(req request.BulkScoreRequest) error
@@ -36,6 +37,30 @@ func (s *gradeService) CreateAssessment(req request.AssessmentCreateRequest) (*d
 	}
 
 	if err := s.gradeRepo.CreateAssessment(assessment); err != nil {
+		return nil, err
+	}
+
+	return assessment, nil
+}
+
+func (s *gradeService) UpdateAssessment(id string, req request.AssessmentCreateRequest) (*domain.Assessment, error) {
+	assessment, err := s.gradeRepo.FindAssessmentByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update fields
+	assessment.Title = req.Title
+	assessment.Type = req.Type
+	assessment.Date = req.Date
+	assessment.Description = req.Description
+
+	// Update Max Score if provided
+	if req.MaxScore > 0 {
+		assessment.MaxScore = req.MaxScore
+	}
+
+	if err := s.gradeRepo.UpdateAssessment(assessment); err != nil {
 		return nil, err
 	}
 
