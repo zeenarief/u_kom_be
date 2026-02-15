@@ -2,13 +2,13 @@ package service
 
 import (
 	"fmt"
-	"time"
 	"smart_school_be/internal/apperrors"
 	"smart_school_be/internal/model/domain"
 	"smart_school_be/internal/model/request"
 	"smart_school_be/internal/model/response"
 	"smart_school_be/internal/repository"
 	"smart_school_be/internal/utils"
+	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 	_ "github.com/google/uuid"
@@ -410,7 +410,8 @@ func (s *authService) getProfileContext(userID string, roles []string) *response
 	// "guru" = teacher, "karyawan" = employee
 	if contains(roles, "employee") || contains(roles, "karyawan") ||
 		contains(roles, "teacher") || contains(roles, "guru") ||
-		contains(roles, "admin") || contains(roles, "superadmin") {
+		contains(roles, "admin") || contains(roles, "superadmin") ||
+		contains(roles, "musyrif") {
 		employee, err := s.employeeRepo.FindByUserID(userID)
 		if err == nil && employee != nil {
 			return &response.ProfileContext{

@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"time"
 	"smart_school_be/internal/handler"
 	"smart_school_be/internal/middleware"
 	"smart_school_be/internal/service"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,6 +29,7 @@ func SetupRoutes(
 	scheduleHandler *handler.ScheduleHandler,
 	attendanceHandler *handler.AttendanceHandler,
 	gradeHandler *handler.GradeHandler,
+	violationHandler handler.ViolationHandler,
 ) {
 	// API v1 group
 	apiV1 := router.Group("/api/v1")
@@ -50,6 +51,7 @@ func SetupRoutes(
 	RegisterScheduleRoutes(apiV1, scheduleHandler, authService)
 	RegisterAttendanceRoutes(apiV1, attendanceHandler, authService)
 	RegisterGradeRoutes(apiV1, gradeHandler, authService)
+	RegisterViolationRoutes(apiV1, violationHandler, authService)
 
 	protected := apiV1.Group("/")
 	protected.Use(middleware.AuthMiddleware(authService))

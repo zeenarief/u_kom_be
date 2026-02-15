@@ -97,9 +97,27 @@ func seedPermissions(db *gorm.DB) error {
 		{Name: "attendance.submit", Description: "Manage attendance"},
 		{Name: "attendance.read", Description: "Read attendance"},
 
-		// ===== Assessments =====
-		{Name: "assessments.manage", Description: "Manage assessments"},
-		{Name: "assessments.read", Description: "Read assessments"},
+		// ===== Violdations =====
+		{Name: "violation_category.create", Description: "Create new violation category"},
+		{Name: "violation_category.read", Description: "Read violation categories"},
+		{Name: "violation_category.update", Description: "Update violation category"},
+		{Name: "violation_category.delete", Description: "Delete violation category"},
+
+		{Name: "violation_type.create", Description: "Create new violation type"},
+		{Name: "violation_type.read", Description: "Read violation types"},
+		{Name: "violation_type.update", Description: "Update violation type"},
+		{Name: "violation_type.delete", Description: "Delete violation type"},
+
+		{Name: "violation_record.create", Description: "Record new student violation"},
+		{Name: "violation_record.read", Description: "Read student violation records"},
+		{Name: "violation_record.read_all", Description: "Read all student violation records"},
+		{Name: "violation_record.delete", Description: "Delete student violation record"},
+
+		// ===== Grades =====
+		{Name: "grades.manage_assessments", Description: "Manage assessment"},
+		{Name: "grades.view_assessments", Description: "View assessment"},
+		{Name: "grades.manage_scores", Description: "Manage scores"},
+		{Name: "grades.view_scores", Description: "View scores"},
 	}
 
 	for _, permission := range permissions {
@@ -153,6 +171,20 @@ func seedRoles(db *gorm.DB) error {
 			} else {
 				return err
 			}
+		} else {
+			// Jika role sudah ada, update permissions untuk admin
+			if role.Name == "admin" {
+				var allPermissions []domain.Permission
+				if err := db.Find(&allPermissions).Error; err != nil {
+					return fmt.Errorf("failed to fetch all permissions: %w", err)
+				}
+
+				// Replace permissions association
+				if err := db.Model(&existing).Association("Permissions").Replace(allPermissions); err != nil {
+					return fmt.Errorf("failed to update admin permissions: %w", err)
+				}
+				log.Printf("Updated admin role permissions")
+			}
 		}
 	}
 
@@ -184,6 +216,13 @@ func seedAdminUser(db *gorm.DB) error {
 		} else {
 			return err
 		}
+	} else {
+		// Update existing user password
+		existingUser.Password = adminUser.Password
+		if err := db.Save(&existingUser).Error; err != nil {
+			return fmt.Errorf("failed to update admin user password: %w", err)
+		}
+		log.Printf("Updated admin user password: %s", adminUser.Email)
 	}
 
 	return nil
