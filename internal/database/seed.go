@@ -96,6 +96,7 @@ func seedPermissions(db *gorm.DB) error {
 		{Name: "schedules.manage", Description: "Manage schedule"},
 		{Name: "attendance.submit", Description: "Manage attendance"},
 		{Name: "attendance.read", Description: "Read attendance"},
+		{Name: "assessments.read", Description: "Read assessment"},
 
 		// ===== Violdations =====
 		{Name: "violation_category.create", Description: "Create new violation category"},

@@ -4,13 +4,14 @@ import (
 	"smart_school_be/internal/apperrors"
 	"smart_school_be/internal/model/domain"
 	"smart_school_be/internal/model/request"
+	"smart_school_be/internal/model/response"
 	"smart_school_be/internal/repository"
 )
 
 type GradeService interface {
 	CreateAssessment(req request.AssessmentCreateRequest) (*domain.Assessment, error)
 	UpdateAssessment(id string, req request.AssessmentCreateRequest) (*domain.Assessment, error)
-	GetAssessmentsByTeachingAssignment(teachingAssignmentID string) ([]domain.Assessment, error)
+	GetAssessmentsByTeachingAssignment(teachingAssignmentID string, pagination request.PaginationRequest) (*response.PaginatedData, error)
 	GetAssessmentDetail(id string) (*domain.Assessment, error)
 	SubmitScores(req request.BulkScoreRequest) error
 	DeleteAssessment(id string) error
@@ -42,7 +43,8 @@ func (s *gradeService) CreateAssessment(req request.AssessmentCreateRequest) (*d
 		return nil, err
 	}
 
-	return assessment, nil
+	// Reload to get full data (relationships)
+	return s.gradeRepo.FindAssessmentByID(assessment.ID)
 }
 
 func (s *gradeService) UpdateAssessment(id string, req request.AssessmentCreateRequest) (*domain.Assessment, error) {
@@ -69,8 +71,17 @@ func (s *gradeService) UpdateAssessment(id string, req request.AssessmentCreateR
 	return assessment, nil
 }
 
-func (s *gradeService) GetAssessmentsByTeachingAssignment(teachingAssignmentID string) ([]domain.Assessment, error) {
-	return s.gradeRepo.GetAssessmentsByTeachingAssignment(teachingAssignmentID)
+func (s *gradeService) GetAssessmentsByTeachingAssignment(teachingAssignmentID string, pagination request.PaginationRequest) (*response.PaginatedData, error) {
+	limit := pagination.GetLimit()
+	offset := pagination.GetOffset()
+
+	assessments, total, err := s.gradeRepo.GetAssessmentsByTeachingAssignment(teachingAssignmentID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	paginatedData := response.NewPaginatedData(assessments, total, pagination.GetPage(), limit)
+	return &paginatedData, nil
 }
 
 func (s *gradeService) GetAssessmentDetail(id string) (*domain.Assessment, error) {

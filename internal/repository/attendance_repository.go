@@ -90,7 +90,6 @@ func (r *attendanceRepository) GetHistoryByTeachingAssignmentID(taID string, lim
 	var sessions []domain.AttendanceSession
 	var total int64
 	query := r.db.Model(&domain.AttendanceSession{}).
-		Select("attendance_sessions.*").
 		Joins("JOIN schedules s ON s.id = attendance_sessions.schedule_id").
 		Joins("JOIN teaching_assignments ta ON ta.id = s.teaching_assignment_id").
 		Where("ta.id = ?", taID)

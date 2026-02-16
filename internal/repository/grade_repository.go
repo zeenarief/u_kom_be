@@ -11,7 +11,7 @@ type GradeRepository interface {
 	CreateAssessment(assessment *domain.Assessment) error
 	UpdateAssessment(assessment *domain.Assessment) error
 	FindAssessmentByID(id string) (*domain.Assessment, error)
-	GetAssessmentsByTeachingAssignment(teachingAssignmentID string) ([]domain.Assessment, error)
+	GetAssessmentsByTeachingAssignment(teachingAssignmentID string, limit, offset int) ([]domain.Assessment, int64, error)
 	DeleteAssessment(id string) error
 
 	// Scores
@@ -41,6 +41,9 @@ func (r *gradeRepository) FindAssessmentByID(id string) (*domain.Assessment, err
 	err := r.db.Preload("TeachingAssignment").
 		Preload("TeachingAssignment.Subject").
 		Preload("TeachingAssignment.Classroom").
+		Preload("TeachingAssignment.Classroom.AcademicYear").
+		Preload("TeachingAssignment.Teacher").
+		Preload("TeachingAssignment.Teacher.User").
 		Preload("Scores").
 		Preload("Scores.Student").
 		First(&assessment, "id = ?", id).Error
@@ -50,12 +53,26 @@ func (r *gradeRepository) FindAssessmentByID(id string) (*domain.Assessment, err
 	return &assessment, nil
 }
 
-func (r *gradeRepository) GetAssessmentsByTeachingAssignment(teachingAssignmentID string) ([]domain.Assessment, error) {
+func (r *gradeRepository) GetAssessmentsByTeachingAssignment(teachingAssignmentID string, limit, offset int) ([]domain.Assessment, int64, error) {
 	var assessments []domain.Assessment
-	err := r.db.Where("teaching_assignment_id = ?", teachingAssignmentID).
+	var total int64
+	query := r.db.Model(&domain.Assessment{}).Where("teaching_assignment_id = ?", teachingAssignmentID)
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	err := query.
+		Preload("TeachingAssignment").
+		Preload("TeachingAssignment.Subject").
+		Preload("TeachingAssignment.Classroom").
+		Preload("TeachingAssignment.Classroom.AcademicYear").
+		Preload("TeachingAssignment.Teacher").
+		Preload("TeachingAssignment.Teacher.User").
 		Order("date DESC").
+		Limit(limit).Offset(offset).
 		Find(&assessments).Error
-	return assessments, err
+	return assessments, total, err
 }
 
 func (r *gradeRepository) SaveStudentScore(score *domain.StudentScore) error {

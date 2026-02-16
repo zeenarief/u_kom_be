@@ -55,7 +55,9 @@ func (h *GradeHandler) GetAssessmentsByTeachingAssignment(c *gin.Context) {
 		return
 	}
 
-	res, err := h.service.GetAssessmentsByTeachingAssignment(teachingAssignmentID)
+	pagination := request.NewPaginationRequest(c.Query("page"), c.Query("limit"))
+
+	res, err := h.service.GetAssessmentsByTeachingAssignment(teachingAssignmentID, pagination)
 	if err != nil {
 		HandleError(c, err)
 		return
