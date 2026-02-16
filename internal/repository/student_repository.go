@@ -12,7 +12,7 @@ type StudentRepository interface {
 	FindByID(id string) (*domain.Student, error)
 	FindByNISN(nisn string) (*domain.Student, error)
 	FindByNIM(nim string) (*domain.Student, error)
-	FindAll(search string, classroomID string) ([]domain.Student, error)
+	FindAll(search string, classroomID string, limit, offset int) ([]domain.Student, int64, error)
 	Update(student *domain.Student) error
 	Delete(id string) error
 	FindByIDWithParents(id string) (*domain.Student, error)
@@ -73,9 +73,10 @@ func (r *studentRepository) FindByNIM(nim string) (*domain.Student, error) {
 	return &student, nil
 }
 
-func (r *studentRepository) FindAll(search string, classroomID string) ([]domain.Student, error) {
+func (r *studentRepository) FindAll(search string, classroomID string, limit, offset int) ([]domain.Student, int64, error) {
 	var students []domain.Student
-	query := r.db
+	var total int64
+	query := r.db.Model(&domain.Student{})
 
 	if classroomID != "" {
 		// Filter by classroom using JOIN
@@ -88,13 +89,18 @@ func (r *studentRepository) FindAll(search string, classroomID string) ([]domain
 		query = query.Where("students.full_name LIKE ? OR students.nisn LIKE ? OR students.nim LIKE ? OR students.city LIKE ?", searchPattern, searchPattern, searchPattern, searchPattern)
 	}
 
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
 	err := query.
 		Preload("User").
 		Preload("StudentClassrooms", "status = ?", "ACTIVE").
 		Preload("StudentClassrooms.Classroom").
 		Order("students.full_name ASC").
+		Limit(limit).Offset(offset).
 		Find(&students).Error
-	return students, err
+	return students, total, err
 }
 
 func (r *studentRepository) Update(student *domain.Student) error {

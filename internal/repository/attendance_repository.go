@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"time"
 	"smart_school_be/internal/model/domain"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -11,8 +11,8 @@ type AttendanceRepository interface {
 	CreateSession(session *domain.AttendanceSession) error
 	FindSessionByScheduleDate(scheduleID string, date time.Time) (*domain.AttendanceSession, error)
 	FindSessionByID(id string) (*domain.AttendanceSession, error)
-	GetHistoryByTeacher(teacherID string) ([]domain.AttendanceSession, error)
-	GetHistoryByTeachingAssignmentID(taID string) ([]domain.AttendanceSession, error)
+	GetHistoryByTeacher(teacherID string, limit, offset int) ([]domain.AttendanceSession, int64, error)
+	GetHistoryByTeachingAssignmentID(taID string, limit, offset int) ([]domain.AttendanceSession, int64, error)
 	// Update logic jika guru ingin mengedit absen
 	UpdateSession(session *domain.AttendanceSession, newDetails []domain.AttendanceDetail) error
 	DeleteSession(id string) error
@@ -63,32 +63,50 @@ func (r *attendanceRepository) FindSessionByID(id string) (*domain.AttendanceSes
 	return &session, nil
 }
 
-func (r *attendanceRepository) GetHistoryByTeacher(teacherID string) ([]domain.AttendanceSession, error) {
+func (r *attendanceRepository) GetHistoryByTeacher(teacherID string, limit, offset int) ([]domain.AttendanceSession, int64, error) {
 	var sessions []domain.AttendanceSession
+	var total int64
 	// Join kompleks untuk mendapatkan sesi berdasarkan Guru
-	err := r.db.Joins("JOIN schedules s ON s.id = attendance_sessions.schedule_id").
-		Joins("JOIN teaching_assignments ta ON ta.id = s.teaching_assignment_id").
-		Preload("Schedule.TeachingAssignment.Subject").
-		Preload("Schedule.TeachingAssignment.Classroom").
-		Preload("Details"). // Added Preload Details
-		Where("ta.teacher_id = ?", teacherID).
-		Order("attendance_sessions.date DESC").
-		Find(&sessions).Error
-	return sessions, err
-}
-
-func (r *attendanceRepository) GetHistoryByTeachingAssignmentID(taID string) ([]domain.AttendanceSession, error) {
-	var sessions []domain.AttendanceSession
-	err := r.db.Select("attendance_sessions.*").
+	query := r.db.Model(&domain.AttendanceSession{}).
 		Joins("JOIN schedules s ON s.id = attendance_sessions.schedule_id").
 		Joins("JOIN teaching_assignments ta ON ta.id = s.teaching_assignment_id").
+		Where("ta.teacher_id = ?", teacherID)
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	err := query.
 		Preload("Schedule.TeachingAssignment.Subject").
 		Preload("Schedule.TeachingAssignment.Classroom").
 		Preload("Details"). // Added Preload Details
-		Where("ta.id = ?", taID).
 		Order("attendance_sessions.date DESC").
+		Limit(limit).Offset(offset).
 		Find(&sessions).Error
-	return sessions, err
+	return sessions, total, err
+}
+
+func (r *attendanceRepository) GetHistoryByTeachingAssignmentID(taID string, limit, offset int) ([]domain.AttendanceSession, int64, error) {
+	var sessions []domain.AttendanceSession
+	var total int64
+	query := r.db.Model(&domain.AttendanceSession{}).
+		Select("attendance_sessions.*").
+		Joins("JOIN schedules s ON s.id = attendance_sessions.schedule_id").
+		Joins("JOIN teaching_assignments ta ON ta.id = s.teaching_assignment_id").
+		Where("ta.id = ?", taID)
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	err := query.
+		Preload("Schedule.TeachingAssignment.Subject").
+		Preload("Schedule.TeachingAssignment.Classroom").
+		Preload("Details"). // Added Preload Details
+		Order("attendance_sessions.date DESC").
+		Limit(limit).Offset(offset).
+		Find(&sessions).Error
+	return sessions, total, err
 }
 
 // NEW: Update Session dengan Transaksi

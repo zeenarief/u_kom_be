@@ -14,10 +14,10 @@ import (
 
 type FinanceService interface {
 	CreateDonation(req request.CreateDonationRequest, employeeID string) (*response.DonationResponse, error)
-	GetDonations(filter map[string]interface{}, limit, offset int) ([]response.DonationResponse, int64, error)
+	GetDonations(filter map[string]interface{}, pagination request.PaginationRequest) (*response.PaginatedData, error)
 	GetDonationByID(id string) (*response.DonationResponse, error)
 	UpdateDonation(id string, req request.UpdateDonationRequest) (*response.DonationResponse, error)
-	GetDonors(name string, limit, offset int) ([]response.DonorResponse, int64, error)
+	GetDonors(name string, pagination request.PaginationRequest) (*response.PaginatedData, error)
 	GetDonorByID(id string) (*response.DonorResponse, error)
 	UpdateDonor(id string, req request.UpdateDonorRequest) (*response.DonorResponse, error)
 }
@@ -175,10 +175,13 @@ func (s *financeService) CreateDonation(req request.CreateDonationRequest, userI
 	return responsePtr(response.FromDomainDonation(savedDonation, s.baseURL)), nil
 }
 
-func (s *financeService) GetDonations(filter map[string]interface{}, limit, offset int) ([]response.DonationResponse, int64, error) {
+func (s *financeService) GetDonations(filter map[string]interface{}, pagination request.PaginationRequest) (*response.PaginatedData, error) {
+	limit := pagination.GetLimit()
+	offset := pagination.GetOffset()
+
 	donations, total, err := s.donationRepo.FindAll(filter, limit, offset)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
 	var res []response.DonationResponse
@@ -186,13 +189,17 @@ func (s *financeService) GetDonations(filter map[string]interface{}, limit, offs
 		res = append(res, response.FromDomainDonation(&d, s.baseURL))
 	}
 
-	return res, total, nil
+	paginatedData := response.NewPaginatedData(res, total, pagination.GetPage(), limit)
+	return &paginatedData, nil
 }
 
-func (s *financeService) GetDonors(name string, limit, offset int) ([]response.DonorResponse, int64, error) {
+func (s *financeService) GetDonors(name string, pagination request.PaginationRequest) (*response.PaginatedData, error) {
+	limit := pagination.GetLimit()
+	offset := pagination.GetOffset()
+
 	donors, total, err := s.donorRepo.FindAll(name, limit, offset)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
 	var res []response.DonorResponse
@@ -200,7 +207,8 @@ func (s *financeService) GetDonors(name string, limit, offset int) ([]response.D
 		res = append(res, response.FromDomainDonor(&d))
 	}
 
-	return res, total, nil
+	paginatedData := response.NewPaginatedData(res, total, pagination.GetPage(), limit)
+	return &paginatedData, nil
 }
 
 func (s *financeService) GetDonationByID(id string) (*response.DonationResponse, error) {

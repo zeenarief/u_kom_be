@@ -24,10 +24,10 @@ type ViolationRepository interface {
 
 	// Student Violation
 	RecordViolation(violation *domain.StudentViolation) error
-	FindStudentViolations(studentID string) ([]domain.StudentViolation, error)
+	FindStudentViolations(studentID string, limit, offset int) ([]domain.StudentViolation, int64, error)
 	FindViolationByID(id string) (*domain.StudentViolation, error)
 	DeleteViolation(id string) error
-	FindAllViolations(filter string) ([]domain.StudentViolation, error)
+	FindAllViolations(filter string, limit, offset int) ([]domain.StudentViolation, int64, error)
 }
 
 type violationRepository struct {
@@ -109,15 +109,23 @@ func (r *violationRepository) RecordViolation(violation *domain.StudentViolation
 	return r.db.Create(violation).Error
 }
 
-func (r *violationRepository) FindStudentViolations(studentID string) ([]domain.StudentViolation, error) {
+func (r *violationRepository) FindStudentViolations(studentID string, limit, offset int) ([]domain.StudentViolation, int64, error) {
 	var violations []domain.StudentViolation
-	err := r.db.Preload("ViolationType").
+	var total int64
+	query := r.db.Model(&domain.StudentViolation{}).Where("student_id = ?", studentID)
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	err := query.
+		Preload("ViolationType").
 		Preload("ViolationType.Category").
 		Preload("Student").
-		Where("student_id = ?", studentID).
 		Order("violation_date DESC").
+		Limit(limit).Offset(offset).
 		Find(&violations).Error
-	return violations, err
+	return violations, total, err
 }
 
 func (r *violationRepository) FindViolationByID(id string) (*domain.StudentViolation, error) {
@@ -138,19 +146,29 @@ func (r *violationRepository) FindViolationByID(id string) (*domain.StudentViola
 func (r *violationRepository) DeleteViolation(id string) error {
 	return r.db.Delete(&domain.StudentViolation{}, "id = ?", id).Error
 }
-func (r *violationRepository) FindAllViolations(filter string) ([]domain.StudentViolation, error) {
+func (r *violationRepository) FindAllViolations(filter string, limit, offset int) ([]domain.StudentViolation, int64, error) {
 	var violations []domain.StudentViolation
-	query := r.db.Preload("ViolationType").
-		Preload("ViolationType.Category").
-		Preload("Student").
-		Order("violation_date DESC")
+	var total int64
+	query := r.db.Model(&domain.StudentViolation{})
 
 	if filter != "" {
 		searchPattern := "%" + filter + "%"
+		// Join to filter by student name or violation name
 		query = query.Joins("JOIN students s ON s.id = student_violations.student_id").
-			Where("s.full_name LIKE ?", searchPattern)
+			Joins("JOIN violation_types vt ON vt.id = student_violations.violation_type_id").
+			Where("s.full_name LIKE ? OR vt.name LIKE ?", searchPattern, searchPattern)
 	}
 
-	err := query.Find(&violations).Error
-	return violations, err
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	err := query.
+		Preload("ViolationType").
+		Preload("ViolationType.Category").
+		Preload("Student").
+		Order("violation_date DESC").
+		Limit(limit).Offset(offset).
+		Find(&violations).Error
+	return violations, total, err
 }

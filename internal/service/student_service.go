@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"strings"
-	"time"
 	"smart_school_be/internal/apperrors"
 	"smart_school_be/internal/converter"
 	"smart_school_be/internal/model/domain"
@@ -13,6 +11,8 @@ import (
 	"smart_school_be/internal/model/response"
 	"smart_school_be/internal/repository"
 	"smart_school_be/internal/utils"
+	"strings"
+	"time"
 
 	"github.com/go-pdf/fpdf"
 	"github.com/phpdave11/gofpdf/contrib/gofpdi"
@@ -22,7 +22,7 @@ import (
 type StudentService interface {
 	CreateStudent(req request.StudentCreateRequest, files StudentFiles) (*response.StudentDetailResponse, error)
 	GetStudentByID(id string) (*response.StudentDetailResponse, error)
-	GetAllStudents(search string, classroomID string) ([]response.StudentListResponse, error)
+	GetAllStudents(search string, classroomID string, pagination request.PaginationRequest) (*response.PaginatedData, error)
 	UpdateStudent(id string, req request.StudentUpdateRequest, files StudentFiles) (*response.StudentDetailResponse, error)
 	DeleteStudent(id string) error
 	SyncParents(studentID string, req request.StudentSyncParentsRequest) error
@@ -245,14 +245,19 @@ func (s *studentService) GetStudentByID(id string) (*response.StudentDetailRespo
 	return responseDTO, nil
 }
 
-// GetAllStudents mengambil semua siswa
-func (s *studentService) GetAllStudents(search string, classroomID string) ([]response.StudentListResponse, error) {
-	students, err := s.studentRepo.FindAll(search, classroomID)
+// GetAllStudents mengambil semua siswa dengan pagination
+func (s *studentService) GetAllStudents(search string, classroomID string, pagination request.PaginationRequest) (*response.PaginatedData, error) {
+	limit := pagination.GetLimit()
+	offset := pagination.GetOffset()
+
+	students, total, err := s.studentRepo.FindAll(search, classroomID, limit, offset)
 	if err != nil {
 		return nil, err
 	}
 	// Panggil konverter list
-	return s.converter.ToStudentListResponses(students), nil
+	data := s.converter.ToStudentListResponses(students)
+	paginatedData := response.NewPaginatedData(data, total, pagination.GetPage(), limit)
+	return &paginatedData, nil
 }
 
 // UpdateStudent memperbarui data siswa
@@ -627,7 +632,9 @@ func (s *studentService) UnlinkUser(studentID string) error {
 
 func (s *studentService) ExportStudentsToExcel() (*bytes.Buffer, error) {
 	// 1. Ambil semua data siswa
-	students, err := s.studentRepo.FindAll("", "")
+	// 1. Ambil semua data siswa (tanpa limit/offset, atau set limit besar)
+	// Gunakan limit besar untuk export
+	students, _, err := s.studentRepo.FindAll("", "", 10000, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -699,7 +706,8 @@ func (s *studentService) ExportStudentsToExcel() (*bytes.Buffer, error) {
 }
 
 func (s *studentService) ExportStudentsToPdf() (*bytes.Buffer, error) {
-	students, err := s.studentRepo.FindAll("", "")
+	// Gunakan limit besar untuk export
+	students, _, err := s.studentRepo.FindAll("", "", 10000, 0)
 	if err != nil {
 		return nil, err
 	}

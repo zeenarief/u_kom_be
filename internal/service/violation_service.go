@@ -24,9 +24,9 @@ type ViolationService interface {
 
 	// Student Violation
 	RecordViolation(req request.CreateStudentViolationRequest) error
-	GetStudentViolations(studentID string) ([]response.StudentViolationResponse, error)
+	GetStudentViolations(studentID string, pagination request.PaginationRequest) (*response.PaginatedData, error)
 	DeleteViolation(id string) error
-	GetAllViolations(filter string) ([]response.StudentViolationResponse, error)
+	GetAllViolations(filter string, pagination request.PaginationRequest) (*response.PaginatedData, error)
 }
 
 type violationService struct {
@@ -203,26 +203,36 @@ func (s *violationService) RecordViolation(req request.CreateStudentViolationReq
 	return s.violationRepo.RecordViolation(violation)
 }
 
-func (s *violationService) GetStudentViolations(studentID string) ([]response.StudentViolationResponse, error) {
-	violations, err := s.violationRepo.FindStudentViolations(studentID)
+func (s *violationService) GetStudentViolations(studentID string, pagination request.PaginationRequest) (*response.PaginatedData, error) {
+	limit := pagination.GetLimit()
+	offset := pagination.GetOffset()
+
+	violations, total, err := s.violationRepo.FindStudentViolations(studentID, limit, offset)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.mapToResponses(violations), nil
+	data := s.mapToResponses(violations)
+	paginatedData := response.NewPaginatedData(data, total, pagination.GetPage(), limit)
+	return &paginatedData, nil
 }
 
 func (s *violationService) DeleteViolation(id string) error {
 	return s.violationRepo.DeleteViolation(id)
 }
 
-func (s *violationService) GetAllViolations(filter string) ([]response.StudentViolationResponse, error) {
-	violations, err := s.violationRepo.FindAllViolations(filter)
+func (s *violationService) GetAllViolations(filter string, pagination request.PaginationRequest) (*response.PaginatedData, error) {
+	limit := pagination.GetLimit()
+	offset := pagination.GetOffset()
+
+	violations, total, err := s.violationRepo.FindAllViolations(filter, limit, offset)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.mapToResponses(violations), nil
+	data := s.mapToResponses(violations)
+	paginatedData := response.NewPaginatedData(data, total, pagination.GetPage(), limit)
+	return &paginatedData, nil
 }
 
 func (s *violationService) mapToResponses(violations []domain.StudentViolation) []response.StudentViolationResponse {

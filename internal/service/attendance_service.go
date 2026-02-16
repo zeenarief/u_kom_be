@@ -1,20 +1,20 @@
 package service
 
 import (
-	"time"
 	"smart_school_be/internal/apperrors"
 	"smart_school_be/internal/model/domain"
 	"smart_school_be/internal/model/request"
 	"smart_school_be/internal/model/response"
 	"smart_school_be/internal/repository"
 	"smart_school_be/internal/utils"
+	"time"
 )
 
 type AttendanceService interface {
 	SubmitAttendance(req request.AttendanceSubmitRequest) (*response.AttendanceSessionDetailResponse, error)
 	GetSessionDetail(id string) (*response.AttendanceSessionDetailResponse, error)
-	GetHistoryByTeacher(teacherID string) ([]response.AttendanceHistoryResponse, error)
-	GetHistoryByAssignment(taID string) ([]response.AttendanceHistoryResponse, error)
+	GetHistoryByTeacher(teacherID string, pagination request.PaginationRequest) (*response.PaginatedData, error)
+	GetHistoryByAssignment(taID string, pagination request.PaginationRequest) (*response.PaginatedData, error)
 	GetSessionByScheduleDate(scheduleID, dateStr string) (*response.AttendanceSessionDetailResponse, error)
 	GetSessionOrClassList(scheduleID, dateStr string) (*response.AttendanceSessionDetailResponse, error)
 	DeleteSession(id string) error
@@ -140,8 +140,11 @@ func (s *attendanceService) GetSessionDetail(id string) (*response.AttendanceSes
 }
 
 // GetHistoryByTeacher menampilkan riwayat mengajar guru tertentu
-func (s *attendanceService) GetHistoryByTeacher(teacherID string) ([]response.AttendanceHistoryResponse, error) {
-	sessions, err := s.repo.GetHistoryByTeacher(teacherID)
+func (s *attendanceService) GetHistoryByTeacher(teacherID string, pagination request.PaginationRequest) (*response.PaginatedData, error) {
+	limit := pagination.GetLimit()
+	offset := pagination.GetOffset()
+
+	sessions, total, err := s.repo.GetHistoryByTeacher(teacherID, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -166,11 +169,15 @@ func (s *attendanceService) GetHistoryByTeacher(teacherID string) ([]response.At
 		})
 	}
 
-	return history, nil
+	paginatedData := response.NewPaginatedData(history, total, pagination.GetPage(), limit)
+	return &paginatedData, nil
 }
 
-func (s *attendanceService) GetHistoryByAssignment(taID string) ([]response.AttendanceHistoryResponse, error) {
-	sessions, err := s.repo.GetHistoryByTeachingAssignmentID(taID)
+func (s *attendanceService) GetHistoryByAssignment(taID string, pagination request.PaginationRequest) (*response.PaginatedData, error) {
+	limit := pagination.GetLimit()
+	offset := pagination.GetOffset()
+
+	sessions, total, err := s.repo.GetHistoryByTeachingAssignmentID(taID, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +203,9 @@ func (s *attendanceService) GetHistoryByAssignment(taID string) ([]response.Atte
 			CountAbsent: countAbsent,
 		})
 	}
-	return history, nil
+
+	paginatedData := response.NewPaginatedData(history, total, pagination.GetPage(), limit)
+	return &paginatedData, nil
 }
 
 func (s *attendanceService) GetSessionByScheduleDate(scheduleID, dateStr string) (*response.AttendanceSessionDetailResponse, error) {

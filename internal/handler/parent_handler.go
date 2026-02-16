@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"strings"
 	"smart_school_be/internal/model/request"
 	"smart_school_be/internal/service"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,7 +34,9 @@ func (h *ParentHandler) CreateParent(c *gin.Context) {
 
 func (h *ParentHandler) GetAllParents(c *gin.Context) {
 	searchQuery := c.Query("q")
-	parents, err := h.parentService.GetAllParents(searchQuery)
+	pagination := request.NewPaginationRequest(c.Query("page"), c.Query("limit"))
+
+	parents, err := h.parentService.GetAllParents(searchQuery, pagination)
 	if err != nil {
 		HandleError(c, err)
 		return

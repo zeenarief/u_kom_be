@@ -2,10 +2,10 @@ package handler
 
 import (
 	"fmt"
-	"time"
 	"smart_school_be/internal/model/request"
 	"smart_school_be/internal/service"
 	"smart_school_be/internal/utils"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -93,7 +93,9 @@ func (h *StudentHandler) CreateStudent(c *gin.Context) {
 func (h *StudentHandler) GetAllStudents(c *gin.Context) {
 	searchQuery := c.Query("q")
 	classroomID := c.Query("classroom_id")
-	students, err := h.studentService.GetAllStudents(searchQuery, classroomID)
+	pagination := request.NewPaginationRequest(c.Query("page"), c.Query("limit"))
+
+	students, err := h.studentService.GetAllStudents(searchQuery, classroomID, pagination)
 	if err != nil {
 		HandleError(c, err)
 		return

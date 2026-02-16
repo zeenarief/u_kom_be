@@ -67,7 +67,7 @@ func (h *AttendanceHandler) GetHistory(c *gin.Context) {
 		return
 	}
 
-	res, err := h.service.GetHistoryByTeacher(teacherID)
+	res, err := h.service.GetHistoryByTeacher(teacherID, request.NewPaginationRequest(c.Query("page"), c.Query("limit")))
 	if err != nil {
 		HandleError(c, err)
 		return
@@ -82,7 +82,7 @@ func (h *AttendanceHandler) GetHistoryByAssignment(c *gin.Context) {
 		return
 	}
 
-	res, err := h.service.GetHistoryByAssignment(taID)
+	res, err := h.service.GetHistoryByAssignment(taID, request.NewPaginationRequest(c.Query("page"), c.Query("limit")))
 	if err != nil {
 		HandleError(c, err)
 		return

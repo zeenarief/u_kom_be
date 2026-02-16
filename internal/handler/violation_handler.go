@@ -158,7 +158,9 @@ func (h *violationHandler) RecordViolation(c *gin.Context) {
 
 func (h *violationHandler) GetStudentViolations(c *gin.Context) {
 	studentID := c.Param("studentID")
-	violations, err := h.violationService.GetStudentViolations(studentID)
+	pagination := request.NewPaginationRequest(c.Query("page"), c.Query("limit"))
+
+	violations, err := h.violationService.GetStudentViolations(studentID, pagination)
 	if err != nil {
 		InternalServerError(c, err.Error())
 		return
@@ -179,7 +181,9 @@ func (h *violationHandler) DeleteViolation(c *gin.Context) {
 
 func (h *violationHandler) GetAllViolations(c *gin.Context) {
 	filter := c.Query("search")
-	violations, err := h.violationService.GetAllViolations(filter)
+	pagination := request.NewPaginationRequest(c.Query("page"), c.Query("limit"))
+
+	violations, err := h.violationService.GetAllViolations(filter, pagination)
 	if err != nil {
 		InternalServerError(c, err.Error())
 		return

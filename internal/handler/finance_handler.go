@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"strconv"
 
 	"smart_school_be/internal/model/request"
 	"smart_school_be/internal/service"
@@ -59,14 +58,7 @@ func (h *FinanceHandler) CreateDonation(c *gin.Context) {
 }
 
 func (h *FinanceHandler) GetDonations(c *gin.Context) {
-	limit := 10
-	offset := 0
-	if l, err := strconv.Atoi(c.Query("limit")); err == nil && l > 0 {
-		limit = l
-	}
-	if o, err := strconv.Atoi(c.Query("offset")); err == nil && o >= 0 {
-		offset = o
-	}
+	pagination := request.NewPaginationRequest(c.Query("page"), c.Query("limit"))
 
 	filter := make(map[string]interface{})
 	if v := c.Query("type"); v != "" {
@@ -82,44 +74,27 @@ func (h *FinanceHandler) GetDonations(c *gin.Context) {
 		filter["date_to"] = v
 	}
 
-	res, total, err := h.financeService.GetDonations(filter, limit, offset)
+	res, err := h.financeService.GetDonations(filter, pagination)
 	if err != nil {
 		HandleError(c, err)
 		return
 	}
 
-	SuccessResponse(c, "Donations retrieved successfully", map[string]interface{}{
-		"items":  res,
-		"total":  total,
-		"limit":  limit,
-		"offset": offset,
-	})
+	SuccessResponse(c, "Donations retrieved successfully", res)
 }
 
 func (h *FinanceHandler) GetDonors(c *gin.Context) {
-	limit := 100
-	offset := 0
-	if l, err := strconv.Atoi(c.Query("limit")); err == nil && l > 0 {
-		limit = l
-	}
-	if o, err := strconv.Atoi(c.Query("offset")); err == nil && o >= 0 {
-		offset = o
-	}
+	pagination := request.NewPaginationRequest(c.Query("page"), c.Query("limit"))
 
 	name := c.Query("name")
 
-	res, total, err := h.financeService.GetDonors(name, limit, offset)
+	res, err := h.financeService.GetDonors(name, pagination)
 	if err != nil {
 		HandleError(c, err)
 		return
 	}
 
-	SuccessResponse(c, "Donors retrieved successfully", map[string]interface{}{
-		"items":  res,
-		"total":  total,
-		"limit":  limit,
-		"offset": offset,
-	})
+	SuccessResponse(c, "Donors retrieved successfully", res)
 }
 
 func (h *FinanceHandler) GetDonationByID(c *gin.Context) {

@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"strings"
 	"smart_school_be/internal/apperrors"
 	"smart_school_be/internal/converter"
 	"smart_school_be/internal/model/domain"
@@ -10,12 +9,13 @@ import (
 	"smart_school_be/internal/model/response"
 	"smart_school_be/internal/repository"
 	"smart_school_be/internal/utils"
+	"strings"
 )
 
 type ParentService interface {
 	CreateParent(req request.ParentCreateRequest) (*response.ParentDetailResponse, error)
 	GetParentByID(id string) (*response.ParentDetailResponse, error)
-	GetAllParents(search string) ([]response.ParentListResponse, error)
+	GetAllParents(search string, pagination request.PaginationRequest) (*response.PaginatedData, error)
 	UpdateParent(id string, req request.ParentUpdateRequest) (*response.ParentDetailResponse, error)
 	DeleteParent(id string) error
 	LinkUser(parentID string, userID string) error
@@ -178,14 +178,19 @@ func (s *parentService) GetParentByID(id string) (*response.ParentDetailResponse
 	return resp, nil
 }
 
-// GetAllParents mengambil semua data orang tua (ringkas)
-func (s *parentService) GetAllParents(search string) ([]response.ParentListResponse, error) {
-	parents, err := s.parentRepo.FindAll(search)
+// GetAllParents mengambil semua data orang tua (ringkas) dengan pagination
+func (s *parentService) GetAllParents(search string, pagination request.PaginationRequest) (*response.PaginatedData, error) {
+	limit := pagination.GetLimit()
+	offset := pagination.GetOffset()
+
+	parents, total, err := s.parentRepo.FindAll(search, limit, offset)
 	if err != nil {
 		return nil, err
 	}
-	// Panggil konverter untuk response list (ringkas, tanpa NIK)
-	return s.converter.ToParentListResponses(parents), nil
+	// Panggil konverter untuk response list
+	data := s.converter.ToParentListResponses(parents)
+	paginatedData := response.NewPaginatedData(data, total, pagination.GetPage(), limit)
+	return &paginatedData, nil
 }
 
 // UpdateParent memperbarui data orang tua
