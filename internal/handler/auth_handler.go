@@ -102,7 +102,7 @@ func (h *AuthHandler) ServeFile(c *gin.Context) {
 	filename := c.Param("filename") // e.g., "akta_xyz.pdf"
 
 	// Validasi folder agar user tidak bisa akses folder sistem (Path Traversal Attack)
-	if folder != "students" && folder != "employees" {
+	if folder != "students" && folder != "employees" && folder != "donations" {
 		c.JSON(403, gin.H{"error": "Forbidden access"})
 		return
 	}

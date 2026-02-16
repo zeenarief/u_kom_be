@@ -12,3 +12,7 @@ func RemoveDuplicates(slice []string) []string {
 	}
 	return list
 }
+
+func StringPtr(s string) *string {
+	return &s
+}

@@ -14,6 +14,7 @@ type EmployeeCreateRequest struct {
 	DateOfBirth      *utils.Date `json:"date_of_birth,omitempty"`
 	JoinDate         *utils.Date `json:"join_date,omitempty"`
 	EmploymentStatus *string     `json:"employment_status,omitempty"` // Changed to pointer for nullable
+	UserID           string      `json:"user_id,omitempty"`           // Optional: Link to user during creation
 }
 
 // DTO untuk Update Employee

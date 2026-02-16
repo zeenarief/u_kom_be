@@ -1,0 +1,100 @@
+### 1. Login Admin
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "login": "admin@example.com",
+  "password": "admin123"
+}
+
+> {%
+client.global.set("admin_token", response.body.data.access_token);
+%}
+
+### 2. Create Finance Staff User
+POST http://localhost:8080/api/v1/users
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "username": "finance_staff",
+  "name": "Finance Staff",
+  "email": "finance@school.com",
+  "password": "Password123",
+  "role_ids": ["3ff9da3b-09fe-11f1-a8da-0a8da63998b6"] 
+}
+
+> {%
+client.global.set("finance_user_id", response.body.data.id);
+%}
+
+### 3. Create Employee Profile (Linked to User)
+POST http://localhost:8080/api/v1/employees
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "full_name": "Finance Staff",
+  "nik": "1234567890123499",
+  "gender": "male",
+  "phone_number": "081234567890",
+  "address": "Jl. Keuangan No. 1",
+  "date_of_birth": "1990-01-01",
+  "join_date": "2023-01-01",
+  "employment_status": "active",
+  "job_title": "Staff Keuangan",
+  "user_id": "{{finance_user_id}}" 
+}
+
+### 4. Login as Finance Staff
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "login": "finance@school.com",
+  "password": "Password123"
+}
+
+> {%
+client.global.set("finance_token", response.body.data.access_token);
+%}
+
+### 5. Create Donation (Money)
+# Expectation: Success
+POST http://localhost:8080/api/v1/finance/donations
+Authorization: Bearer {{finance_token}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="donor_name"
+
+Budi Santoso
+--boundary
+Content-Disposition: form-data; name="donor_phone"
+
+081298765432
+--boundary
+Content-Disposition: form-data; name="type"
+
+MONEY
+--boundary
+Content-Disposition: form-data; name="payment_method"
+
+CASH
+--boundary
+Content-Disposition: form-data; name="total_amount"
+
+500000
+--boundary
+Content-Disposition: form-data; name="description"
+
+Sumbangan Pembangunan Masjid
+--boundary--
+
+### 6. Get Donations List
+GET http://localhost:8080/api/v1/finance/donations
+Authorization: Bearer {{finance_token}}
+
+### 7. Get Donors List
+GET http://localhost:8080/api/v1/finance/donors
+Authorization: Bearer {{finance_token}}

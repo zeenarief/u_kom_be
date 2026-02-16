@@ -30,6 +30,7 @@ func SetupRoutes(
 	attendanceHandler *handler.AttendanceHandler,
 	gradeHandler *handler.GradeHandler,
 	violationHandler handler.ViolationHandler,
+	financeHandler *handler.FinanceHandler,
 ) {
 	// API v1 group
 	apiV1 := router.Group("/api/v1")
@@ -52,11 +53,15 @@ func SetupRoutes(
 	RegisterAttendanceRoutes(apiV1, attendanceHandler, authService)
 	RegisterGradeRoutes(apiV1, gradeHandler, authService)
 	RegisterViolationRoutes(apiV1, violationHandler, authService)
+	RegisterFinanceRoutes(apiV1, financeHandler, authService)
 
 	protected := apiV1.Group("/")
 	protected.Use(middleware.AuthMiddleware(authService))
 
 	protected.GET("/files/:folder/:filename", authHandler.ServeFile)
+
+	// Public static files
+	// router.Static("/uploads", "./storage/uploads")
 
 	// Health check route
 	apiV1.GET("/health", healthCheck)

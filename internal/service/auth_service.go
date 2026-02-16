@@ -408,7 +408,7 @@ func (s *authService) getProfileContext(userID string, roles []string) *response
 
 	// 2. Check if user has employee/teacher/admin role
 	// "guru" = teacher, "karyawan" = employee
-	if contains(roles, "employee") || contains(roles, "karyawan") ||
+	if contains(roles, "employee") || contains(roles, "fundraiser") ||
 		contains(roles, "teacher") || contains(roles, "guru") ||
 		contains(roles, "admin") || contains(roles, "superadmin") ||
 		contains(roles, "musyrif") {

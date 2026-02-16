@@ -1,0 +1,1712 @@
+2026/02/16 06:56:03 Connected to database successfully!
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/v1/auth/register     --> smart_school_be/internal/handler.(*AuthHandler).Register-fm (3 handlers)
+[GIN-debug] POST   /api/v1/auth/login        --> smart_school_be/internal/handler.(*AuthHandler).Login-fm (3 handlers)
+[GIN-debug] POST   /api/v1/auth/refresh      --> smart_school_be/internal/handler.(*AuthHandler).RefreshToken-fm (3 handlers)
+[GIN-debug] POST   /api/v1/auth/logout       --> smart_school_be/internal/handler.(*AuthHandler).Logout-fm (4 handlers)
+[GIN-debug] GET    /api/v1/users             --> smart_school_be/internal/handler.(*UserHandler).GetAllUsers-fm (5 handlers)
+[GIN-debug] POST   /api/v1/users             --> smart_school_be/internal/handler.(*UserHandler).CreateUser-fm (5 handlers)
+[GIN-debug] GET    /api/v1/users/:id         --> smart_school_be/internal/handler.(*UserHandler).GetUserByID-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/users/:id         --> smart_school_be/internal/handler.(*UserHandler).UpdateUser-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/users/:id         --> smart_school_be/internal/handler.(*UserHandler).DeleteUser-fm (5 handlers)
+[GIN-debug] POST   /api/v1/users/:id/sync-roles --> smart_school_be/internal/handler.(*UserHandler).SyncUserRoles-fm (5 handlers)
+[GIN-debug] POST   /api/v1/users/:id/sync-permissions --> smart_school_be/internal/handler.(*UserHandler).SyncUserPermissions-fm (5 handlers)
+[GIN-debug] GET    /api/v1/users/:id/permissions --> smart_school_be/internal/handler.(*UserHandler).GetUserPermissions-fm (5 handlers)
+[GIN-debug] POST   /api/v1/users/:id/change-password --> smart_school_be/internal/handler.(*UserHandler).ChangePassword-fm (5 handlers)
+[GIN-debug] GET    /api/v1/profile           --> smart_school_be/internal/handler.(*UserHandler).GetProfile-fm (5 handlers)
+[GIN-debug] POST   /api/v1/roles             --> smart_school_be/internal/handler.(*RoleHandler).CreateRole-fm (5 handlers)
+[GIN-debug] GET    /api/v1/roles             --> smart_school_be/internal/handler.(*RoleHandler).GetAllRoles-fm (5 handlers)
+[GIN-debug] GET    /api/v1/roles/:id         --> smart_school_be/internal/handler.(*RoleHandler).GetRoleByID-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/roles/:id         --> smart_school_be/internal/handler.(*RoleHandler).UpdateRole-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/roles/:id         --> smart_school_be/internal/handler.(*RoleHandler).DeleteRole-fm (5 handlers)
+[GIN-debug] POST   /api/v1/roles/:id/sync-permissions --> smart_school_be/internal/handler.(*RoleHandler).SyncRolePermissions-fm (5 handlers)
+[GIN-debug] POST   /api/v1/permissions       --> smart_school_be/internal/handler.(*PermissionHandler).CreatePermission-fm (5 handlers)
+[GIN-debug] GET    /api/v1/permissions       --> smart_school_be/internal/handler.(*PermissionHandler).GetAllPermissions-fm (5 handlers)
+[GIN-debug] GET    /api/v1/permissions/:id   --> smart_school_be/internal/handler.(*PermissionHandler).GetPermissionByID-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/permissions/:id   --> smart_school_be/internal/handler.(*PermissionHandler).UpdatePermission-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/permissions/:id   --> smart_school_be/internal/handler.(*PermissionHandler).DeletePermission-fm (5 handlers)
+[GIN-debug] POST   /api/v1/students          --> smart_school_be/internal/handler.(*StudentHandler).CreateStudent-fm (5 handlers)
+[GIN-debug] GET    /api/v1/students          --> smart_school_be/internal/handler.(*StudentHandler).GetAllStudents-fm (5 handlers)
+[GIN-debug] GET    /api/v1/students/:id      --> smart_school_be/internal/handler.(*StudentHandler).GetStudentByID-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/students/:id      --> smart_school_be/internal/handler.(*StudentHandler).UpdateStudent-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/students/:id      --> smart_school_be/internal/handler.(*StudentHandler).DeleteStudent-fm (5 handlers)
+[GIN-debug] POST   /api/v1/students/:id/sync-parents --> smart_school_be/internal/handler.(*StudentHandler).SyncParents-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/students/:id/set-guardian --> smart_school_be/internal/handler.(*StudentHandler).SetGuardian-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/students/:id/remove-guardian --> smart_school_be/internal/handler.(*StudentHandler).RemoveGuardian-fm (5 handlers)
+[GIN-debug] POST   /api/v1/students/:id/link-user --> smart_school_be/internal/handler.(*StudentHandler).LinkUser-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/students/:id/unlink-user --> smart_school_be/internal/handler.(*StudentHandler).UnlinkUser-fm (5 handlers)
+[GIN-debug] GET    /api/v1/students/export/excel --> smart_school_be/internal/handler.(*StudentHandler).ExportExcel-fm (5 handlers)
+[GIN-debug] GET    /api/v1/students/export/pdf --> smart_school_be/internal/handler.(*StudentHandler).ExportPDF-fm (5 handlers)
+[GIN-debug] GET    /api/v1/students/:id/export/pdf --> smart_school_be/internal/handler.(*StudentHandler).ExportStudentBiodata-fm (5 handlers)
+[GIN-debug] POST   /api/v1/parents           --> smart_school_be/internal/handler.(*ParentHandler).CreateParent-fm (5 handlers)
+[GIN-debug] GET    /api/v1/parents           --> smart_school_be/internal/handler.(*ParentHandler).GetAllParents-fm (5 handlers)
+[GIN-debug] GET    /api/v1/parents/:id       --> smart_school_be/internal/handler.(*ParentHandler).GetParentByID-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/parents/:id       --> smart_school_be/internal/handler.(*ParentHandler).UpdateParent-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/parents/:id       --> smart_school_be/internal/handler.(*ParentHandler).DeleteParent-fm (5 handlers)
+[GIN-debug] POST   /api/v1/parents/:id/link-user --> smart_school_be/internal/handler.(*ParentHandler).LinkUser-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/parents/:id/unlink-user --> smart_school_be/internal/handler.(*ParentHandler).UnlinkUser-fm (5 handlers)
+[GIN-debug] POST   /api/v1/guardians         --> smart_school_be/internal/handler.(*GuardianHandler).CreateGuardian-fm (5 handlers)
+[GIN-debug] GET    /api/v1/guardians         --> smart_school_be/internal/handler.(*GuardianHandler).GetAllGuardians-fm (5 handlers)
+[GIN-debug] GET    /api/v1/guardians/:id     --> smart_school_be/internal/handler.(*GuardianHandler).GetGuardianByID-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/guardians/:id     --> smart_school_be/internal/handler.(*GuardianHandler).UpdateGuardian-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/guardians/:id     --> smart_school_be/internal/handler.(*GuardianHandler).DeleteGuardian-fm (5 handlers)
+[GIN-debug] POST   /api/v1/guardians/:id/link-user --> smart_school_be/internal/handler.(*GuardianHandler).LinkUser-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/guardians/:id/unlink-user --> smart_school_be/internal/handler.(*GuardianHandler).UnlinkUser-fm (5 handlers)
+[GIN-debug] POST   /api/v1/employees         --> smart_school_be/internal/handler.(*EmployeeHandler).CreateEmployee-fm (5 handlers)
+[GIN-debug] GET    /api/v1/employees         --> smart_school_be/internal/handler.(*EmployeeHandler).GetAllEmployees-fm (5 handlers)
+[GIN-debug] GET    /api/v1/employees/:id     --> smart_school_be/internal/handler.(*EmployeeHandler).GetEmployeeByID-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/employees/:id     --> smart_school_be/internal/handler.(*EmployeeHandler).UpdateEmployee-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/employees/:id     --> smart_school_be/internal/handler.(*EmployeeHandler).DeleteEmployee-fm (5 handlers)
+[GIN-debug] POST   /api/v1/employees/:id/link-user --> smart_school_be/internal/handler.(*EmployeeHandler).LinkUser-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/employees/:id/unlink-user --> smart_school_be/internal/handler.(*EmployeeHandler).UnlinkUser-fm (5 handlers)
+[GIN-debug] GET    /api/v1/dashboard/stats   --> smart_school_be/internal/handler.(*DashboardHandler).GetStats-fm (4 handlers)
+[GIN-debug] GET    /api/v1/dashboard/teacher/stats --> smart_school_be/internal/handler.(*DashboardHandler).GetTeacherStats-fm (4 handlers)
+[GIN-debug] GET    /api/v1/academic-years    --> smart_school_be/internal/handler.(*AcademicYearHandler).FindAll-fm (4 handlers)
+[GIN-debug] GET    /api/v1/academic-years/:id --> smart_school_be/internal/handler.(*AcademicYearHandler).FindByID-fm (4 handlers)
+[GIN-debug] POST   /api/v1/academic-years    --> smart_school_be/internal/handler.(*AcademicYearHandler).Create-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/academic-years/:id --> smart_school_be/internal/handler.(*AcademicYearHandler).Update-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/academic-years/:id --> smart_school_be/internal/handler.(*AcademicYearHandler).Delete-fm (5 handlers)
+[GIN-debug] PATCH  /api/v1/academic-years/:id/activate --> smart_school_be/internal/handler.(*AcademicYearHandler).Activate-fm (5 handlers)
+[GIN-debug] GET    /api/v1/classrooms        --> smart_school_be/internal/handler.(*ClassroomHandler).FindAll-fm (4 handlers)
+[GIN-debug] GET    /api/v1/classrooms/:id    --> smart_school_be/internal/handler.(*ClassroomHandler).FindByID-fm (4 handlers)
+[GIN-debug] POST   /api/v1/classrooms        --> smart_school_be/internal/handler.(*ClassroomHandler).Create-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/classrooms/:id    --> smart_school_be/internal/handler.(*ClassroomHandler).Update-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/classrooms/:id    --> smart_school_be/internal/handler.(*ClassroomHandler).Delete-fm (5 handlers)
+[GIN-debug] POST   /api/v1/classrooms/:id/students --> smart_school_be/internal/handler.(*ClassroomHandler).AddStudents-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/classrooms/:id/students/:studentID --> smart_school_be/internal/handler.(*ClassroomHandler).RemoveStudent-fm (5 handlers)
+[GIN-debug] GET    /api/v1/subjects          --> smart_school_be/internal/handler.(*SubjectHandler).FindAll-fm (4 handlers)
+[GIN-debug] GET    /api/v1/subjects/:id      --> smart_school_be/internal/handler.(*SubjectHandler).FindByID-fm (4 handlers)
+[GIN-debug] POST   /api/v1/subjects          --> smart_school_be/internal/handler.(*SubjectHandler).Create-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/subjects/:id      --> smart_school_be/internal/handler.(*SubjectHandler).Update-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/subjects/:id      --> smart_school_be/internal/handler.(*SubjectHandler).Delete-fm (5 handlers)
+[GIN-debug] POST   /api/v1/assignments       --> smart_school_be/internal/handler.(*TeachingAssignmentHandler).Create-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/assignments/:id   --> smart_school_be/internal/handler.(*TeachingAssignmentHandler).Delete-fm (5 handlers)
+[GIN-debug] GET    /api/v1/assignments/by-class --> smart_school_be/internal/handler.(*TeachingAssignmentHandler).GetByClassroom-fm (4 handlers)
+[GIN-debug] GET    /api/v1/assignments/by-teacher --> smart_school_be/internal/handler.(*TeachingAssignmentHandler).GetByTeacher-fm (4 handlers)
+[GIN-debug] POST   /api/v1/schedules         --> smart_school_be/internal/handler.(*ScheduleHandler).Create-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/schedules/:id     --> smart_school_be/internal/handler.(*ScheduleHandler).Delete-fm (5 handlers)
+[GIN-debug] GET    /api/v1/schedules/by-class --> smart_school_be/internal/handler.(*ScheduleHandler).GetByClassroom-fm (4 handlers)
+[GIN-debug] GET    /api/v1/schedules/by-teacher --> smart_school_be/internal/handler.(*ScheduleHandler).GetByTeacher-fm (4 handlers)
+[GIN-debug] GET    /api/v1/schedules/by-teaching-assignment/:id --> smart_school_be/internal/handler.(*ScheduleHandler).GetByTeachingAssignment-fm (4 handlers)
+[GIN-debug] GET    /api/v1/schedules/teacher/today --> smart_school_be/internal/handler.(*ScheduleHandler).GetTodaySchedule-fm (4 handlers)
+[GIN-debug] POST   /api/v1/attendances       --> smart_school_be/internal/handler.(*AttendanceHandler).Submit-fm (5 handlers)
+[GIN-debug] GET    /api/v1/attendances/:id   --> smart_school_be/internal/handler.(*AttendanceHandler).GetDetail-fm (5 handlers)
+[GIN-debug] GET    /api/v1/attendances/history --> smart_school_be/internal/handler.(*AttendanceHandler).GetHistory-fm (5 handlers)
+[GIN-debug] GET    /api/v1/attendances/history/teaching-assignment/:id --> smart_school_be/internal/handler.(*AttendanceHandler).GetHistoryByAssignment-fm (5 handlers)
+[GIN-debug] GET    /api/v1/attendances/check --> smart_school_be/internal/handler.(*AttendanceHandler).CheckSession-fm (4 handlers)
+[GIN-debug] DELETE /api/v1/attendances/:id   --> smart_school_be/internal/handler.(*AttendanceHandler).Delete-fm (5 handlers)
+[GIN-debug] POST   /api/v1/grades/assessments --> smart_school_be/internal/handler.(*GradeHandler).CreateAssessment-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/grades/assessments/:id --> smart_school_be/internal/handler.(*GradeHandler).UpdateAssessment-fm (5 handlers)
+[GIN-debug] GET    /api/v1/grades/assessments/teaching-assignment/:teachingAssignmentID --> smart_school_be/internal/handler.(*GradeHandler).GetAssessmentsByTeachingAssignment-fm (5 handlers)
+[GIN-debug] GET    /api/v1/grades/assessments/:id --> smart_school_be/internal/handler.(*GradeHandler).GetAssessmentDetail-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/grades/assessments/:id --> smart_school_be/internal/handler.(*GradeHandler).DeleteAssessment-fm (5 handlers)
+[GIN-debug] POST   /api/v1/grades/scores/bulk --> smart_school_be/internal/handler.(*GradeHandler).SubmitScores-fm (5 handlers)
+[GIN-debug] POST   /api/v1/violations/categories --> smart_school_be/internal/handler.ViolationHandler.CreateCategory-fm (5 handlers)
+[GIN-debug] GET    /api/v1/violations/categories --> smart_school_be/internal/handler.ViolationHandler.GetCategories-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/violations/categories/:id --> smart_school_be/internal/handler.ViolationHandler.UpdateCategory-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/violations/categories/:id --> smart_school_be/internal/handler.ViolationHandler.DeleteCategory-fm (5 handlers)
+[GIN-debug] POST   /api/v1/violations/types  --> smart_school_be/internal/handler.ViolationHandler.CreateType-fm (5 handlers)
+[GIN-debug] GET    /api/v1/violations/types  --> smart_school_be/internal/handler.ViolationHandler.GetTypes-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/violations/types/:id --> smart_school_be/internal/handler.ViolationHandler.UpdateType-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/violations/types/:id --> smart_school_be/internal/handler.ViolationHandler.DeleteType-fm (5 handlers)
+[GIN-debug] POST   /api/v1/violations/record --> smart_school_be/internal/handler.ViolationHandler.RecordViolation-fm (5 handlers)
+[GIN-debug] GET    /api/v1/violations/student/:studentID --> smart_school_be/internal/handler.ViolationHandler.GetStudentViolations-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/violations/record/:id --> smart_school_be/internal/handler.ViolationHandler.DeleteViolation-fm (5 handlers)
+[GIN-debug] GET    /api/v1/violations/all    --> smart_school_be/internal/handler.ViolationHandler.GetAllViolations-fm (5 handlers)
+[GIN-debug] POST   /api/v1/finance/donations --> smart_school_be/internal/handler.(*FinanceHandler).CreateDonation-fm (5 handlers)
+[GIN-debug] GET    /api/v1/finance/donations --> smart_school_be/internal/handler.(*FinanceHandler).GetDonations-fm (5 handlers)
+[GIN-debug] GET    /api/v1/finance/donations/:id --> smart_school_be/internal/handler.(*FinanceHandler).GetDonationByID-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/finance/donations/:id --> smart_school_be/internal/handler.(*FinanceHandler).UpdateDonation-fm (5 handlers)
+[GIN-debug] GET    /api/v1/finance/donors    --> smart_school_be/internal/handler.(*FinanceHandler).GetDonors-fm (5 handlers)
+[GIN-debug] GET    /api/v1/finance/donors/:id --> smart_school_be/internal/handler.(*FinanceHandler).GetDonorByID-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/finance/donors/:id --> smart_school_be/internal/handler.(*FinanceHandler).UpdateDonor-fm (5 handlers)
+[GIN-debug] GET    /api/v1/files/:folder/:filename --> smart_school_be/internal/handler.(*AuthHandler).ServeFile-fm (4 handlers)
+[GIN-debug] GET    /api/v1/health            --> smart_school_be/cmd/server/routes.healthCheck (3 handlers)
+2026/02/16 06:56:03 Server starting on 0.0.0.0:8080 in debug mode
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on 0.0.0.0:8080
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:94
+[0m[33m[0.266ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:94
+[0m[33m[0.382ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:94
+[0m[33m[0.445ms] [34;1m[rows:64][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = '3ff976d4-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:94
+[0m[33m[0.715ms] [34;1m[rows:64][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('010c16fb-d912-430f-9650-0690138b0ca9','084d9cfa-da71-45c7-9c97-bc5cc12be6dd','0ff355db-c480-4fea-9562-349ed8d3119a','156606dc-d902-4ba5-a8f5-883aff4ce307','189c39d5-a937-4ef5-b28d-7e94f2d0151b','1cbd5376-abec-4db9-8a1a-e14710a5e581','1d312ec7-8a19-4c62-bc0b-c319fab61a51','1ed133e9-2083-4d09-a696-9f4e823b439f','21276732-ef80-40a5-bea3-9ee1fefc7e34','25186d99-4ea9-4214-a7d9-800d284b5d5f','27da0355-f6a4-466a-a93e-8e29d1c8922a','2b35b6f2-3309-4448-adf8-616535dc840f','2c249b47-30d2-4804-8f41-28c996e83a1c','3097217c-f00b-4fb0-9ae9-2b29125787f3','35c36384-3dbb-4637-b280-24c4bba03fbc','372c9b1f-95fd-40d0-972f-4557887711a3','41d3e67d-9d9d-4c34-81b1-f4ca256ab690','4a5757a2-9fe9-480c-b66d-02011056b1c2','4a6a2cb5-66f3-4b0c-ac73-c373e3c9a1b3','4bc07f82-ca62-40a4-9d49-e08f5063148d','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5a6db571-7634-4069-b563-1e5ee9f58a69','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','68a44503-ad98-42f6-8833-f073d32b6c9e','752569a8-765b-43ef-840d-0892477f59de','757d9d0b-4b42-4dd7-b27f-724464eea35a','76485e30-2292-49bc-bd72-1ccc0ffc992b','7909be13-b782-4ed5-bc59-97b1073e08e7','7a2730b4-60ea-4b4b-8546-77ca57eacf3b','841e1ea4-d07e-4add-b7c0-79bb7cf2393d','8d730b67-cdae-4de8-9e26-9925e3d5577c','91328f7a-c973-490b-97fb-f5aecd61cc21','919d9eac-cc45-47dc-8e44-6a2c13bdac13','949798b8-602f-446f-81e9-312194227888','97ea8493-5bd2-49e6-a361-6e1808f1f8f7','99e28ba7-2451-4c27-b2d3-99ebc95bf27e','9e1c5b52-2c1e-4db1-9a4a-d04b503101b2','a26bd84e-84e6-47e6-b84b-2907508e916d','a43bccde-f49c-4b4a-bed1-cabfc62b0c9a','a4749a3e-4561-4f2b-8125-65d7274acc21','b0fa12af-44c0-4c9f-ad58-c9403d91abce','b0fbe58a-a42a-44dc-a92a-be46df292010','b2c1ee43-e709-4570-bd99-e57e877fcfc9','b31667b1-255b-42c1-9b4d-0a04919a1abd','b4f9e29a-1384-4f50-9a8f-c561488a05fd','b5070401-f7b6-493b-8aa4-b297e66e0775','b731a767-62c2-48c7-8f76-da520b5ab3de','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca1c4467-562b-443f-955b-1fb9f09782cd','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0','cae179e6-790d-4fd4-b58b-057d744aeb7c','cbca8b39-ee7d-4dbd-b2bb-7dd91552d4f6','d0731579-13b0-45e0-8b35-468bf9350274','d28d1371-2cb2-4f15-81e5-a669317b7e8f','e4a0a55d-7040-436b-94d3-395d5f624798','e7837ec6-95bb-48aa-83f6-c7f719d57a87','e7998a08-df72-40c5-9b7a-864b79f0083c','f471387f-367c-4d3a-bcf0-7903940aed02','f4f87a7d-9363-4814-8f3e-715cf7a343b9','f8231fd8-9b62-4e45-b1c8-2a7942131a9e','fcf4e7fd-2dab-4fca-ae9d-7e91eef838d0','ff2642f2-ed1e-426b-aad7-835c6d3e7eec')
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:94
+[0m[33m[1.728ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = '3ff976d4-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:94
+[0m[33m[5.091ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE email = 'admin@example.com' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:48
+[0m[33m[4.687ms] [34;1m[rows:1][0m UPDATE `users` SET `current_token_hash`='a37cee40a08a21a25f1864d8322ab42671c0b4063d3d77d352f3225df51d9e49',`updated_at`='2026-02-16 06:56:10.62' WHERE id = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [31;1m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/employee_repository.go:74 [35;1mrecord not found
+[0m[33m[0.692ms] [34;1m[rows:0][0m SELECT * FROM `employees` WHERE user_id = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6' ORDER BY `employees`.`id` LIMIT 1
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.682ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.417ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.603ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.513ms] [34;1m[rows:64][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = '3ff976d4-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.875ms] [34;1m[rows:64][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('010c16fb-d912-430f-9650-0690138b0ca9','084d9cfa-da71-45c7-9c97-bc5cc12be6dd','0ff355db-c480-4fea-9562-349ed8d3119a','156606dc-d902-4ba5-a8f5-883aff4ce307','189c39d5-a937-4ef5-b28d-7e94f2d0151b','1cbd5376-abec-4db9-8a1a-e14710a5e581','1d312ec7-8a19-4c62-bc0b-c319fab61a51','1ed133e9-2083-4d09-a696-9f4e823b439f','21276732-ef80-40a5-bea3-9ee1fefc7e34','25186d99-4ea9-4214-a7d9-800d284b5d5f','27da0355-f6a4-466a-a93e-8e29d1c8922a','2b35b6f2-3309-4448-adf8-616535dc840f','2c249b47-30d2-4804-8f41-28c996e83a1c','3097217c-f00b-4fb0-9ae9-2b29125787f3','35c36384-3dbb-4637-b280-24c4bba03fbc','372c9b1f-95fd-40d0-972f-4557887711a3','41d3e67d-9d9d-4c34-81b1-f4ca256ab690','4a5757a2-9fe9-480c-b66d-02011056b1c2','4a6a2cb5-66f3-4b0c-ac73-c373e3c9a1b3','4bc07f82-ca62-40a4-9d49-e08f5063148d','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5a6db571-7634-4069-b563-1e5ee9f58a69','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','68a44503-ad98-42f6-8833-f073d32b6c9e','752569a8-765b-43ef-840d-0892477f59de','757d9d0b-4b42-4dd7-b27f-724464eea35a','76485e30-2292-49bc-bd72-1ccc0ffc992b','7909be13-b782-4ed5-bc59-97b1073e08e7','7a2730b4-60ea-4b4b-8546-77ca57eacf3b','841e1ea4-d07e-4add-b7c0-79bb7cf2393d','8d730b67-cdae-4de8-9e26-9925e3d5577c','91328f7a-c973-490b-97fb-f5aecd61cc21','919d9eac-cc45-47dc-8e44-6a2c13bdac13','949798b8-602f-446f-81e9-312194227888','97ea8493-5bd2-49e6-a361-6e1808f1f8f7','99e28ba7-2451-4c27-b2d3-99ebc95bf27e','9e1c5b52-2c1e-4db1-9a4a-d04b503101b2','a26bd84e-84e6-47e6-b84b-2907508e916d','a43bccde-f49c-4b4a-bed1-cabfc62b0c9a','a4749a3e-4561-4f2b-8125-65d7274acc21','b0fa12af-44c0-4c9f-ad58-c9403d91abce','b0fbe58a-a42a-44dc-a92a-be46df292010','b2c1ee43-e709-4570-bd99-e57e877fcfc9','b31667b1-255b-42c1-9b4d-0a04919a1abd','b4f9e29a-1384-4f50-9a8f-c561488a05fd','b5070401-f7b6-493b-8aa4-b297e66e0775','b731a767-62c2-48c7-8f76-da520b5ab3de','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca1c4467-562b-443f-955b-1fb9f09782cd','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0','cae179e6-790d-4fd4-b58b-057d744aeb7c','cbca8b39-ee7d-4dbd-b2bb-7dd91552d4f6','d0731579-13b0-45e0-8b35-468bf9350274','d28d1371-2cb2-4f15-81e5-a669317b7e8f','e4a0a55d-7040-436b-94d3-395d5f624798','e7837ec6-95bb-48aa-83f6-c7f719d57a87','e7998a08-df72-40c5-9b7a-864b79f0083c','f471387f-367c-4d3a-bcf0-7903940aed02','f4f87a7d-9363-4814-8f3e-715cf7a343b9','f8231fd8-9b62-4e45-b1c8-2a7942131a9e','fcf4e7fd-2dab-4fca-ae9d-7e91eef838d0','ff2642f2-ed1e-426b-aad7-835c6d3e7eec')
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.196ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = '3ff976d4-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[6.939ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:150
+[0m[33m[0.474ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donations`
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.386ms] [34;1m[rows:4][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` IN ('847a4abb-c5f7-4b9f-868b-fa138c85ad65','36cd98b3-8596-431f-bdaa-5acf8e38a090','b827f848-880e-4cb9-80e0-1f689155289d','da7ca4e0-603f-4a34-ad19-ce81b89b2b22')
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.519ms] [34;1m[rows:7][0m SELECT * FROM `employees` WHERE `employees`.`id` IN ('52924aee-4964-4fc8-9d25-72ebc212c28c','efdd679c-bb2c-4c58-8c77-910c060da89e','67d343a2-a1f9-457f-b7a5-02ef13604e04','6518220e-cca5-431e-97ba-5caa2d293a48','f1dbb3a3-caac-429c-a1a3-97d914e72d35','df3306c3-1e24-4178-971e-37f9018d82f3','ef501d35-964f-49f7-b174-a58a68543e84')
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.599ms] [34;1m[rows:14][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` IN ('f253de7d-825a-439e-aa48-2cd496195b5d','7e41fb55-0be1-41f6-b503-d26acd29c1ef','3ee46dba-2119-4ef8-9012-496941c9b75d','d4a0ff2c-4cc8-4007-9745-60733ec556b0','7b16f95e-9d6c-41a5-9737-f339a9923ab3','f1be8615-4165-4377-9b84-be82f695347f','24f11a0a-6e64-475b-9faa-0ea31e4fb29a','142da000-19be-407e-8872-bb20bf33233c','201c0135-74c9-49a5-8bbe-09d7be8dbfab','bdc8593b-7c7c-475a-85e2-d45ac2e73d18','d2e21d83-7434-4358-9061-76199485a333','d3b5b270-b683-4b65-a5b8-d529f33620b6','e013d27c-e240-489b-8e6b-f99f7eb7cbc8','78ca37e6-8d42-4922-b954-d2987f7dd911','0e2fb7f4-3e3f-466a-975a-2c319937a6ba','726a347f-7d1e-423d-86f3-e21a82cc4ea2','44da956b-fd31-4421-bbb8-917d4961079f','cc514cf2-2bbd-4834-83d0-44d347a37338','f590b52b-6e67-486a-880e-f00d63b361ca','ab73a525-fe0e-4bba-a486-a396e1831dfd')
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[2.515ms] [34;1m[rows:20][0m SELECT * FROM `finance_donations` ORDER BY date DESC LIMIT 20
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[1.018ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.374ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.634ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.412ms] [34;1m[rows:64][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = '3ff976d4-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.866ms] [34;1m[rows:64][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('010c16fb-d912-430f-9650-0690138b0ca9','084d9cfa-da71-45c7-9c97-bc5cc12be6dd','0ff355db-c480-4fea-9562-349ed8d3119a','156606dc-d902-4ba5-a8f5-883aff4ce307','189c39d5-a937-4ef5-b28d-7e94f2d0151b','1cbd5376-abec-4db9-8a1a-e14710a5e581','1d312ec7-8a19-4c62-bc0b-c319fab61a51','1ed133e9-2083-4d09-a696-9f4e823b439f','21276732-ef80-40a5-bea3-9ee1fefc7e34','25186d99-4ea9-4214-a7d9-800d284b5d5f','27da0355-f6a4-466a-a93e-8e29d1c8922a','2b35b6f2-3309-4448-adf8-616535dc840f','2c249b47-30d2-4804-8f41-28c996e83a1c','3097217c-f00b-4fb0-9ae9-2b29125787f3','35c36384-3dbb-4637-b280-24c4bba03fbc','372c9b1f-95fd-40d0-972f-4557887711a3','41d3e67d-9d9d-4c34-81b1-f4ca256ab690','4a5757a2-9fe9-480c-b66d-02011056b1c2','4a6a2cb5-66f3-4b0c-ac73-c373e3c9a1b3','4bc07f82-ca62-40a4-9d49-e08f5063148d','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5a6db571-7634-4069-b563-1e5ee9f58a69','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','68a44503-ad98-42f6-8833-f073d32b6c9e','752569a8-765b-43ef-840d-0892477f59de','757d9d0b-4b42-4dd7-b27f-724464eea35a','76485e30-2292-49bc-bd72-1ccc0ffc992b','7909be13-b782-4ed5-bc59-97b1073e08e7','7a2730b4-60ea-4b4b-8546-77ca57eacf3b','841e1ea4-d07e-4add-b7c0-79bb7cf2393d','8d730b67-cdae-4de8-9e26-9925e3d5577c','91328f7a-c973-490b-97fb-f5aecd61cc21','919d9eac-cc45-47dc-8e44-6a2c13bdac13','949798b8-602f-446f-81e9-312194227888','97ea8493-5bd2-49e6-a361-6e1808f1f8f7','99e28ba7-2451-4c27-b2d3-99ebc95bf27e','9e1c5b52-2c1e-4db1-9a4a-d04b503101b2','a26bd84e-84e6-47e6-b84b-2907508e916d','a43bccde-f49c-4b4a-bed1-cabfc62b0c9a','a4749a3e-4561-4f2b-8125-65d7274acc21','b0fa12af-44c0-4c9f-ad58-c9403d91abce','b0fbe58a-a42a-44dc-a92a-be46df292010','b2c1ee43-e709-4570-bd99-e57e877fcfc9','b31667b1-255b-42c1-9b4d-0a04919a1abd','b4f9e29a-1384-4f50-9a8f-c561488a05fd','b5070401-f7b6-493b-8aa4-b297e66e0775','b731a767-62c2-48c7-8f76-da520b5ab3de','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca1c4467-562b-443f-955b-1fb9f09782cd','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0','cae179e6-790d-4fd4-b58b-057d744aeb7c','cbca8b39-ee7d-4dbd-b2bb-7dd91552d4f6','d0731579-13b0-45e0-8b35-468bf9350274','d28d1371-2cb2-4f15-81e5-a669317b7e8f','e4a0a55d-7040-436b-94d3-395d5f624798','e7837ec6-95bb-48aa-83f6-c7f719d57a87','e7998a08-df72-40c5-9b7a-864b79f0083c','f471387f-367c-4d3a-bcf0-7903940aed02','f4f87a7d-9363-4814-8f3e-715cf7a343b9','f8231fd8-9b62-4e45-b1c8-2a7942131a9e','fcf4e7fd-2dab-4fca-ae9d-7e91eef838d0','ff2642f2-ed1e-426b-aad7-835c6d3e7eec')
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.011ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = '3ff976d4-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.757ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.341ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '847a4abb-c5f7-4b9f-868b-fa138c85ad65'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.411ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.355ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = 'f253de7d-825a-439e-aa48-2cd496195b5d'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[1.647ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = 'f253de7d-825a-439e-aa48-2cd496195b5d' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.598ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.341ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.624ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.456ms] [34;1m[rows:64][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = '3ff976d4-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.749ms] [34;1m[rows:64][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('010c16fb-d912-430f-9650-0690138b0ca9','084d9cfa-da71-45c7-9c97-bc5cc12be6dd','0ff355db-c480-4fea-9562-349ed8d3119a','156606dc-d902-4ba5-a8f5-883aff4ce307','189c39d5-a937-4ef5-b28d-7e94f2d0151b','1cbd5376-abec-4db9-8a1a-e14710a5e581','1d312ec7-8a19-4c62-bc0b-c319fab61a51','1ed133e9-2083-4d09-a696-9f4e823b439f','21276732-ef80-40a5-bea3-9ee1fefc7e34','25186d99-4ea9-4214-a7d9-800d284b5d5f','27da0355-f6a4-466a-a93e-8e29d1c8922a','2b35b6f2-3309-4448-adf8-616535dc840f','2c249b47-30d2-4804-8f41-28c996e83a1c','3097217c-f00b-4fb0-9ae9-2b29125787f3','35c36384-3dbb-4637-b280-24c4bba03fbc','372c9b1f-95fd-40d0-972f-4557887711a3','41d3e67d-9d9d-4c34-81b1-f4ca256ab690','4a5757a2-9fe9-480c-b66d-02011056b1c2','4a6a2cb5-66f3-4b0c-ac73-c373e3c9a1b3','4bc07f82-ca62-40a4-9d49-e08f5063148d','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5a6db571-7634-4069-b563-1e5ee9f58a69','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','68a44503-ad98-42f6-8833-f073d32b6c9e','752569a8-765b-43ef-840d-0892477f59de','757d9d0b-4b42-4dd7-b27f-724464eea35a','76485e30-2292-49bc-bd72-1ccc0ffc992b','7909be13-b782-4ed5-bc59-97b1073e08e7','7a2730b4-60ea-4b4b-8546-77ca57eacf3b','841e1ea4-d07e-4add-b7c0-79bb7cf2393d','8d730b67-cdae-4de8-9e26-9925e3d5577c','91328f7a-c973-490b-97fb-f5aecd61cc21','919d9eac-cc45-47dc-8e44-6a2c13bdac13','949798b8-602f-446f-81e9-312194227888','97ea8493-5bd2-49e6-a361-6e1808f1f8f7','99e28ba7-2451-4c27-b2d3-99ebc95bf27e','9e1c5b52-2c1e-4db1-9a4a-d04b503101b2','a26bd84e-84e6-47e6-b84b-2907508e916d','a43bccde-f49c-4b4a-bed1-cabfc62b0c9a','a4749a3e-4561-4f2b-8125-65d7274acc21','b0fa12af-44c0-4c9f-ad58-c9403d91abce','b0fbe58a-a42a-44dc-a92a-be46df292010','b2c1ee43-e709-4570-bd99-e57e877fcfc9','b31667b1-255b-42c1-9b4d-0a04919a1abd','b4f9e29a-1384-4f50-9a8f-c561488a05fd','b5070401-f7b6-493b-8aa4-b297e66e0775','b731a767-62c2-48c7-8f76-da520b5ab3de','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca1c4467-562b-443f-955b-1fb9f09782cd','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0','cae179e6-790d-4fd4-b58b-057d744aeb7c','cbca8b39-ee7d-4dbd-b2bb-7dd91552d4f6','d0731579-13b0-45e0-8b35-468bf9350274','d28d1371-2cb2-4f15-81e5-a669317b7e8f','e4a0a55d-7040-436b-94d3-395d5f624798','e7837ec6-95bb-48aa-83f6-c7f719d57a87','e7998a08-df72-40c5-9b7a-864b79f0083c','f471387f-367c-4d3a-bcf0-7903940aed02','f4f87a7d-9363-4814-8f3e-715cf7a343b9','f8231fd8-9b62-4e45-b1c8-2a7942131a9e','fcf4e7fd-2dab-4fca-ae9d-7e91eef838d0','ff2642f2-ed1e-426b-aad7-835c6d3e7eec')
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.930ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = '3ff976d4-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 06:56:10 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.521ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.476ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.569ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.154ms] [34;1m[rows:64][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = '3ff976d4-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.385ms] [34;1m[rows:64][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('010c16fb-d912-430f-9650-0690138b0ca9','084d9cfa-da71-45c7-9c97-bc5cc12be6dd','0ff355db-c480-4fea-9562-349ed8d3119a','156606dc-d902-4ba5-a8f5-883aff4ce307','189c39d5-a937-4ef5-b28d-7e94f2d0151b','1cbd5376-abec-4db9-8a1a-e14710a5e581','1d312ec7-8a19-4c62-bc0b-c319fab61a51','1ed133e9-2083-4d09-a696-9f4e823b439f','21276732-ef80-40a5-bea3-9ee1fefc7e34','25186d99-4ea9-4214-a7d9-800d284b5d5f','27da0355-f6a4-466a-a93e-8e29d1c8922a','2b35b6f2-3309-4448-adf8-616535dc840f','2c249b47-30d2-4804-8f41-28c996e83a1c','3097217c-f00b-4fb0-9ae9-2b29125787f3','35c36384-3dbb-4637-b280-24c4bba03fbc','372c9b1f-95fd-40d0-972f-4557887711a3','41d3e67d-9d9d-4c34-81b1-f4ca256ab690','4a5757a2-9fe9-480c-b66d-02011056b1c2','4a6a2cb5-66f3-4b0c-ac73-c373e3c9a1b3','4bc07f82-ca62-40a4-9d49-e08f5063148d','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5a6db571-7634-4069-b563-1e5ee9f58a69','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','68a44503-ad98-42f6-8833-f073d32b6c9e','752569a8-765b-43ef-840d-0892477f59de','757d9d0b-4b42-4dd7-b27f-724464eea35a','76485e30-2292-49bc-bd72-1ccc0ffc992b','7909be13-b782-4ed5-bc59-97b1073e08e7','7a2730b4-60ea-4b4b-8546-77ca57eacf3b','841e1ea4-d07e-4add-b7c0-79bb7cf2393d','8d730b67-cdae-4de8-9e26-9925e3d5577c','91328f7a-c973-490b-97fb-f5aecd61cc21','919d9eac-cc45-47dc-8e44-6a2c13bdac13','949798b8-602f-446f-81e9-312194227888','97ea8493-5bd2-49e6-a361-6e1808f1f8f7','99e28ba7-2451-4c27-b2d3-99ebc95bf27e','9e1c5b52-2c1e-4db1-9a4a-d04b503101b2','a26bd84e-84e6-47e6-b84b-2907508e916d','a43bccde-f49c-4b4a-bed1-cabfc62b0c9a','a4749a3e-4561-4f2b-8125-65d7274acc21','b0fa12af-44c0-4c9f-ad58-c9403d91abce','b0fbe58a-a42a-44dc-a92a-be46df292010','b2c1ee43-e709-4570-bd99-e57e877fcfc9','b31667b1-255b-42c1-9b4d-0a04919a1abd','b4f9e29a-1384-4f50-9a8f-c561488a05fd','b5070401-f7b6-493b-8aa4-b297e66e0775','b731a767-62c2-48c7-8f76-da520b5ab3de','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca1c4467-562b-443f-955b-1fb9f09782cd','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0','cae179e6-790d-4fd4-b58b-057d744aeb7c','cbca8b39-ee7d-4dbd-b2bb-7dd91552d4f6','d0731579-13b0-45e0-8b35-468bf9350274','d28d1371-2cb2-4f15-81e5-a669317b7e8f','e4a0a55d-7040-436b-94d3-395d5f624798','e7837ec6-95bb-48aa-83f6-c7f719d57a87','e7998a08-df72-40c5-9b7a-864b79f0083c','f471387f-367c-4d3a-bcf0-7903940aed02','f4f87a7d-9363-4814-8f3e-715cf7a343b9','f8231fd8-9b62-4e45-b1c8-2a7942131a9e','fcf4e7fd-2dab-4fca-ae9d-7e91eef838d0','ff2642f2-ed1e-426b-aad7-835c6d3e7eec')
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[6.093ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = '3ff976d4-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[9.687ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:48
+[0m[33m[11.026ms] [34;1m[rows:1][0m UPDATE `users` SET `current_token_hash`='417288196b27ae5c80a8b69c85e0d68e7550912b1f3be728ac3eb35680dd1c79',`updated_at`='2026-02-16 07:00:13.101' WHERE id = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 07:00:13 [31;1m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/employee_repository.go:74 [35;1mrecord not found
+[0m[33m[0.785ms] [34;1m[rows:0][0m SELECT * FROM `employees` WHERE user_id = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6' ORDER BY `employees`.`id` LIMIT 1
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.789ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.591ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.666ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.878ms] [34;1m[rows:64][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = '3ff976d4-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.124ms] [34;1m[rows:64][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('010c16fb-d912-430f-9650-0690138b0ca9','084d9cfa-da71-45c7-9c97-bc5cc12be6dd','0ff355db-c480-4fea-9562-349ed8d3119a','156606dc-d902-4ba5-a8f5-883aff4ce307','189c39d5-a937-4ef5-b28d-7e94f2d0151b','1cbd5376-abec-4db9-8a1a-e14710a5e581','1d312ec7-8a19-4c62-bc0b-c319fab61a51','1ed133e9-2083-4d09-a696-9f4e823b439f','21276732-ef80-40a5-bea3-9ee1fefc7e34','25186d99-4ea9-4214-a7d9-800d284b5d5f','27da0355-f6a4-466a-a93e-8e29d1c8922a','2b35b6f2-3309-4448-adf8-616535dc840f','2c249b47-30d2-4804-8f41-28c996e83a1c','3097217c-f00b-4fb0-9ae9-2b29125787f3','35c36384-3dbb-4637-b280-24c4bba03fbc','372c9b1f-95fd-40d0-972f-4557887711a3','41d3e67d-9d9d-4c34-81b1-f4ca256ab690','4a5757a2-9fe9-480c-b66d-02011056b1c2','4a6a2cb5-66f3-4b0c-ac73-c373e3c9a1b3','4bc07f82-ca62-40a4-9d49-e08f5063148d','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5a6db571-7634-4069-b563-1e5ee9f58a69','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','68a44503-ad98-42f6-8833-f073d32b6c9e','752569a8-765b-43ef-840d-0892477f59de','757d9d0b-4b42-4dd7-b27f-724464eea35a','76485e30-2292-49bc-bd72-1ccc0ffc992b','7909be13-b782-4ed5-bc59-97b1073e08e7','7a2730b4-60ea-4b4b-8546-77ca57eacf3b','841e1ea4-d07e-4add-b7c0-79bb7cf2393d','8d730b67-cdae-4de8-9e26-9925e3d5577c','91328f7a-c973-490b-97fb-f5aecd61cc21','919d9eac-cc45-47dc-8e44-6a2c13bdac13','949798b8-602f-446f-81e9-312194227888','97ea8493-5bd2-49e6-a361-6e1808f1f8f7','99e28ba7-2451-4c27-b2d3-99ebc95bf27e','9e1c5b52-2c1e-4db1-9a4a-d04b503101b2','a26bd84e-84e6-47e6-b84b-2907508e916d','a43bccde-f49c-4b4a-bed1-cabfc62b0c9a','a4749a3e-4561-4f2b-8125-65d7274acc21','b0fa12af-44c0-4c9f-ad58-c9403d91abce','b0fbe58a-a42a-44dc-a92a-be46df292010','b2c1ee43-e709-4570-bd99-e57e877fcfc9','b31667b1-255b-42c1-9b4d-0a04919a1abd','b4f9e29a-1384-4f50-9a8f-c561488a05fd','b5070401-f7b6-493b-8aa4-b297e66e0775','b731a767-62c2-48c7-8f76-da520b5ab3de','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca1c4467-562b-443f-955b-1fb9f09782cd','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0','cae179e6-790d-4fd4-b58b-057d744aeb7c','cbca8b39-ee7d-4dbd-b2bb-7dd91552d4f6','d0731579-13b0-45e0-8b35-468bf9350274','d28d1371-2cb2-4f15-81e5-a669317b7e8f','e4a0a55d-7040-436b-94d3-395d5f624798','e7837ec6-95bb-48aa-83f6-c7f719d57a87','e7998a08-df72-40c5-9b7a-864b79f0083c','f471387f-367c-4d3a-bcf0-7903940aed02','f4f87a7d-9363-4814-8f3e-715cf7a343b9','f8231fd8-9b62-4e45-b1c8-2a7942131a9e','fcf4e7fd-2dab-4fca-ae9d-7e91eef838d0','ff2642f2-ed1e-426b-aad7-835c6d3e7eec')
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.158ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = '3ff976d4-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[5.440ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/student_repository.go:115
+[0m[33m[0.864ms] [34;1m[rows:2][0m SELECT * FROM `parents` WHERE `parents`.`id` IN ('323dcbd1-0a03-11f1-a8da-0a8da63998b6','323dccc7-0a03-11f1-a8da-0a8da63998b6')
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/student_repository.go:115
+[0m[33m[1.760ms] [34;1m[rows:2][0m SELECT * FROM `student_parent` WHERE `student_parent`.`student_id` = 'a3dbde87-6de7-440a-9815-ba34c8bcfa2e'
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/student_repository.go:115
+[0m[33m[0.806ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE `users`.`id` = '207d5ce6-c197-4b2d-bf5a-70c8ac6169f2'
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/student_repository.go:115
+[0m[33m[4.762ms] [34;1m[rows:1][0m SELECT * FROM `students` WHERE id = 'a3dbde87-6de7-440a-9815-ba34c8bcfa2e' ORDER BY `students`.`id` LIMIT 1
+
+2026/02/16 07:00:13 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/parent_repository.go:38
+[0m[33m[0.807ms] [34;1m[rows:1][0m SELECT * FROM `parents` WHERE id = '323dcbd1-0a03-11f1-a8da-0a8da63998b6' ORDER BY `parents`.`id` LIMIT 1
+
+2026/02/16 07:00:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[1.325ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:00:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.395ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 07:00:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.387ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 07:00:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.550ms] [34;1m[rows:64][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = '3ff976d4-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 07:00:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.961ms] [34;1m[rows:64][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('010c16fb-d912-430f-9650-0690138b0ca9','084d9cfa-da71-45c7-9c97-bc5cc12be6dd','0ff355db-c480-4fea-9562-349ed8d3119a','156606dc-d902-4ba5-a8f5-883aff4ce307','189c39d5-a937-4ef5-b28d-7e94f2d0151b','1cbd5376-abec-4db9-8a1a-e14710a5e581','1d312ec7-8a19-4c62-bc0b-c319fab61a51','1ed133e9-2083-4d09-a696-9f4e823b439f','21276732-ef80-40a5-bea3-9ee1fefc7e34','25186d99-4ea9-4214-a7d9-800d284b5d5f','27da0355-f6a4-466a-a93e-8e29d1c8922a','2b35b6f2-3309-4448-adf8-616535dc840f','2c249b47-30d2-4804-8f41-28c996e83a1c','3097217c-f00b-4fb0-9ae9-2b29125787f3','35c36384-3dbb-4637-b280-24c4bba03fbc','372c9b1f-95fd-40d0-972f-4557887711a3','41d3e67d-9d9d-4c34-81b1-f4ca256ab690','4a5757a2-9fe9-480c-b66d-02011056b1c2','4a6a2cb5-66f3-4b0c-ac73-c373e3c9a1b3','4bc07f82-ca62-40a4-9d49-e08f5063148d','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5a6db571-7634-4069-b563-1e5ee9f58a69','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','68a44503-ad98-42f6-8833-f073d32b6c9e','752569a8-765b-43ef-840d-0892477f59de','757d9d0b-4b42-4dd7-b27f-724464eea35a','76485e30-2292-49bc-bd72-1ccc0ffc992b','7909be13-b782-4ed5-bc59-97b1073e08e7','7a2730b4-60ea-4b4b-8546-77ca57eacf3b','841e1ea4-d07e-4add-b7c0-79bb7cf2393d','8d730b67-cdae-4de8-9e26-9925e3d5577c','91328f7a-c973-490b-97fb-f5aecd61cc21','919d9eac-cc45-47dc-8e44-6a2c13bdac13','949798b8-602f-446f-81e9-312194227888','97ea8493-5bd2-49e6-a361-6e1808f1f8f7','99e28ba7-2451-4c27-b2d3-99ebc95bf27e','9e1c5b52-2c1e-4db1-9a4a-d04b503101b2','a26bd84e-84e6-47e6-b84b-2907508e916d','a43bccde-f49c-4b4a-bed1-cabfc62b0c9a','a4749a3e-4561-4f2b-8125-65d7274acc21','b0fa12af-44c0-4c9f-ad58-c9403d91abce','b0fbe58a-a42a-44dc-a92a-be46df292010','b2c1ee43-e709-4570-bd99-e57e877fcfc9','b31667b1-255b-42c1-9b4d-0a04919a1abd','b4f9e29a-1384-4f50-9a8f-c561488a05fd','b5070401-f7b6-493b-8aa4-b297e66e0775','b731a767-62c2-48c7-8f76-da520b5ab3de','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca1c4467-562b-443f-955b-1fb9f09782cd','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0','cae179e6-790d-4fd4-b58b-057d744aeb7c','cbca8b39-ee7d-4dbd-b2bb-7dd91552d4f6','d0731579-13b0-45e0-8b35-468bf9350274','d28d1371-2cb2-4f15-81e5-a669317b7e8f','e4a0a55d-7040-436b-94d3-395d5f624798','e7837ec6-95bb-48aa-83f6-c7f719d57a87','e7998a08-df72-40c5-9b7a-864b79f0083c','f471387f-367c-4d3a-bcf0-7903940aed02','f4f87a7d-9363-4814-8f3e-715cf7a343b9','f8231fd8-9b62-4e45-b1c8-2a7942131a9e','fcf4e7fd-2dab-4fca-ae9d-7e91eef838d0','ff2642f2-ed1e-426b-aad7-835c6d3e7eec')
+
+2026/02/16 07:00:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.396ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = '3ff976d4-09fe-11f1-a8da-0a8da63998b6'
+
+2026/02/16 07:00:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.894ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '3ffbbda1-09fe-11f1-a8da-0a8da63998b6' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:00:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/student_repository.go:115
+[0m[33m[1.612ms] [34;1m[rows:2][0m SELECT * FROM `parents` WHERE `parents`.`id` IN ('323dcbd1-0a03-11f1-a8da-0a8da63998b6','323dccc7-0a03-11f1-a8da-0a8da63998b6')
+
+2026/02/16 07:00:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/student_repository.go:115
+[0m[33m[3.526ms] [34;1m[rows:2][0m SELECT * FROM `student_parent` WHERE `student_parent`.`student_id` = 'a3dbde87-6de7-440a-9815-ba34c8bcfa2e'
+
+2026/02/16 07:00:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/student_repository.go:115
+[0m[33m[0.817ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE `users`.`id` = '207d5ce6-c197-4b2d-bf5a-70c8ac6169f2'
+
+2026/02/16 07:00:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/student_repository.go:115
+[0m[33m[5.875ms] [34;1m[rows:1][0m SELECT * FROM `students` WHERE id = 'a3dbde87-6de7-440a-9815-ba34c8bcfa2e' ORDER BY `students`.`id` LIMIT 1
+
+2026/02/16 07:00:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/parent_repository.go:38
+[0m[33m[0.997ms] [34;1m[rows:1][0m SELECT * FROM `parents` WHERE id = '323dcbd1-0a03-11f1-a8da-0a8da63998b6' ORDER BY `parents`.`id` LIMIT 1
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.365ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.345ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.300ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.325ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.050ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.565ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:48
+[0m[33m[8.358ms] [34;1m[rows:1][0m UPDATE `users` SET `current_token_hash`='59b71e4597c077daad221361c90bc9b8f7f14c60ef204c125b4f0ebf8f887e68',`updated_at`='2026-02-16 07:04:14.268' WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/employee_repository.go:74
+[0m[33m[0.465ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE user_id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `employees`.`id` LIMIT 1
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.692ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.354ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.383ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.341ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.410ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.228ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.573ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.444ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '847a4abb-c5f7-4b9f-868b-fa138c85ad65'
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.520ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.391ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = 'f253de7d-825a-439e-aa48-2cd496195b5d'
+
+2026/02/16 07:04:14 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[3.528ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = 'f253de7d-825a-439e-aa48-2cd496195b5d' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:04:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.677ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.337ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.316ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.330ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.352ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.135ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.554ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.256ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '847a4abb-c5f7-4b9f-868b-fa138c85ad65'
+
+2026/02/16 07:04:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.310ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 07:04:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.280ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = 'f253de7d-825a-439e-aa48-2cd496195b5d'
+
+2026/02/16 07:04:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[1.270ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = 'f253de7d-825a-439e-aa48-2cd496195b5d' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:04:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.637ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.361ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.358ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.640ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.561ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.675ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[4.318ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:150
+[0m[33m[0.243ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donations`
+
+2026/02/16 07:04:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.372ms] [34;1m[rows:4][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` IN ('847a4abb-c5f7-4b9f-868b-fa138c85ad65','36cd98b3-8596-431f-bdaa-5acf8e38a090','b827f848-880e-4cb9-80e0-1f689155289d','da7ca4e0-603f-4a34-ad19-ce81b89b2b22')
+
+2026/02/16 07:04:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.412ms] [34;1m[rows:4][0m SELECT * FROM `employees` WHERE `employees`.`id` IN ('52924aee-4964-4fc8-9d25-72ebc212c28c','efdd679c-bb2c-4c58-8c77-910c060da89e','67d343a2-a1f9-457f-b7a5-02ef13604e04','6518220e-cca5-431e-97ba-5caa2d293a48')
+
+2026/02/16 07:04:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.448ms] [34;1m[rows:8][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` IN ('f253de7d-825a-439e-aa48-2cd496195b5d','7e41fb55-0be1-41f6-b503-d26acd29c1ef','3ee46dba-2119-4ef8-9012-496941c9b75d','d4a0ff2c-4cc8-4007-9745-60733ec556b0','7b16f95e-9d6c-41a5-9737-f339a9923ab3','f1be8615-4165-4377-9b84-be82f695347f','24f11a0a-6e64-475b-9faa-0ea31e4fb29a','142da000-19be-407e-8872-bb20bf33233c','201c0135-74c9-49a5-8bbe-09d7be8dbfab','bdc8593b-7c7c-475a-85e2-d45ac2e73d18')
+
+2026/02/16 07:04:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[1.955ms] [34;1m[rows:10][0m SELECT * FROM `finance_donations` ORDER BY date DESC LIMIT 10
+
+2026/02/16 07:04:34 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[1.205ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:34 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.782ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:34 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.490ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:34 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.449ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:34 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.657ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:34 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.027ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:34 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[5.084ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:34 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.399ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '36cd98b3-8596-431f-bdaa-5acf8e38a090'
+
+2026/02/16 07:04:34 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.400ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = 'efdd679c-bb2c-4c58-8c77-910c060da89e'
+
+2026/02/16 07:04:34 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.413ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = '7e41fb55-0be1-41f6-b503-d26acd29c1ef'
+
+2026/02/16 07:04:34 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[1.889ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = '7e41fb55-0be1-41f6-b503-d26acd29c1ef' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:04:37 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.618ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:37 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.477ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:37 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.407ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:37 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.441ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:37 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.050ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:37 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.090ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:37 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[4.686ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:37 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:150
+[0m[33m[0.400ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donations`
+
+2026/02/16 07:04:37 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.563ms] [34;1m[rows:4][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` IN ('847a4abb-c5f7-4b9f-868b-fa138c85ad65','36cd98b3-8596-431f-bdaa-5acf8e38a090','b827f848-880e-4cb9-80e0-1f689155289d','da7ca4e0-603f-4a34-ad19-ce81b89b2b22')
+
+2026/02/16 07:04:37 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.579ms] [34;1m[rows:4][0m SELECT * FROM `employees` WHERE `employees`.`id` IN ('52924aee-4964-4fc8-9d25-72ebc212c28c','efdd679c-bb2c-4c58-8c77-910c060da89e','67d343a2-a1f9-457f-b7a5-02ef13604e04','6518220e-cca5-431e-97ba-5caa2d293a48')
+
+2026/02/16 07:04:37 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[2.615ms] [34;1m[rows:8][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` IN ('f253de7d-825a-439e-aa48-2cd496195b5d','7e41fb55-0be1-41f6-b503-d26acd29c1ef','3ee46dba-2119-4ef8-9012-496941c9b75d','d4a0ff2c-4cc8-4007-9745-60733ec556b0','7b16f95e-9d6c-41a5-9737-f339a9923ab3','f1be8615-4165-4377-9b84-be82f695347f','24f11a0a-6e64-475b-9faa-0ea31e4fb29a','142da000-19be-407e-8872-bb20bf33233c','201c0135-74c9-49a5-8bbe-09d7be8dbfab','bdc8593b-7c7c-475a-85e2-d45ac2e73d18')
+
+2026/02/16 07:04:37 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[4.775ms] [34;1m[rows:10][0m SELECT * FROM `finance_donations` ORDER BY date DESC LIMIT 10
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[1.513ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[2.629ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.093ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.028ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.724ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.636ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.679ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.183ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.613ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[7.567ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:74
+[0m[33m[0.231ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donors`
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.389ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:78
+[0m[33m[0.511ms] [34;1m[rows:5][0m SELECT * FROM `finance_donors` ORDER BY name ASC LIMIT 5
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.451ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.815ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[5.443ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[2.235ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '847a4abb-c5f7-4b9f-868b-fa138c85ad65'
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[2.514ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.510ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = 'f253de7d-825a-439e-aa48-2cd496195b5d'
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[6.240ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = 'f253de7d-825a-439e-aa48-2cd496195b5d' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.453ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.515ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.344ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.280ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.388ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.091ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.574ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:74
+[0m[33m[0.270ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donors` WHERE name LIKE '%Ahmad Basuki%'
+
+2026/02/16 07:04:39 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:78
+[0m[33m[0.317ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE name LIKE '%Ahmad Basuki%' ORDER BY name ASC LIMIT 5
+
+2026/02/16 07:04:44 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[1.484ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:44 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.757ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:44 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.708ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:44 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.884ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:44 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.806ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:44 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[4.449ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:44 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[7.102ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.594ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.430ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.662ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.417ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.638ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.742ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[4.182ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.496ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '847a4abb-c5f7-4b9f-868b-fa138c85ad65'
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[1.167ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[2.464ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = 'f253de7d-825a-439e-aa48-2cd496195b5d'
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[5.772ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = 'f253de7d-825a-439e-aa48-2cd496195b5d' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.880ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.758ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.776ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.413ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.916ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[6.693ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[9.695ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:74
+[0m[33m[0.320ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donors`
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:78
+[0m[33m[0.635ms] [34;1m[rows:5][0m SELECT * FROM `finance_donors` ORDER BY name ASC LIMIT 5
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.700ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.317ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.532ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.419ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.426ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.442ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.061ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:74
+[0m[33m[0.395ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donors` WHERE name LIKE '%Ahmad Basuki%'
+
+2026/02/16 07:04:50 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:78
+[0m[33m[1.099ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE name LIKE '%Ahmad Basuki%' ORDER BY name ASC LIMIT 5
+
+2026/02/16 07:04:52 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.561ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:52 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.096ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:52 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.394ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:52 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.391ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:52 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.440ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:52 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.315ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:52 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[5.983ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:52 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:150
+[0m[33m[0.222ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donations`
+
+2026/02/16 07:04:52 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.394ms] [34;1m[rows:4][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` IN ('847a4abb-c5f7-4b9f-868b-fa138c85ad65','36cd98b3-8596-431f-bdaa-5acf8e38a090','b827f848-880e-4cb9-80e0-1f689155289d','da7ca4e0-603f-4a34-ad19-ce81b89b2b22')
+
+2026/02/16 07:04:52 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.441ms] [34;1m[rows:4][0m SELECT * FROM `employees` WHERE `employees`.`id` IN ('52924aee-4964-4fc8-9d25-72ebc212c28c','efdd679c-bb2c-4c58-8c77-910c060da89e','67d343a2-a1f9-457f-b7a5-02ef13604e04','6518220e-cca5-431e-97ba-5caa2d293a48')
+
+2026/02/16 07:04:52 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.472ms] [34;1m[rows:8][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` IN ('f253de7d-825a-439e-aa48-2cd496195b5d','7e41fb55-0be1-41f6-b503-d26acd29c1ef','3ee46dba-2119-4ef8-9012-496941c9b75d','d4a0ff2c-4cc8-4007-9745-60733ec556b0','7b16f95e-9d6c-41a5-9737-f339a9923ab3','f1be8615-4165-4377-9b84-be82f695347f','24f11a0a-6e64-475b-9faa-0ea31e4fb29a','142da000-19be-407e-8872-bb20bf33233c','201c0135-74c9-49a5-8bbe-09d7be8dbfab','bdc8593b-7c7c-475a-85e2-d45ac2e73d18')
+
+2026/02/16 07:04:52 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[2.056ms] [34;1m[rows:10][0m SELECT * FROM `finance_donations` ORDER BY date DESC LIMIT 10
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.614ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.604ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.684ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.912ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.521ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.726ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[4.642ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[9.245ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[7.049ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.563ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.343ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '847a4abb-c5f7-4b9f-868b-fa138c85ad65'
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.451ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.467ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.775ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.826ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[11.963ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.810ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = 'f253de7d-825a-439e-aa48-2cd496195b5d'
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[2.936ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = 'f253de7d-825a-439e-aa48-2cd496195b5d' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:74
+[0m[33m[0.398ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donors`
+
+2026/02/16 07:04:54 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:78
+[0m[33m[1.711ms] [34;1m[rows:5][0m SELECT * FROM `finance_donors` ORDER BY name ASC LIMIT 5
+
+2026/02/16 07:04:55 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.622ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:55 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.358ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:55 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.378ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:04:55 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.390ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:55 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.538ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:04:55 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.429ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:04:55 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.781ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:04:55 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:74
+[0m[33m[0.410ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donors` WHERE name LIKE '%Ahmad Basuki%'
+
+2026/02/16 07:04:55 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:78
+[0m[33m[0.515ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE name LIKE '%Ahmad Basuki%' ORDER BY name ASC LIMIT 5
+
+2026/02/16 07:05:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.855ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:05:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.515ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:05:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.495ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:05:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.598ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:05:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.876ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:05:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.104ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:05:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.900ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:05:25 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.611ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:05:25 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.399ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:05:25 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.379ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:05:25 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.783ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:05:25 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.604ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:05:25 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.147ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:05:25 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[4.611ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:05:25 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:74
+[0m[33m[0.323ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donors`
+
+2026/02/16 07:05:25 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:78
+[0m[33m[0.544ms] [34;1m[rows:5][0m SELECT * FROM `finance_donors` ORDER BY name ASC LIMIT 5
+
+2026/02/16 07:05:29 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.512ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:05:29 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.312ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:05:29 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.300ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:05:29 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.269ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:05:29 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.361ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:05:29 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.007ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:05:29 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.160ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:05:29 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:74
+[0m[33m[0.299ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donors` WHERE name LIKE '%P%'
+
+2026/02/16 07:05:29 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:78
+[0m[33m[0.316ms] [34;1m[rows:2][0m SELECT * FROM `finance_donors` WHERE name LIKE '%P%' ORDER BY name ASC LIMIT 5
+
+2026/02/16 07:05:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.633ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:05:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.358ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:05:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.327ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:05:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.329ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:05:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.359ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:05:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.122ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:05:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.412ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:05:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:74
+[0m[33m[0.291ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donors` WHERE name LIKE '%Pa%'
+
+2026/02/16 07:05:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:78
+[0m[33m[0.365ms] [34;1m[rows:2][0m SELECT * FROM `finance_donors` WHERE name LIKE '%Pa%' ORDER BY name ASC LIMIT 5
+
+2026/02/16 07:05:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.527ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:05:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.425ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:05:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.510ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:05:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.339ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:05:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.388ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:05:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.420ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:05:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.118ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:05:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:74
+[0m[33m[0.306ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donors` WHERE name LIKE '%Paimin%'
+
+2026/02/16 07:05:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:78
+[0m[33m[0.402ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE name LIKE '%Paimin%' ORDER BY name ASC LIMIT 5
+
+2026/02/16 07:05:35 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.550ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:05:35 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.297ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:05:35 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.328ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:05:35 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.321ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:05:35 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.376ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:05:35 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.213ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:05:35 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.392ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:05:35 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:74
+[0m[33m[0.302ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donors` WHERE name LIKE '%Paijo Paimin%'
+
+2026/02/16 07:05:35 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:78
+[0m[33m[0.327ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE name LIKE '%Paijo Paimin%' ORDER BY name ASC LIMIT 5
+
+2026/02/16 07:05:46 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[1.184ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:05:46 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.548ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:05:46 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.689ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:05:46 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.450ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:05:46 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.981ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:05:46 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.170ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:05:46 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[4.450ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:05:46 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/employee_repository.go:74
+[0m[33m[1.198ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE user_id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `employees`.`id` LIMIT 1
+
+2026/02/16 07:05:46 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:57
+[0m[33m[1.094ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE phone = '08123456789' ORDER BY `finance_donors`.`id` LIMIT 1
+
+2026/02/16 07:05:46 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:74
+[0m[33m[1.987ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donors` WHERE name LIKE '%Paijo Paimin%'
+
+2026/02/16 07:05:46 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:78
+[0m[33m[1.081ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE name LIKE '%Paijo Paimin%' ORDER BY name ASC LIMIT 1
+
+2026/02/16 07:05:46 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:87
+[0m[33m[1.429ms] [34;1m[rows:1][0m INSERT INTO `finance_donations` (`id`,`donor_id`,`employee_id`,`date`,`type`,`payment_method`,`total_amount`,`proof_file`,`description`,`created_at`,`updated_at`) VALUES ('32313e68-af35-47c3-a248-540eac56222c','91a9703c-052d-4577-8f17-2af620ce80e8','52924aee-4964-4fc8-9d25-72ebc212c28c','2026-02-16 07:05:46.857','MONEY','CASH',800000,'donations/donation_proof_1771200346851716602.png','','2026-02-16 07:05:46.858','2026-02-16 07:05:46.858')
+
+2026/02/16 07:05:46 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.434ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '91a9703c-052d-4577-8f17-2af620ce80e8'
+
+2026/02/16 07:05:46 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.541ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 07:05:46 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.926ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = '32313e68-af35-47c3-a248-540eac56222c'
+
+2026/02/16 07:05:46 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[3.051ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = '32313e68-af35-47c3-a248-540eac56222c' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:05:47 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[1.003ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:05:47 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.648ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:05:47 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.661ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:05:47 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.655ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:05:47 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.589ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:05:47 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[4.092ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:05:47 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[7.886ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:05:47 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:74
+[0m[33m[0.252ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donors`
+
+2026/02/16 07:05:47 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:78
+[0m[33m[0.550ms] [34;1m[rows:5][0m SELECT * FROM `finance_donors` ORDER BY name ASC LIMIT 5
+
+2026/02/16 07:06:38 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.633ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:06:38 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.415ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:06:38 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.469ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:06:38 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.386ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:06:38 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.582ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:06:38 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.631ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:06:38 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.794ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:06:38 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:150
+[0m[33m[0.296ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donations`
+
+2026/02/16 07:06:38 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.464ms] [34;1m[rows:5][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` IN ('91a9703c-052d-4577-8f17-2af620ce80e8','847a4abb-c5f7-4b9f-868b-fa138c85ad65','36cd98b3-8596-431f-bdaa-5acf8e38a090','b827f848-880e-4cb9-80e0-1f689155289d','da7ca4e0-603f-4a34-ad19-ce81b89b2b22')
+
+2026/02/16 07:06:38 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.707ms] [34;1m[rows:4][0m SELECT * FROM `employees` WHERE `employees`.`id` IN ('52924aee-4964-4fc8-9d25-72ebc212c28c','efdd679c-bb2c-4c58-8c77-910c060da89e','67d343a2-a1f9-457f-b7a5-02ef13604e04','6518220e-cca5-431e-97ba-5caa2d293a48')
+
+2026/02/16 07:06:38 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.658ms] [34;1m[rows:6][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` IN ('32313e68-af35-47c3-a248-540eac56222c','f253de7d-825a-439e-aa48-2cd496195b5d','7e41fb55-0be1-41f6-b503-d26acd29c1ef','3ee46dba-2119-4ef8-9012-496941c9b75d','d4a0ff2c-4cc8-4007-9745-60733ec556b0','7b16f95e-9d6c-41a5-9737-f339a9923ab3','f1be8615-4165-4377-9b84-be82f695347f','24f11a0a-6e64-475b-9faa-0ea31e4fb29a','142da000-19be-407e-8872-bb20bf33233c','201c0135-74c9-49a5-8bbe-09d7be8dbfab')
+
+2026/02/16 07:06:38 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[2.610ms] [34;1m[rows:10][0m SELECT * FROM `finance_donations` ORDER BY date DESC LIMIT 10
+
+2026/02/16 07:06:40 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[1.067ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:06:40 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.434ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:06:40 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.531ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:06:40 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.474ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:06:40 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.633ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:06:40 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.806ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:06:40 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.767ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:06:40 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.412ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '91a9703c-052d-4577-8f17-2af620ce80e8'
+
+2026/02/16 07:06:40 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[1.140ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 07:06:40 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.832ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = '32313e68-af35-47c3-a248-540eac56222c'
+
+2026/02/16 07:06:40 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[3.311ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = '32313e68-af35-47c3-a248-540eac56222c' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:07:57 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[2.640ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:07:57 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.597ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:07:57 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.611ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:07:57 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.317ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:07:57 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.363ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:07:57 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.490ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:07:57 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[5.659ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:07:57 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.246ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '91a9703c-052d-4577-8f17-2af620ce80e8'
+
+2026/02/16 07:07:57 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.330ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 07:07:57 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.305ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = '32313e68-af35-47c3-a248-540eac56222c'
+
+2026/02/16 07:07:57 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[1.563ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = '32313e68-af35-47c3-a248-540eac56222c' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:09:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.802ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:09:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.601ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:09:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.545ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:09:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.551ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:09:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.360ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:09:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.075ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:09:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[5.391ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:09:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.489ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '91a9703c-052d-4577-8f17-2af620ce80e8'
+
+2026/02/16 07:09:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[1.736ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 07:09:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.683ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = '32313e68-af35-47c3-a248-540eac56222c'
+
+2026/02/16 07:09:30 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[3.929ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = '32313e68-af35-47c3-a248-540eac56222c' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:10:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[1.321ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:10:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.399ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:10:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.425ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:10:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.811ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:10:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.659ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:10:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.147ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:10:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.794ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:10:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:150
+[0m[33m[0.402ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donations`
+
+2026/02/16 07:10:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.520ms] [34;1m[rows:5][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` IN ('91a9703c-052d-4577-8f17-2af620ce80e8','847a4abb-c5f7-4b9f-868b-fa138c85ad65','36cd98b3-8596-431f-bdaa-5acf8e38a090','b827f848-880e-4cb9-80e0-1f689155289d','da7ca4e0-603f-4a34-ad19-ce81b89b2b22')
+
+2026/02/16 07:10:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[1.368ms] [34;1m[rows:4][0m SELECT * FROM `employees` WHERE `employees`.`id` IN ('52924aee-4964-4fc8-9d25-72ebc212c28c','efdd679c-bb2c-4c58-8c77-910c060da89e','67d343a2-a1f9-457f-b7a5-02ef13604e04','6518220e-cca5-431e-97ba-5caa2d293a48')
+
+2026/02/16 07:10:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.682ms] [34;1m[rows:6][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` IN ('32313e68-af35-47c3-a248-540eac56222c','f253de7d-825a-439e-aa48-2cd496195b5d','7e41fb55-0be1-41f6-b503-d26acd29c1ef','3ee46dba-2119-4ef8-9012-496941c9b75d','d4a0ff2c-4cc8-4007-9745-60733ec556b0','7b16f95e-9d6c-41a5-9737-f339a9923ab3','f1be8615-4165-4377-9b84-be82f695347f','24f11a0a-6e64-475b-9faa-0ea31e4fb29a','142da000-19be-407e-8872-bb20bf33233c','201c0135-74c9-49a5-8bbe-09d7be8dbfab')
+
+2026/02/16 07:10:16 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[3.532ms] [34;1m[rows:10][0m SELECT * FROM `finance_donations` ORDER BY date DESC LIMIT 10
+
+2026/02/16 07:10:18 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.530ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:10:18 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.295ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:10:18 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.326ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:10:18 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.281ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:10:18 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.353ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:10:18 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.026ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:10:18 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.146ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:10:18 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.233ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '91a9703c-052d-4577-8f17-2af620ce80e8'
+
+2026/02/16 07:10:18 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.302ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 07:10:18 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.300ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = '32313e68-af35-47c3-a248-540eac56222c'
+
+2026/02/16 07:10:18 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[1.262ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = '32313e68-af35-47c3-a248-540eac56222c' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:10:23 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[1.430ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:10:23 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.507ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:10:23 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.708ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:10:23 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.551ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:10:23 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.778ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:10:23 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[6.476ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:10:23 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[8.525ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:10:23 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:150
+[0m[33m[0.331ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donations`
+
+2026/02/16 07:10:23 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.740ms] [34;1m[rows:5][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` IN ('91a9703c-052d-4577-8f17-2af620ce80e8','847a4abb-c5f7-4b9f-868b-fa138c85ad65','36cd98b3-8596-431f-bdaa-5acf8e38a090','b827f848-880e-4cb9-80e0-1f689155289d','da7ca4e0-603f-4a34-ad19-ce81b89b2b22')
+
+2026/02/16 07:10:23 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.767ms] [34;1m[rows:4][0m SELECT * FROM `employees` WHERE `employees`.`id` IN ('52924aee-4964-4fc8-9d25-72ebc212c28c','efdd679c-bb2c-4c58-8c77-910c060da89e','67d343a2-a1f9-457f-b7a5-02ef13604e04','6518220e-cca5-431e-97ba-5caa2d293a48')
+
+2026/02/16 07:10:23 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.793ms] [34;1m[rows:6][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` IN ('32313e68-af35-47c3-a248-540eac56222c','f253de7d-825a-439e-aa48-2cd496195b5d','7e41fb55-0be1-41f6-b503-d26acd29c1ef','3ee46dba-2119-4ef8-9012-496941c9b75d','d4a0ff2c-4cc8-4007-9745-60733ec556b0','7b16f95e-9d6c-41a5-9737-f339a9923ab3','f1be8615-4165-4377-9b84-be82f695347f','24f11a0a-6e64-475b-9faa-0ea31e4fb29a','142da000-19be-407e-8872-bb20bf33233c','201c0135-74c9-49a5-8bbe-09d7be8dbfab')
+
+2026/02/16 07:10:23 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[3.526ms] [34;1m[rows:10][0m SELECT * FROM `finance_donations` ORDER BY date DESC LIMIT 10
+
+2026/02/16 07:10:26 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.629ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:10:26 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.474ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:10:26 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.505ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:10:26 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.540ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:10:26 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.574ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:10:26 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.337ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:10:26 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[4.542ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:10:26 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.408ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = 'da7ca4e0-603f-4a34-ad19-ce81b89b2b22'
+
+2026/02/16 07:10:26 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.431ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 07:10:26 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.513ms] [34;1m[rows:2][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = '7b16f95e-9d6c-41a5-9737-f339a9923ab3'
+
+2026/02/16 07:10:26 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[2.084ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = '7b16f95e-9d6c-41a5-9737-f339a9923ab3' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:10:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[1.227ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:10:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.588ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:10:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.803ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:10:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.972ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:10:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.740ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:10:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[4.851ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:10:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[9.824ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:10:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:150
+[0m[33m[0.311ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donations`
+
+2026/02/16 07:10:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.556ms] [34;1m[rows:5][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` IN ('91a9703c-052d-4577-8f17-2af620ce80e8','847a4abb-c5f7-4b9f-868b-fa138c85ad65','36cd98b3-8596-431f-bdaa-5acf8e38a090','b827f848-880e-4cb9-80e0-1f689155289d','da7ca4e0-603f-4a34-ad19-ce81b89b2b22')
+
+2026/02/16 07:10:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[2.122ms] [34;1m[rows:4][0m SELECT * FROM `employees` WHERE `employees`.`id` IN ('52924aee-4964-4fc8-9d25-72ebc212c28c','efdd679c-bb2c-4c58-8c77-910c060da89e','67d343a2-a1f9-457f-b7a5-02ef13604e04','6518220e-cca5-431e-97ba-5caa2d293a48')
+
+2026/02/16 07:10:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.720ms] [34;1m[rows:6][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` IN ('32313e68-af35-47c3-a248-540eac56222c','f253de7d-825a-439e-aa48-2cd496195b5d','7e41fb55-0be1-41f6-b503-d26acd29c1ef','3ee46dba-2119-4ef8-9012-496941c9b75d','d4a0ff2c-4cc8-4007-9745-60733ec556b0','7b16f95e-9d6c-41a5-9737-f339a9923ab3','f1be8615-4165-4377-9b84-be82f695347f','24f11a0a-6e64-475b-9faa-0ea31e4fb29a','142da000-19be-407e-8872-bb20bf33233c','201c0135-74c9-49a5-8bbe-09d7be8dbfab')
+
+2026/02/16 07:10:31 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[4.422ms] [34;1m[rows:10][0m SELECT * FROM `finance_donations` ORDER BY date DESC LIMIT 10
+
+2026/02/16 07:10:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.721ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:10:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.383ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:10:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.347ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:10:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.365ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:10:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.452ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:10:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.497ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:10:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.862ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:10:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.258ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '91a9703c-052d-4577-8f17-2af620ce80e8'
+
+2026/02/16 07:10:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.300ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 07:10:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.438ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = '32313e68-af35-47c3-a248-540eac56222c'
+
+2026/02/16 07:10:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[1.557ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = '32313e68-af35-47c3-a248-540eac56222c' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:10:58 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.804ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:10:58 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.431ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:10:58 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.714ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:10:58 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.038ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:10:58 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.484ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:10:58 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[5.954ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:10:58 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[9.040ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:10:58 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.780ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '91a9703c-052d-4577-8f17-2af620ce80e8'
+
+2026/02/16 07:10:58 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.463ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 07:10:58 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.439ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = '32313e68-af35-47c3-a248-540eac56222c'
+
+2026/02/16 07:10:58 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[2.642ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = '32313e68-af35-47c3-a248-540eac56222c' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:12:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.964ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:12:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.062ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:12:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.062ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:12:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.580ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:12:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.597ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:12:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.280ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:12:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[6.006ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:12:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.744ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '91a9703c-052d-4577-8f17-2af620ce80e8'
+
+2026/02/16 07:12:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.598ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 07:12:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.759ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = '32313e68-af35-47c3-a248-540eac56222c'
+
+2026/02/16 07:12:01 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[3.146ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = '32313e68-af35-47c3-a248-540eac56222c' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:13:35 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.577ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:13:35 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.519ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:13:35 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.424ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:13:35 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.600ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:13:35 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.765ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:13:35 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.163ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:13:35 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[4.345ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:14:24 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.941ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:14:24 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.366ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:14:24 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.312ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:14:24 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.311ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:14:24 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.341ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:14:24 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.117ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:14:24 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.640ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:14:24 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.228ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '91a9703c-052d-4577-8f17-2af620ce80e8'
+
+2026/02/16 07:14:24 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.274ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 07:14:24 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.598ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = '32313e68-af35-47c3-a248-540eac56222c'
+
+2026/02/16 07:14:24 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[1.532ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = '32313e68-af35-47c3-a248-540eac56222c' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:14:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.787ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:14:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.353ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:14:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.319ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:14:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.962ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:14:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.915ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:14:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.765ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:14:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[5.303ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:14:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.817ms] [34;1m[rows:1][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` = '91a9703c-052d-4577-8f17-2af620ce80e8'
+
+2026/02/16 07:14:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.656ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE `employees`.`id` = '52924aee-4964-4fc8-9d25-72ebc212c28c'
+
+2026/02/16 07:14:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[0.825ms] [34;1m[rows:0][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` = '32313e68-af35-47c3-a248-540eac56222c'
+
+2026/02/16 07:14:33 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:124
+[0m[33m[6.907ms] [34;1m[rows:1][0m SELECT * FROM `finance_donations` WHERE id = '32313e68-af35-47c3-a248-540eac56222c' ORDER BY `finance_donations`.`id` LIMIT 1
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.499ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.491ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.632ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.562ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.679ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[6.564ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:48
+[0m[33m[4.437ms] [34;1m[rows:1][0m UPDATE `users` SET `current_token_hash`='914e98649871bc76771aedc00834a8c8627d94cd8239cbb593d7f2aab758334d',`updated_at`='2026-02-16 07:20:06.052' WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/employee_repository.go:74
+[0m[33m[0.682ms] [34;1m[rows:1][0m SELECT * FROM `employees` WHERE user_id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `employees`.`id` LIMIT 1
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[0.860ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.813ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.903ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.731ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.671ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.560ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[5.440ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:150
+[0m[33m[0.371ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donations`
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[1.400ms] [34;1m[rows:5][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` IN ('91a9703c-052d-4577-8f17-2af620ce80e8','847a4abb-c5f7-4b9f-868b-fa138c85ad65','36cd98b3-8596-431f-bdaa-5acf8e38a090','b827f848-880e-4cb9-80e0-1f689155289d','da7ca4e0-603f-4a34-ad19-ce81b89b2b22')
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.722ms] [34;1m[rows:4][0m SELECT * FROM `employees` WHERE `employees`.`id` IN ('52924aee-4964-4fc8-9d25-72ebc212c28c','efdd679c-bb2c-4c58-8c77-910c060da89e','67d343a2-a1f9-457f-b7a5-02ef13604e04','6518220e-cca5-431e-97ba-5caa2d293a48')
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.660ms] [34;1m[rows:6][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` IN ('32313e68-af35-47c3-a248-540eac56222c','f253de7d-825a-439e-aa48-2cd496195b5d','7e41fb55-0be1-41f6-b503-d26acd29c1ef','3ee46dba-2119-4ef8-9012-496941c9b75d','d4a0ff2c-4cc8-4007-9745-60733ec556b0','7b16f95e-9d6c-41a5-9737-f339a9923ab3','f1be8615-4165-4377-9b84-be82f695347f','24f11a0a-6e64-475b-9faa-0ea31e4fb29a','142da000-19be-407e-8872-bb20bf33233c','201c0135-74c9-49a5-8bbe-09d7be8dbfab')
+
+2026/02/16 07:20:06 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[8.070ms] [34;1m[rows:10][0m SELECT * FROM `finance_donations` ORDER BY date DESC LIMIT 10
+
+2026/02/16 07:20:49 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[1.109ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:20:49 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.412ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:20:49 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.515ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:20:49 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.450ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:20:49 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.535ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:20:49 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[1.784ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:20:49 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[3.491ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:20:49 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:150
+[0m[33m[1.206ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donations` WHERE type = 'GOODS'
+
+2026/02/16 07:20:49 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[1.389ms] [34;1m[rows:2][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` IN ('b827f848-880e-4cb9-80e0-1f689155289d','da7ca4e0-603f-4a34-ad19-ce81b89b2b22')
+
+2026/02/16 07:20:49 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[1.649ms] [34;1m[rows:10][0m SELECT * FROM `employees` WHERE `employees`.`id` IN ('efdd679c-bb2c-4c58-8c77-910c060da89e','52924aee-4964-4fc8-9d25-72ebc212c28c','67d343a2-a1f9-457f-b7a5-02ef13604e04','6518220e-cca5-431e-97ba-5caa2d293a48','f1dbb3a3-caac-429c-a1a3-97d914e72d35','df3306c3-1e24-4178-971e-37f9018d82f3','ef501d35-964f-49f7-b174-a58a68543e84','5b6e9765-d8ef-4850-a96d-9e3c39b671a2','19e18945-b417-4055-a5b2-7791670f178f','3a997b9e-9446-4695-a5e9-91ac970a1695')
+
+2026/02/16 07:20:49 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.901ms] [34;1m[rows:20][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` IN ('3ee46dba-2119-4ef8-9012-496941c9b75d','7b16f95e-9d6c-41a5-9737-f339a9923ab3','24f11a0a-6e64-475b-9faa-0ea31e4fb29a','bdc8593b-7c7c-475a-85e2-d45ac2e73d18','e013d27c-e240-489b-8e6b-f99f7eb7cbc8','726a347f-7d1e-423d-86f3-e21a82cc4ea2','f590b52b-6e67-486a-880e-f00d63b361ca','a04c42eb-3c4d-4b88-8115-039fcd38f1f6','3d423e97-6e97-4fa4-a33e-9e87bd30d5ef','f46e5e4e-8bb5-48cb-ab9b-a022a7908b15')
+
+2026/02/16 07:20:49 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[6.425ms] [34;1m[rows:10][0m SELECT * FROM `finance_donations` WHERE type = 'GOODS' ORDER BY date DESC LIMIT 10
+
+2026/02/16 07:20:56 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:40
+[0m[33m[1.015ms] [34;1m[rows:1][0m SELECT `current_token_hash` FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:20:56 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.427ms] [34;1m[rows:0][0m SELECT * FROM `user_permission` WHERE `user_permission`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:20:56 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.489ms] [34;1m[rows:1][0m SELECT * FROM `user_role` WHERE `user_role`.`user_id` = '4c43af42-a2dc-4b91-b213-8cf3f849ed10'
+
+2026/02/16 07:20:56 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.938ms] [34;1m[rows:7][0m SELECT * FROM `role_permission` WHERE `role_permission`.`role_id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:20:56 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[0.538ms] [34;1m[rows:7][0m SELECT * FROM `permissions` WHERE `permissions`.`id` IN ('35c36384-3dbb-4637-b280-24c4bba03fbc','4ebf8d15-5079-4646-83a7-510c7d636745','56673d1f-0575-49c5-ae71-e28fb2bd36fd','5b77a4bb-5962-47ac-bd39-cce9a6e2fcc7','ba3b44f7-0017-4638-8a65-0918b479a13b','bd0225bf-213b-4892-97bd-43270bfc1084','ca6bd15b-68c3-4b05-ac1b-002f5dcacfa0')
+
+2026/02/16 07:20:56 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[2.639ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE `roles`.`id` = 'c52d918f-9696-4b17-aa62-51a61614b210'
+
+2026/02/16 07:20:56 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/user_repository.go:201
+[0m[33m[4.299ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE id = '4c43af42-a2dc-4b91-b213-8cf3f849ed10' ORDER BY `users`.`id` LIMIT 1
+
+2026/02/16 07:20:56 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:150
+[0m[33m[0.261ms] [34;1m[rows:1][0m SELECT count(*) FROM `finance_donations`
+
+2026/02/16 07:20:56 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[1.992ms] [34;1m[rows:5][0m SELECT * FROM `finance_donors` WHERE `finance_donors`.`id` IN ('91a9703c-052d-4577-8f17-2af620ce80e8','847a4abb-c5f7-4b9f-868b-fa138c85ad65','36cd98b3-8596-431f-bdaa-5acf8e38a090','b827f848-880e-4cb9-80e0-1f689155289d','da7ca4e0-603f-4a34-ad19-ce81b89b2b22')
+
+2026/02/16 07:20:56 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.528ms] [34;1m[rows:4][0m SELECT * FROM `employees` WHERE `employees`.`id` IN ('52924aee-4964-4fc8-9d25-72ebc212c28c','efdd679c-bb2c-4c58-8c77-910c060da89e','67d343a2-a1f9-457f-b7a5-02ef13604e04','6518220e-cca5-431e-97ba-5caa2d293a48')
+
+2026/02/16 07:20:56 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[0.645ms] [34;1m[rows:6][0m SELECT * FROM `finance_donation_items` WHERE `finance_donation_items`.`donation_id` IN ('32313e68-af35-47c3-a248-540eac56222c','f253de7d-825a-439e-aa48-2cd496195b5d','7e41fb55-0be1-41f6-b503-d26acd29c1ef','3ee46dba-2119-4ef8-9012-496941c9b75d','d4a0ff2c-4cc8-4007-9745-60733ec556b0','7b16f95e-9d6c-41a5-9737-f339a9923ab3','f1be8615-4165-4377-9b84-be82f695347f','24f11a0a-6e64-475b-9faa-0ea31e4fb29a','142da000-19be-407e-8872-bb20bf33233c','201c0135-74c9-49a5-8bbe-09d7be8dbfab')
+
+2026/02/16 07:20:56 [32m/home/zeen/Development/SmartSchool/smart_school_be/internal/repository/finance_repository.go:154
+[0m[33m[4.234ms] [34;1m[rows:10][0m SELECT * FROM `finance_donations` ORDER BY date DESC LIMIT 10

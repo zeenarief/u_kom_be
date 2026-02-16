@@ -113,6 +113,13 @@ func seedPermissions(db *gorm.DB) error {
 		{Name: "violation_record.read_all", Description: "Read all student violation records"},
 		{Name: "violation_record.delete", Description: "Delete student violation record"},
 
+		// ===== Finance =====
+		{Name: "finance_donations.create", Description: "Create new donation"},
+		{Name: "finance_donations.read", Description: "Read donation records"},
+		{Name: "finance_donations.update", Description: "Update donation records"},
+		{Name: "finance_donors.read", Description: "Read donor records"},
+		{Name: "finance_donors.update", Description: "Update donor records"},
+
 		// ===== Grades =====
 		{Name: "grades.manage_assessments", Description: "Manage assessment"},
 		{Name: "grades.view_assessments", Description: "View assessment"},

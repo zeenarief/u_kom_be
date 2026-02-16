@@ -37,6 +37,7 @@ type Server struct {
 	AttendanceHandler         *handler.AttendanceHandler
 	GradeHandler              *handler.GradeHandler
 	ViolationHandler          handler.ViolationHandler
+	FinanceHandler            *handler.FinanceHandler
 	AuthService               service.AuthService
 }
 
@@ -78,6 +79,7 @@ func NewServer() *Server {
 	attendanceRepo := repository.NewAttendanceRepository(db)
 	gradeRepo := repository.NewGradeRepository(db)
 	violationRepo := repository.NewViolationRepository(db)
+	donorRepo, donationRepo := repository.NewFinanceRepository(db) // Assuming NewFinanceRepository returns both
 
 	// Initialize utils
 	encryptionUtil, err := utils.NewEncryptionUtil(cfg.EncryptionKey)
@@ -163,6 +165,7 @@ func NewServer() *Server {
 	attendanceService := service.NewAttendanceService(attendanceRepo, scheduleRepo, studentRepo)
 	gradeService := service.NewGradeService(gradeRepo)
 	violationService := service.NewViolationService(violationRepo, studentRepo)
+	financeService := service.NewFinanceService(donorRepo, donationRepo, employeeRepo, baseURL)
 
 	// Initialize handlers
 	userHandler := handler.NewUserHandler(userService)
@@ -182,6 +185,7 @@ func NewServer() *Server {
 	attendanceHandler := handler.NewAttendanceHandler(attendanceService)
 	gradeHandler := handler.NewGradeHandler(gradeService)
 	violationHandler := handler.NewViolationHandler(violationService)
+	financeHandler := handler.NewFinanceHandler(financeService)
 
 	// Setup router with middleware
 	router := setupRouter(cfg, authService)
@@ -206,6 +210,7 @@ func NewServer() *Server {
 		AttendanceHandler:         attendanceHandler,
 		GradeHandler:              gradeHandler,
 		ViolationHandler:          violationHandler,
+		FinanceHandler:            financeHandler,
 		AuthService:               authService,
 	}
 }
@@ -249,6 +254,7 @@ func (s *Server) Start() error {
 		s.AttendanceHandler,
 		s.GradeHandler,
 		s.ViolationHandler,
+		s.FinanceHandler,
 	)
 
 	// Start server

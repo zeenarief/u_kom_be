@@ -92,11 +92,14 @@ func (s *employeeService) CreateEmployee(req request.EmployeeCreateRequest) (*re
 		NIKHash:          nikHash,      // <-- Simpan hash untuk validasi
 		Gender:           req.Gender,
 		PhoneNumber:      req.PhoneNumber,
-		Address:          req.Address,
 		DateOfBirth:      req.DateOfBirth,
 		JoinDate:         req.JoinDate,
 		EmploymentStatus: req.EmploymentStatus,
-		// UserID sengaja NULL saat dibuat
+	}
+
+	// Handle optional UserID assignment
+	if req.UserID != "" {
+		employee.UserID = utils.StringPtr(req.UserID)
 	}
 
 	// 4. Panggil Repository
