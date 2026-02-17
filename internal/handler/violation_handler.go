@@ -23,6 +23,8 @@ type ViolationHandler interface {
 	// Student Violation
 	RecordViolation(c *gin.Context)
 	GetStudentViolations(c *gin.Context)
+	GetStudentViolationDetail(c *gin.Context)
+	UpdateViolation(c *gin.Context)
 	DeleteViolation(c *gin.Context)
 	GetAllViolations(c *gin.Context)
 }
@@ -162,11 +164,38 @@ func (h *violationHandler) GetStudentViolations(c *gin.Context) {
 
 	violations, err := h.violationService.GetStudentViolations(studentID, pagination)
 	if err != nil {
-		InternalServerError(c, err.Error())
+		HandleError(c, err)
 		return
 	}
 
-	SuccessResponse(c, "Data retrieved successfully", violations)
+	SuccessResponse(c, "Violations retrieved successfully", violations)
+}
+
+func (h *violationHandler) GetStudentViolationDetail(c *gin.Context) {
+	id := c.Param("id")
+	violation, err := h.violationService.GetViolationDetail(id)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	SuccessResponse(c, "Violation detail retrieved successfully", violation)
+}
+
+func (h *violationHandler) UpdateViolation(c *gin.Context) {
+	id := c.Param("id")
+	var req request.UpdateStudentViolationRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		BadRequestError(c, err.Error(), nil)
+		return
+	}
+
+	if err := h.violationService.UpdateViolation(id, req); err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	SuccessResponse(c, "Violation updated successfully", nil)
 }
 
 func (h *violationHandler) DeleteViolation(c *gin.Context) {

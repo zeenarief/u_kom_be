@@ -33,3 +33,11 @@ type CreateStudentViolationRequest struct {
 	ActionTaken     string    `json:"action_taken"`
 	Notes           string    `json:"notes"`
 }
+
+type UpdateStudentViolationRequest struct {
+	ViolationTypeID string     `json:"violation_type_id" validate:"omitempty,uuid"`
+	ViolationDate   *time.Time `json:"violation_date"`
+	Points          *int       `json:"points"`
+	ActionTaken     string     `json:"action_taken"`
+	Notes           string     `json:"notes"`
+}

@@ -23,8 +23,11 @@ type ViolationService interface {
 	DeleteType(id string) error
 
 	// Student Violation
+	// Student Violation
 	RecordViolation(req request.CreateStudentViolationRequest) error
 	GetStudentViolations(studentID string, pagination request.PaginationRequest) (*response.PaginatedData, error)
+	GetViolationDetail(id string) (*response.StudentViolationDetailResponse, error)
+	UpdateViolation(id string, req request.UpdateStudentViolationRequest) error
 	DeleteViolation(id string) error
 	GetAllViolations(filter string, pagination request.PaginationRequest) (*response.PaginatedData, error)
 }
@@ -212,9 +215,90 @@ func (s *violationService) GetStudentViolations(studentID string, pagination req
 		return nil, err
 	}
 
-	data := s.mapToResponses(violations)
-	paginatedData := response.NewPaginatedData(data, total, pagination.GetPage(), limit)
+	violationResponses := s.mapToResponses(violations)
+
+	paginatedData := response.NewPaginatedData(violationResponses, total, pagination.GetPage(), limit)
 	return &paginatedData, nil
+}
+
+func (s *violationService) GetViolationDetail(id string) (*response.StudentViolationDetailResponse, error) {
+	violation, err := s.violationRepo.FindViolationByID(id)
+	if err != nil {
+		return nil, err
+	}
+	if violation == nil {
+		return nil, errors.New("violation not found")
+	}
+
+	resp := &response.StudentViolationDetailResponse{
+		ID:              violation.ID,
+		StudentID:       violation.StudentID,
+		ViolationTypeID: violation.ViolationTypeID,
+		ViolationDate:   violation.ViolationDate,
+		Points:          violation.Points,
+		ActionTaken:     violation.ActionTaken,
+		Notes:           violation.Notes,
+		CreatedAt:       violation.CreatedAt,
+		UpdatedAt:       violation.UpdatedAt,
+	}
+
+	if violation.Student != nil {
+		resp.StudentName = violation.Student.FullName
+		resp.StudentNIM = violation.Student.NIM
+		resp.StudentNISN = violation.Student.NISN
+		// resp.StudentClass = violation.Student.Classroom.Name // Requires Preload
+	}
+
+	if violation.ViolationType != nil {
+		resp.ViolationName = violation.ViolationType.Name
+		if violation.ViolationType.Category != nil {
+			resp.ViolationCategory = violation.ViolationType.Category.Name
+		}
+	}
+
+	return resp, nil
+}
+
+func (s *violationService) UpdateViolation(id string, req request.UpdateStudentViolationRequest) error {
+	violation, err := s.violationRepo.FindViolationByID(id)
+	if err != nil {
+		return err
+	}
+	if violation == nil {
+		return errors.New("violation not found")
+	}
+
+	if req.ViolationTypeID != "" {
+		// Validasi violation type exists?
+		// Better to check if needed or rely on FK error. checking is safer.
+		vType, err := s.violationRepo.FindTypeByID(req.ViolationTypeID)
+		if err != nil {
+			return err
+		}
+		if vType == nil {
+			return errors.New("violation type not found")
+		}
+		violation.ViolationTypeID = req.ViolationTypeID
+		// If points not provided, should we update points to default of new type?
+		// Requirement unclear. But usually if points NOT in request, we might want to keep existing OR update to new default.
+		// Let's assume: if points IS provided, use it. If NOT provided but Type CHANGED, maybe use default?
+		// For safety, let's only update points if explicitly requested.
+	}
+
+	if req.ViolationDate != nil {
+		violation.ViolationDate = *req.ViolationDate
+	}
+	if req.Points != nil {
+		violation.Points = *req.Points
+	}
+	if req.ActionTaken != "" {
+		violation.ActionTaken = req.ActionTaken
+	}
+	if req.Notes != "" {
+		violation.Notes = req.Notes
+	}
+
+	return s.violationRepo.UpdateViolation(violation)
 }
 
 func (s *violationService) DeleteViolation(id string) error {
@@ -230,24 +314,22 @@ func (s *violationService) GetAllViolations(filter string, pagination request.Pa
 		return nil, err
 	}
 
-	data := s.mapToResponses(violations)
-	paginatedData := response.NewPaginatedData(data, total, pagination.GetPage(), limit)
+	violationResponses := s.mapToResponses(violations)
+
+	paginatedData := response.NewPaginatedData(violationResponses, total, pagination.GetPage(), limit)
 	return &paginatedData, nil
 }
 
-func (s *violationService) mapToResponses(violations []domain.StudentViolation) []response.StudentViolationResponse {
-	var responses []response.StudentViolationResponse
+func (s *violationService) mapToResponses(violations []domain.StudentViolation) []response.StudentViolationListResponse {
+	var responses []response.StudentViolationListResponse
 	for _, v := range violations {
-		resp := response.StudentViolationResponse{
-			ID:              v.ID,
-			StudentID:       v.StudentID,
-			ViolationTypeID: v.ViolationTypeID,
-			ViolationDate:   v.ViolationDate,
-			Points:          v.Points,
-			ActionTaken:     v.ActionTaken,
-			Notes:           v.Notes,
-			CreatedAt:       v.CreatedAt,
-			UpdatedAt:       v.UpdatedAt,
+		resp := response.StudentViolationListResponse{
+			ID:            v.ID,
+			StudentID:     v.StudentID,
+			ViolationDate: v.ViolationDate,
+			Points:        v.Points,
+			CreatedAt:     v.CreatedAt,
+			UpdatedAt:     v.UpdatedAt,
 		}
 
 		if v.Student != nil {
@@ -255,6 +337,9 @@ func (s *violationService) mapToResponses(violations []domain.StudentViolation) 
 		}
 		if v.ViolationType != nil {
 			resp.ViolationName = v.ViolationType.Name
+			if v.ViolationType.Category != nil {
+				resp.ViolationCategory = v.ViolationType.Category.Name
+			}
 		}
 
 		responses = append(responses, resp)

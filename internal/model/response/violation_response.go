@@ -23,16 +23,32 @@ type ViolationTypeResponse struct {
 	UpdatedAt     time.Time                  `json:"updated_at"`
 }
 
-type StudentViolationResponse struct {
-	ID              string    `json:"id"`
-	StudentID       string    `json:"student_id"`
-	ViolationTypeID string    `json:"violation_type_id"`
-	ViolationDate   time.Time `json:"violation_date"`
-	Points          int       `json:"points"`
-	ActionTaken     string    `json:"action_taken"`
-	Notes           string    `json:"notes"`
-	StudentName     string    `json:"student_name,omitempty"`   // Helper for UI
-	ViolationName   string    `json:"violation_name,omitempty"` // Helper for UI
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
+type StudentViolationListResponse struct {
+	ID                string    `json:"id"`
+	StudentID         string    `json:"student_id"`
+	StudentName       string    `json:"student_name"`
+	ViolationDate     time.Time `json:"violation_date"`
+	Points            int       `json:"points"`
+	ViolationName     string    `json:"violation_name"`
+	ViolationCategory string    `json:"violation_category"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
+}
+
+type StudentViolationDetailResponse struct {
+	ID                string    `json:"id"`
+	StudentID         string    `json:"student_id"`
+	StudentName       string    `json:"student_name"`
+	StudentNIM        *string   `json:"student_nim"`
+	StudentNISN       *string   `json:"student_nisn"`
+	StudentClass      string    `json:"student_class,omitempty"`
+	ViolationTypeID   string    `json:"violation_type_id"`
+	ViolationName     string    `json:"violation_name"`
+	ViolationCategory string    `json:"violation_category"`
+	ViolationDate     time.Time `json:"violation_date"`
+	Points            int       `json:"points"`
+	ActionTaken       string    `json:"action_taken"`
+	Notes             string    `json:"notes"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
 }

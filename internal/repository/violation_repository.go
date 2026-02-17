@@ -26,6 +26,7 @@ type ViolationRepository interface {
 	RecordViolation(violation *domain.StudentViolation) error
 	FindStudentViolations(studentID string, limit, offset int) ([]domain.StudentViolation, int64, error)
 	FindViolationByID(id string) (*domain.StudentViolation, error)
+	UpdateViolation(violation *domain.StudentViolation) error
 	DeleteViolation(id string) error
 	FindAllViolations(filter string, limit, offset int) ([]domain.StudentViolation, int64, error)
 }
@@ -141,6 +142,10 @@ func (r *violationRepository) FindViolationByID(id string) (*domain.StudentViola
 		return nil, err
 	}
 	return &violation, nil
+}
+
+func (r *violationRepository) UpdateViolation(violation *domain.StudentViolation) error {
+	return r.db.Save(violation).Error
 }
 
 func (r *violationRepository) DeleteViolation(id string) error {

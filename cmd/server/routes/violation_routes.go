@@ -26,6 +26,8 @@ func RegisterViolationRoutes(router *gin.RouterGroup, violationHandler handler.V
 
 		// Student Violations
 		violationGroup.POST("/record", middleware.PermissionMiddleware("violation_record.create", authService), violationHandler.RecordViolation)
+		violationGroup.GET("/record/:id", middleware.PermissionMiddleware("violation_record.read", authService), violationHandler.GetStudentViolationDetail)
+		violationGroup.PUT("/record/:id", middleware.PermissionMiddleware("violation_record.update", authService), violationHandler.UpdateViolation)
 		violationGroup.GET("/student/:studentID", middleware.PermissionMiddleware("violation_record.read", authService), violationHandler.GetStudentViolations)
 		violationGroup.DELETE("/record/:id", middleware.PermissionMiddleware("violation_record.delete", authService), violationHandler.DeleteViolation)
 		violationGroup.GET("/all", middleware.PermissionMiddleware("violation_record.read_all", authService), violationHandler.GetAllViolations)
